@@ -1,0 +1,157 @@
+You are working on a responsive website for a music/band project.
+
+## GENERAL ARCHITECTURE
+
+The website ALWAYS follows this structure:
+
+HEADER
+MAIN
+FOOTER
+
+MAIN sections (fixed order):
+
+- HERO
+- RELEASE
+- SHOWS
+- BANDA
+- CONTACTO
+- MUSICA (internal page)
+
+---
+
+## NAVIGATION / MULTI PAGE SYSTEM
+
+The project uses internal navigation between pages or sections:
+
+- HOME (Hero, Release, Shows)
+- BANDA page
+- CONTACTO page
+- MUSICA page
+
+All navigation must be accessible from the HEADER.
+
+Do not remove existing sections when adding pages.
+
+---
+
+## RESPONSIVE LAYOUT RULES
+
+### Mobile (<768px)
+- Single column layout
+- Stack everything vertically:
+HEADER → MAIN → FOOTER
+
+Inside MAIN:
+HERO → RELEASE → SHOWS → BANDA → CONTACTO → MUSICA
+
+---
+
+### Tablet (≥768px)
+- HEADER / MAIN / FOOTER stacked
+Inside MAIN:
+- HERO full width
+- RELEASE + SHOWS in 2 columns
+- BANDA full width
+- CONTACTO full width
+- MUSICA full width
+
+---
+
+### Desktop (≥1024px)
+Inside MAIN:
+- HERO full width
+- RELEASE (left) + SHOWS (right)
+- BANDA (left) + CONTACTO (right)
+- MUSICA full width or grid of cards depending on content
+
+Use CSS Grid as default layout system.
+
+---
+
+## DESIGN STYLE
+
+Reference aesthetic (DO NOT copy code):
+https://xb3nderx.github.io/Incancelables/
+
+Style:
+- Dark, modern, underground band aesthetic
+- High contrast typography
+- Minimal but bold composition
+- Strong spacing and visual hierarchy
+- Music-focused identity
+- Smooth hover interactions
+
+---
+
+## PAGE REQUIREMENTS
+
+### CONTACTO PAGE
+- Custom form (no default browser styles)
+- Fields:
+  - Name
+  - Email
+  - Message
+- Rounded inputs and buttons
+- Modern dark UI styling
+- Hover effects on button
+- Fully responsive
+
+---
+
+### BANDA PAGE
+- Create 5 cards
+- Each card includes:
+  - Image (use assets/topeTest.jpg structure as reference)
+  - Name
+  - Role / description
+
+Card design:
+- Grid layout
+- Hover effect (scale / glow / elevation)
+- Consistent spacing
+- Dark themed card UI
+
+---
+
+### MUSICA PAGE
+- Create cards containing:
+  - YouTube embedded video (iframe)
+  - Song title
+  - Author(s)
+  - Album name
+  - Release year
+
+Layout:
+- Responsive grid
+- Video on top
+- Info section below
+- Clean separation between cards
+
+---
+
+## CODING RULES
+
+- Use semantic HTML5
+- No frameworks unless explicitly requested
+- No inline styles
+- Responsive-first design
+- Clean and maintainable CSS structure
+- Avoid unnecessary nested divs
+- Prefer reusable components in HTML structure
+
+---
+
+## DEVELOPMENT RULES
+
+- Always modify existing files instead of recreating structure
+- Keep navigation consistent across all pages
+- Do not break layout rules defined above
+- Do not invent new sections unless explicitly requested
+
+---
+
+## OUTPUT RULE
+
+When generating code:
+- Output ONLY final code or modified files
+- No explanations
