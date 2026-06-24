@@ -1,3 +1,18 @@
+.layout {
+    display: grid;
+    min-height: 100vh;
+
+    grid-template-columns: 1fr;
+
+    grid-template-rows:
+        auto 1fr auto;
+
+    grid-template-areas:
+        "header"
+        "main"
+        "footer";
+}
+
 /* ==========================
    MAIN
    ========================== */
@@ -59,7 +74,7 @@
 }
 
 .manifiesto p {
-    padding: 2rem;
+    padding: 0.5rem 2rem;
 
     color: var(--text);
 }
@@ -70,8 +85,8 @@
 
 .ultimo-lanzamiento {
     grid-area: ultimo-lanzamiento;
-
-    background-color: burlywood;
+    background-color: var(--bg-alt);
+    color: var(--text);
 }
 
 /* ==========================
@@ -80,8 +95,8 @@
 
 .proximo-show {
     grid-area: proximo-show;
-
-    background-color: burlywood;
+    background-color: dvar(--bg);
+    color: var(--text);
 }
 
 /* ==========================
@@ -90,8 +105,10 @@
 
 .seguinos-whats {
     grid-area: seguinos-whats;
+    text-align: center;
+    padding: 1rem;
 
-    background-color: burlywood;
+    background-color: var(--bg-alt);
 }
 
 /* ==========================

@@ -1,0 +1,213 @@
+.layout {
+    display: grid;
+    min-height: 100vh;
+
+    grid-template-columns: 1fr;
+
+    grid-template-rows:
+        auto 1fr auto auto;
+
+    grid-template-areas:
+        "header"
+        "main"
+        "aside"
+        "footer";
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+MAIN
+///////////////////////////////////////////////////////////////////////////*/
+.main {
+    grid-area: main;
+
+    background-color: var(--bg);
+
+    /* display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 1rem;
+
+    grid-template-areas:
+        "hero"
+        "manifiesto"
+        "ultimo-lanzamiento"
+        "proximo-show"
+        "seguinos-whats"; */
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+INTEGRANTE CARD
+///////////////////////////////////////////////////////////////////////////*/
+.integrantes-grid {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 2rem;
+
+    justify-items: center;
+}
+
+.integrante {
+    width: min(90vw, 320px);
+
+    aspect-ratio: 2 / 3;
+
+    background: #ecece3;
+
+    border-radius: 24px;
+
+    padding: 1rem;
+
+    display: flex;
+    flex-direction: column;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+
+    overflow: hidden;
+}
+
+.integrante:hover {
+    transform: translateY(-10px);
+    scale: 110%;
+}
+
+.integrante-header {
+    border: 2px solid #222;
+    display: grid;
+
+    grid-template-columns:
+        auto 1fr auto;
+
+    align-items: center;
+
+    gap: 0.5rem;
+
+    margin-bottom: 0.75rem;
+}
+
+.integrante-numero {
+    padding: 0.1rem 0.4rem;
+
+    font-weight: bold;
+
+    font-size: 1.2rem;
+}
+
+.integrante-nombre {
+    color: #c63d2d;
+
+    /* font-size: 1rem; */
+    font-size: 1.4rem;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    white-space: nowrap;
+    /* white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; */
+}
+
+.integrante-nombre.largo {
+    font-size: 1rem;
+}
+
+.integrante-logo {
+    width: 36px;
+}
+
+.integrante-foto {
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+    height: 200px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 5px;
+}
+
+.integrante-apodo {
+    text-align: center;
+
+    margin: 0.6rem 0;
+
+    color: #c63d2d;
+
+    font-size: 1.5rem;
+}
+
+.integrante-stats {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-weight: bold;
+}
+
+.integrante-stats td {
+    border: 2px solid #222;
+
+    padding: 0.15rem 0.5rem;
+}
+
+.integrante-stats td:last-child {
+    text-align: right;
+}
+
+.integrante-stats td {
+    border: 2px solid #222;
+
+    padding: 0.15rem 0.5rem;
+}
+
+.integrante-stats td:last-child {
+    text-align: right;
+}
+
+/* ==========================
+    TABLET
+    ========================== */
+
+@media (min-width: 768px) {
+    .integrantes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==========================
+    DESKTOP
+    ========================== */
+
+@media (min-width: 1024px) {
+    .layout {
+        grid-template-columns: 1fr 5fr;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            "header header"
+            "aside main"
+            "footer footer";
+    }
+
+    .integrantes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==========================
+    DESKTOP GRANDE
+    ========================== */
+
+@media (min-width: 1440px) {
+    .layout {
+        grid-template-columns: 2fr 6fr;
+        /* grid-template-rows: 2fr 5fr 1fr; */
+        grid-template-areas:
+            "header header"
+            "aside" "main"
+            "footer" "footer";
+    }
+}

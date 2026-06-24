@@ -18,20 +18,7 @@ html {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.layout {
-    display: grid;
-    min-height: 100vh;
 
-    grid-template-columns: 1fr;
-
-    grid-template-rows:
-        auto 1fr auto;
-
-    grid-template-areas:
-        "header"
-        "main"
-        "footer";
-}
 
 /* ==========================
    ELEMENTOS GENERALES
@@ -129,6 +116,20 @@ h2 {
     color: var(--accent);
     transform: translateX(8px);
 }
+
+.btn {
+    display: inline-block;
+
+    padding: .8rem 1.5rem;
+
+    background: var(--accent);
+
+    color: var(--text);
+
+    border-radius: 5px;
+
+}
+
 
 /* ==========================
    FOOTER
