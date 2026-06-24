@@ -1,0 +1,206 @@
+:root {
+    --bg: #24284e;
+    --bg-alt: #313764;
+    --bg-dark: #1f223f;
+    --accent: #d8830f;
+    --text: #ffffff;
+    --overlay: rgba(0, 0, 0, 0.45);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.layout {
+    display: grid;
+    min-height: 100vh;
+
+    grid-template-columns: 1fr;
+
+    grid-template-rows:
+        auto 1fr auto;
+
+    grid-template-areas:
+        "header"
+        "main"
+        "footer";
+}
+
+/* ==========================
+   ELEMENTOS GENERALES
+   ========================== */
+
+img {
+    width: 100%;
+    display: block;
+}
+
+a {
+    text-decoration: none;
+}
+
+h2 {
+    padding: 2rem 0 0 2rem;
+}
+
+/* ==========================
+   HEADER
+   ========================== */
+
+.header {
+    grid-area: header;
+
+    position: sticky;
+    top: 0;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 1rem;
+
+    background: var(--bg-dark);
+
+    z-index: 1000;
+}
+
+.logo {
+    width: clamp(250px, 45vw, 350px);
+    height: auto;
+
+    color: var(--accent);
+
+    position: relative;
+    top: 10px;
+}
+
+.logo img {
+    width: 100%;
+    height: auto;
+    padding-left: 1rem;
+}
+
+.menu-btn {
+    border: none;
+    background: none;
+
+    color: var(--accent);
+
+    font-size: 3rem;
+
+    cursor: pointer;
+}
+
+.nav {
+    position: absolute;
+
+    top: 100%;
+    left: 0;
+
+    width: 100%;
+
+    background: var(--bg-dark);
+
+    display: none;
+
+    flex-direction: column;
+}
+
+.nav.active {
+    display: flex;
+}
+
+.nav a {
+    color: var(--text);
+    font-size: 1rem;
+    padding: 1rem;
+
+    transition: all 0.3s ease;
+}
+
+.nav a:hover {
+    color: var(--accent);
+    transform: translateX(8px);
+}
+
+/* ==========================
+   FOOTER
+   ========================== */
+
+footer {
+    grid-area: footer;
+
+    color: var(--accent);
+
+    text-align: center;
+
+    padding: 2rem;
+
+    background: var(--bg-dark);
+}
+
+.w3c-validations {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 1rem;
+}
+
+.w3c-validations img {
+    height: 31px;
+    width: auto;
+
+    padding: 0.1rem;
+
+    mix-blend-mode: luminosity;
+    opacity: 0.4;
+}
+
+/* ==========================
+   TABLET
+   ========================== */
+
+@media (min-width: 768px) {
+    .menu-btn {
+        display: none;
+    }
+
+    .nav {
+        position: static;
+
+        display: flex;
+
+        flex-direction: row;
+
+        gap: 1rem;
+
+        width: auto;
+
+        background: none;
+    }
+
+    .nav a:hover {
+        transform: translateY(-4px);
+    }
+}
+
+/* ==========================
+   DESKTOP
+   ========================== */
+
+@media (min-width: 1024px) {}
+
+/* ==========================
+   DESKTOP GRANDE
+   ========================== */
+
+@media (min-width: 1440px) {}

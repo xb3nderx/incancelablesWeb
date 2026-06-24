@@ -1,0 +1,117 @@
+/* ==========================
+   MAIN
+   ========================== */
+
+.main {
+    grid-area: main;
+
+    background-color: var(--bg);
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 1rem;
+
+    grid-template-areas:
+        "hero"
+        "manifiesto"
+        "ultimo-lanzamiento"
+        "proximo-show"
+        "seguinos-whats";
+}
+
+/* ==========================
+   HERO
+   ========================== */
+
+.hero {
+    grid-area: hero;
+    min-height: unset;
+}
+
+.hero img {
+    width: 100%;
+    height: auto;
+    display: block;
+
+    mix-blend-mode: luminosity;
+    opacity: 0.7;
+}
+
+/* ==========================
+   MANIFIESTO
+   ========================== */
+
+.manifiesto {
+    grid-area: manifiesto;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.manifiesto h1 {
+    padding: 2rem;
+
+    color: var(--text);
+
+    text-align: center;
+}
+
+.manifiesto p {
+    padding: 2rem;
+
+    color: var(--text);
+}
+
+/* ==========================
+   ULTIMO LANZAMIENTO
+   ========================== */
+
+.ultimo-lanzamiento {
+    grid-area: ultimo-lanzamiento;
+
+    background-color: burlywood;
+}
+
+/* ==========================
+   PROXIMO SHOW
+   ========================== */
+
+.proximo-show {
+    grid-area: proximo-show;
+
+    background-color: burlywood;
+}
+
+/* ==========================
+   SEGUINOS WHATSAPP
+   ========================== */
+
+.seguinos-whats {
+    grid-area: seguinos-whats;
+
+    background-color: burlywood;
+}
+
+/* ==========================
+   TABLET
+   ========================== */
+
+@media (min-width: 768px) {
+    .hero h1 {
+        font-size: 4rem;
+    }
+}
+
+/* ==========================
+   DESKTOP
+   ========================== */
+
+@media (min-width: 1024px) {}
+
+/* ==========================
+   DESKTOP GRANDE
+   ========================== */
+
+@media (min-width: 1440px) {}

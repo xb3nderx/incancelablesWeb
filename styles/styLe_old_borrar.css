@@ -153,6 +153,8 @@ a {
   grid-template-rows:
     /* hero */
     2fr
+    /* manifiesto */
+    1fr
     /* lanzamiento */
     1fr
     /* proximo show */
@@ -165,6 +167,7 @@ a {
   /* del main */
   grid-template-areas:
     "hero"
+    "manifiesto"
     "ultimo-lanzamiento"
     "proximo-show"
     "seguinos-whats";
@@ -175,12 +178,30 @@ a {
 }
 
 .hero img {
-  width: 100%;
+  /* width: 100%; */
   height: 100%;
   /* La imagen se recorta en lugar de deformarse */
   object-fit: cover;
   mix-blend-mode: luminosity;
   opacity: 0.7;
+}
+
+.manifiesto {
+  grid-area: manifiesto;
+  display: flex;
+  flex-direction: column;
+}
+
+.manifiesto h1 {
+  padding: 2rem;
+  color: var(--text);
+  text-align: center;
+
+}
+
+.manifiesto p {
+  padding: 2rem;
+  color: var(--text);
 }
 
 .ultimo-lanzamiento {
