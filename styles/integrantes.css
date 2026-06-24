@@ -1,3 +1,9 @@
+h1 {
+    margin: 1rem;
+    color: var(--text);
+    text-align: center;
+}
+
 .layout {
     display: grid;
     min-height: 100vh;
@@ -22,18 +28,6 @@ MAIN
 
     background-color: var(--bg);
 
-    /* display: grid;
-
-    grid-template-columns: 1fr;
-
-    gap: 1rem;
-
-    grid-template-areas:
-        "hero"
-        "manifiesto"
-        "ultimo-lanzamiento"
-        "proximo-show"
-        "seguinos-whats"; */
 }
 
 /*////////////////////////////////////////////////////////////////////////////
@@ -66,6 +60,9 @@ INTEGRANTE CARD
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 
     overflow: hidden;
+
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 .integrante:hover {
@@ -146,26 +143,32 @@ INTEGRANTE CARD
     border-collapse: collapse;
 
     font-weight: bold;
+    border: 2px solid #222;
 }
 
 .integrante-stats td {
-    border: 2px solid #222;
-
+    /* border: 2px solid #222; */
+    border-top: 2px solid #222;
+    border-bottom: 2px solid #222;
     padding: 0.15rem 0.5rem;
 }
+
+
 
 .integrante-stats td:last-child {
     text-align: right;
 }
 
-.integrante-stats td {
-    border: 2px solid #222;
 
-    padding: 0.15rem 0.5rem;
-}
 
-.integrante-stats td:last-child {
-    text-align: right;
+/*////////////////////////////////////////////////////////////////////////////
+ASIDE
+///////////////////////////////////////////////////////////////////////////*/
+.aside {
+    grid-area: aside;
+
+    background-color: var(--bg-alt);
+
 }
 
 /* ==========================
@@ -204,10 +207,13 @@ INTEGRANTE CARD
 @media (min-width: 1440px) {
     .layout {
         grid-template-columns: 2fr 6fr;
-        /* grid-template-rows: 2fr 5fr 1fr; */
         grid-template-areas:
             "header header"
             "aside" "main"
             "footer" "footer";
+    }
+
+    .integrantes-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
