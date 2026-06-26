@@ -87,6 +87,37 @@
     grid-area: ultimo-lanzamiento;
     background-color: var(--bg-alt);
     color: var(--text);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+        "titulo"
+        "texto"
+        "imagen";
+    gap: 1rem;
+    text-align: center;
+}
+
+.ultimo-lanzamiento h2 {
+    grid-area: titulo;
+}
+
+.lanzamiento-texto {
+    grid-area: texto;
+    margin: 1rem;
+    text-align: center;
+}
+
+.lanzamiento-disco {
+
+    grid-area: imagen;
+}
+
+.lanzamiento-disco img {
+    width: 180px;
+    max-width: 100%;
+    justify-self: center;
+    margin: 1rem;
 }
 
 /* ==========================
@@ -118,6 +149,39 @@
 @media (min-width: 768px) {
     .hero h1 {
         font-size: 4rem;
+    }
+
+    .ultimo-lanzamiento {
+        grid-template-columns: auto auto;
+        grid-template-areas:
+            "titulo titulo"
+            "texto imagen";
+
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .ultimo-lanzamiento h2 {
+        grid-area: titulo;
+        text-align: center;
+    }
+
+    .lanzamiento-texto {
+        grid-area: texto;
+        text-align: center;
+    }
+
+    .lanzamiento-texto p {
+        margin: 2rem;
+    }
+
+    .lanzamiento-disco {
+        justify-self: center;
+    }
+
+    .lanzamiento-disco img {
+        grid-area: imagen;
+        width: 500px;
     }
 }
 

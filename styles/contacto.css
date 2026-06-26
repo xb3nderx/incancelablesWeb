@@ -1,0 +1,124 @@
+.layout {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows:
+        auto 1fr auto auto;
+    grid-template-areas:
+        "header"
+        "main"
+        "aside"
+        "footer";
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+HEADER
+///////////////////////////////////////////////////////////////////////////*/
+.header {
+    grid-area: header;
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+MAIN
+///////////////////////////////////////////////////////////////////////////*/
+
+.main {
+    grid-area: main;
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Sección Contacto */
+.contacto {
+    padding: 80px 0;
+    text-align: center;
+}
+
+.contact-form {
+    max-width: 600px;
+    margin: 40px auto 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 30px;
+    background-color: #222;
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #ff0000;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.submit-button {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.submit-button:hover {
+    background-color: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+ASIDE
+///////////////////////////////////////////////////////////////////////////*/
+.aside {
+    grid-area: aside;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "texto"
+        "qrwhats";
+}
+
+.aside h2 {
+    grid-area: texto;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.qrwhats img {
+    width: 250px;
+    margin: 0 calc(100vw - 250px)/2;
+    /* justify-self: center; */
+
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+FOOTER
+///////////////////////////////////////////////////////////////////////////*/
+.footer {
+    grid-area: footer;
+}
