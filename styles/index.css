@@ -94,7 +94,6 @@
         "titulo"
         "texto"
         "imagen";
-    gap: 1rem;
     text-align: center;
 }
 
@@ -111,13 +110,16 @@
 .lanzamiento-disco {
 
     grid-area: imagen;
+    display: grid;
+    justify-items: center;
 }
+
 
 .lanzamiento-disco img {
     width: 180px;
     max-width: 100%;
-    justify-self: center;
     margin: 1rem;
+
 }
 
 /* ==========================

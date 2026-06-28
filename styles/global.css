@@ -69,13 +69,13 @@ h2 {
     color: var(--accent);
 
     position: relative;
-    top: 10px;
+    top: 15px;
 }
 
 .logo img {
     width: 100%;
     height: auto;
-    padding-left: 1rem;
+    /* padding-left: 1rem; */
 }
 
 .menu-btn {
