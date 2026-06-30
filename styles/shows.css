@@ -1,33 +1,46 @@
-.shows {
+/*////////////////////////////////////////////////////////////////////////////
+MAIN
+///////////////////////////////////////////////////////////////////////////*/
+.main {
+    background-color: var(--bg-alt);
+    color: var(--text);
     display: grid;
     gap: 2rem;
     padding: 1rem;
+    align-items: center;
+}
+
+.historial {
+    display: flexbox;
+    flex-direction: column;
+    align-items: center;
 }
 
 .show-card {
-
     display: grid;
-
     gap: 1rem;
-
-    background: var(--bg-alt);
-
+    background: var(--card);
+    max-width: 80vw;
+    margin: 1rem 0;
     padding: 1rem;
-
     border-radius: .5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+
+}
+
+.show-card:hover {
+    transform: translateY(10px) scale(110%);
 }
 
 .show-card img {
-
     width: 100%;
-
     height: auto;
-
     display: block;
+    border-radius: 1rem;
 }
 
 .show-info {
-
+    color: var(--bg-dark);
     text-align: center;
 }
 
@@ -36,6 +49,18 @@
     display: inline-block;
 
     margin-top: 1rem;
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+ASIDE
+///////////////////////////////////////////////////////////////////////////*/
+.aside {
+    color: var(--text);
+    background-color: var(--bg);
+}
+
+a .btn {
+    padding: 1rem;
 }
 
 /* ==========================
@@ -52,7 +77,6 @@
     }
 
     .show-info {
-
         text-align: left;
     }
 

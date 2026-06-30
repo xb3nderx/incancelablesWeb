@@ -48,7 +48,7 @@ INTEGRANTE CARD
 
     aspect-ratio: 2 / 3;
 
-    background: #ecece3;
+    background: var(--card);
 
     border-radius: 24px;
 

@@ -101,3 +101,54 @@ FOOTER
 .footer {
     grid-area: footer;
 }
+
+/* ==========================
+   TABLET
+   ========================== */
+@media(min-width:768px) {
+
+    /* Sección Contacto */
+    .contacto {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+    }
+
+    .contact-form {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* ==========================
+   DESKTOP
+   ========================== */
+@media (min-width: 1024px) {
+    .layout {
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            "header header"
+            "main aside"
+            "footer footer";
+    }
+
+}
+
+/* ==========================
+   DESKTOP GRANDE
+   ========================== */
+@media (min-width: 1440px) {}
