@@ -87,9 +87,18 @@ ASIDE
     /* margin: 0 auto; */
 }
 
+.whats-text {
+    background-color: #25D366;
+    border-radius: 5px;
+    padding: 0.2rem;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+}
+
 .qrwhats img {
     width: 250px;
     margin-bottom: 2rem;
+    mix-blend-mode: multiply;
     /* margin: 0 calc(100vw - 250px)/2; */
     /* justify-self: center; */
 
