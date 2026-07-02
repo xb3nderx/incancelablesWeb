@@ -8,9 +8,7 @@
     <!-- SEO -->
     <meta name="description"
         content="Escuchá la música de Incancelables. Live at Mujica, lanzamientos y playlist oficial.">
-
     <meta name="keywords" content="Incancelables, Live at Mujica, Rock, Música, YouTube, Spotify">
-
     <meta name="robots" content="index, follow">
 
     <title>Incancelables - Música</title>
@@ -18,25 +16,21 @@
     <link rel="icon" type="image/x-icon" href="../assets/irrobafav.svg">
 
     <link rel="stylesheet" href="../styles/global.css">
-
     <link rel="stylesheet" href="../styles/musica.css">
-
 </head>
 
 <body>
 
     <div class="layout">
 
-        <!-- ======================================================
-                            HEADER
-        ======================================================= -->
+        <!-- ==========================================
+                    HEADER
+        =========================================== -->
 
         <header class="header">
 
             <a href="../index.html" class="logo">
-
                 <img src="../assets/incan_logo.svg" alt="Incancelables">
-
             </a>
 
             <button class="menu-btn">
@@ -44,43 +38,43 @@
             </button>
 
             <nav class="nav">
-
                 <a href="../index.html">Inicio</a>
                 <a href="musica.html">Música</a>
                 <a href="shows.html">Shows</a>
                 <a href="integrantes.html">Integrantes</a>
                 <a href="contacto.html">Contacto</a>
-
             </nav>
 
         </header>
 
-
-        <!-- ======================================================
-                            MAIN
-        ======================================================= -->
+        <!-- ==========================================
+                    MAIN
+        =========================================== -->
 
         <main class="main">
 
             <article class="album">
 
                 <!-- ==========================================
-                            CABECERA
+                        CABECERA DEL ÁLBUM
                 =========================================== -->
 
                 <header class="album-header">
 
-                    <img class="album-cover" src="../assets/musica/live-at-mujica.png" alt="Portada Live at Mujica">
+
+
+                    <img class="album-cover" src="../assets/musica/live-at-mujica.png"
+                        alt="Portada del álbum Live at Mujica">
+
+
 
                     <div class="album-info">
 
                         <h1>Live at Mujica</h1>
 
                         <p class="album-description">
-
                             Un registro en vivo de una noche que quedó para siempre.
                             Cada mes liberamos una nueva canción hasta completar el disco.
-
                         </p>
 
                     </div>
@@ -88,10 +82,9 @@
                 </header>
 
 
-
                 <!-- ==========================================
-                        ÚLTIMO LANZAMIENTO
-                =========================================== -->
+                ÚLTIMO LANZAMIENTO
+                ========================================== -->
 
                 <section class="latest-release">
 
@@ -103,24 +96,24 @@
 
                     <article class="track-featured">
 
-                        <h3 class="featured-title"></h3>
+                        <h3>Invisible</h3>
 
-                        <p class="release-date"></p>
+                        <p class="release-date">
+                            Publicado el 15 de Agosto de 2026
+                        </p>
 
-                        <p class="track-description"></p>
+                        <p class="track-description">
+                            Primer adelanto oficial de <strong>Live at Mujica</strong>.
+                        </p>
 
                         <div class="platform-buttons">
 
-                            <button class="btn active-platform" data-platform="youtube">
-
+                            <button class="btn active-platform">
                                 ▶ Reproducir en YouTube
-
                             </button>
 
-                            <button class="btn secondary" data-platform="spotify">
-
+                            <button class="btn secondary">
                                 Escuchar en Spotify
-
                             </button>
 
                         </div>
@@ -132,8 +125,8 @@
 
 
                 <!-- ==========================================
-                            PLAYLIST
-                =========================================== -->
+                PLAYLIST
+                ========================================== -->
 
                 <section class="playlist">
 
@@ -142,19 +135,72 @@
                         <h2>Live at Mujica</h2>
 
                         <p>
-
                             Playlist oficial del disco.
-
                         </p>
 
                     </header>
 
                     <ol class="track-list">
 
-                        <!--
-                            Se genera completamente
-                            desde musica.js
-                        -->
+                        <li class="track active" data-youtube="" data-spotify="">
+
+                            <span class="track-number">01</span>
+
+                            <div class="track-info">
+
+                                <h3>Invisible</h3>
+
+                                <p>Publicado</p>
+
+                            </div>
+
+                            <button class="play-button">
+                                ▶
+                            </button>
+
+                        </li>
+
+                        <li class="track" data-youtube="" data-spotify="">
+
+                            <span class="track-number">02</span>
+
+                            <div class="track-info">
+
+                                <h3>Próximo lanzamiento</h3>
+
+                                <p>Agosto 2026</p>
+
+                            </div>
+
+                        </li>
+
+                        <li class="track">
+
+                            <span class="track-number">03</span>
+
+                            <div class="track-info">
+
+                                <h3>Próximo lanzamiento</h3>
+
+                                <p>Septiembre 2026</p>
+
+                            </div>
+
+                        </li>
+
+                        <li class="track">
+
+                            <span class="track-number">04</span>
+
+                            <div class="track-info">
+
+                                <h3>Próximo lanzamiento</h3>
+
+                                <p>Octubre 2026</p>
+
+                            </div>
+
+                        </li>
 
                     </ol>
 
@@ -162,10 +208,9 @@
 
 
 
-
                 <!-- ==========================================
-                            REPRODUCTOR
-                =========================================== -->
+                REPRODUCTOR
+                ========================================== -->
 
                 <section class="player-section">
 
@@ -173,14 +218,15 @@
 
                         <h2>Reproduciendo</h2>
 
-                        <p class="current-track"></p>
+                        <p class="current-track">
+                            Invisible
+                        </p>
 
                     </header>
 
                     <div class="player-container">
 
-                        <iframe src="" title="Reproductor" allowfullscreen>
-
+                        <iframe src="" title="Reproductor de YouTube" allowfullscreen>
                         </iframe>
 
                     </div>
@@ -188,33 +234,27 @@
                 </section>
 
 
-
-
                 <!-- ==========================================
-                        ESCUCHAR EL ÁLBUM
+                    ESCUCHAR EL ÁLBUM
                 =========================================== -->
 
                 <section class="album-platforms">
 
                     <header>
 
-                        <h2>
-
-                            Escuchá el álbum completo
-
-                        </h2>
+                        <h2>Escuchá el álbum completo</h2>
 
                     </header>
 
                     <div class="platform-links">
 
-                        <a class="btn album-youtube" target="_blank">
+                        <a href="#" class="btn">
 
                             Playlist en YouTube
 
                         </a>
 
-                        <a class="btn secondary album-spotify" target="_blank">
+                        <a href="#" class="btn secondary">
 
                             Playlist en Spotify
 
@@ -226,27 +266,22 @@
 
 
 
-
                 <!-- ==========================================
-                            HISTORIA
+                        HISTORIA
                 =========================================== -->
 
                 <section class="album-story">
 
                     <header>
 
-                        <h2>
-
-                            Acerca de Live at Mujica
-
-                        </h2>
+                        <h2>Acerca de Live at Mujica</h2>
 
                     </header>
 
                     <p>
 
-                        Live at Mujica registra una noche muy especial
-                        para Incancelables.
+                        Live at Mujica registra una noche muy especial para
+                        Incancelables.
 
                     </p>
 
@@ -271,20 +306,16 @@
         </main>
 
 
-
-
-        <!-- ======================================================
-                            ASIDE
-        ======================================================= -->
+        <!-- ==========================================
+                    ASIDE
+        =========================================== -->
 
         <aside class="aside">
 
             <section class="community">
 
                 <h2>
-
-                    Sé un Incancelable!!!
-
+                    Sé un incancelable!!!
                 </h2>
 
                 <p>
@@ -305,11 +336,9 @@
         </aside>
 
 
-
-
-        <!-- ======================================================
-                            FOOTER
-        ======================================================= -->
+        <!-- ==========================================
+                    FOOTER
+        =========================================== -->
 
         <footer class="footer">
 
@@ -337,11 +366,10 @@
 
         </footer>
 
+        <script src="../scripts/main.js"></script>
+        <script src="../scripts/musica.js"></script>
+
     </div>
-
-    <script src="../scripts/main.js"></script>
-
-    <script type="module" src="../scripts/musica.js"></script>
 
 </body>
 

@@ -1,34 +1,151 @@
 // /////////////////////////////////////////////////////////////////////////////
-// MÚSICA
+// DATOS DEL ÁLBUM
+// /////////////////////////////////////////////////////////////////////////////
+import { discografia } from "./data/discografia.js";
+const album = discografia[0];
+
+
+// /////////////////////////////////////////////////////////////////////////////
+// ELEMENTOS
 // /////////////////////////////////////////////////////////////////////////////
 
-const tracks = document.querySelectorAll(".track");
+const playlist = document.querySelector(".track-list");
 
 const iframe = document.querySelector(".player-container iframe");
 
 const currentTrack = document.querySelector(".current-track");
 
-const youtubeButton = document.querySelector(".active-platform");
+const featuredTitle = document.querySelector(".featured-title");
 
-const spotifyButton = document.querySelector(".secondary");
+const featuredDate = document.querySelector(".release-date");
+
+const featuredDescription = document.querySelector(".track-description");
+
+const youtubeButton = document.querySelector('[data-platform="youtube"]');
+
+const spotifyButton = document.querySelector('[data-platform="spotify"]');
+
+const albumYoutube = document.querySelector(".album-youtube");
+
+const albumSpotify = document.querySelector(".album-spotify");
 
 let currentPlatform = "youtube";
 
+let activeTrack = 0;
+
 
 // /////////////////////////////////////////////////////////////////////////////
-// CAMBIAR TEMA
+// GENERAR PLAYLIST
 // /////////////////////////////////////////////////////////////////////////////
 
-function loadTrack(track) {
+function createPlaylist() {
 
-    tracks.forEach(item => item.classList.remove("active"));
+    playlist.innerHTML = "";
 
-    track.classList.add("active");
+    album.tracks.forEach((track, index) => {
 
-    currentTrack.textContent =
-        track.querySelector("h3").textContent;
+        const li = document.createElement("li");
 
-    updatePlayer(track);
+        li.className = "track";
+
+        if (index === 0)
+            li.classList.add("active");
+
+
+        const number = document.createElement("span");
+
+        number.className = "track-number";
+
+        number.textContent = track.number;
+
+
+        const info = document.createElement("div");
+
+        info.className = "track-info";
+
+
+        const title = document.createElement("h3");
+
+        title.textContent = track.title;
+
+
+        const release = document.createElement("p");
+
+        release.textContent = track.release;
+
+
+        info.appendChild(title);
+
+        info.appendChild(release);
+
+
+        if (track.released) {
+
+            const playButton = document.createElement("button");
+
+            playButton.className = "play-button";
+
+            playButton.textContent = "▶";
+
+            li.appendChild(playButton);
+
+        }
+
+        li.appendChild(number);
+
+        li.appendChild(info);
+
+        if (track.released) {
+
+            li.addEventListener("click", () => {
+
+                loadTrack(index);
+
+            });
+
+        } else {
+
+            li.classList.add("disabled");
+
+        }
+
+
+        playlist.appendChild(li);
+
+    });
+
+}
+
+
+// /////////////////////////////////////////////////////////////////////////////
+// CARGAR TEMA
+// /////////////////////////////////////////////////////////////////////////////
+
+function loadTrack(index) {
+
+    activeTrack = index;
+
+    const track = album.tracks[index];
+
+    document
+        .querySelectorAll(".track")
+        .forEach(item => item.classList.remove("active"));
+
+    document
+        .querySelectorAll(".track")
+    [index]
+        .classList.add("active");
+
+
+    featuredTitle.textContent = track.title;
+
+    featuredDate.textContent = track.release;
+
+    featuredDescription.textContent = track.description;
+
+    currentTrack.textContent = track.title;
+
+    updatePlayer();
 
 }
 
@@ -37,42 +154,19 @@ function loadTrack(track) {
 // ACTUALIZAR REPRODUCTOR
 // /////////////////////////////////////////////////////////////////////////////
 
-function updatePlayer(track) {
+function updatePlayer() {
 
-    let url = "";
+    const track = album.tracks[activeTrack];
 
-    if (currentPlatform === "youtube") {
-
-        url = track.dataset.youtube;
-
-    } else {
-
-        url = track.dataset.spotify;
-
-    }
-
-    iframe.src = url;
+    iframe.src = currentPlatform === "youtube"
+        ? track.youtube
+        : track.spotify;
 
 }
 
 
 // /////////////////////////////////////////////////////////////////////////////
-// EVENTOS PLAYLIST
-// /////////////////////////////////////////////////////////////////////////////
-
-tracks.forEach(track => {
-
-    track.addEventListener("click", () => {
-
-        loadTrack(track);
-
-    });
-
-});
-
-
-// /////////////////////////////////////////////////////////////////////////////
-// BOTÓN YOUTUBE
+// CAMBIAR PLATAFORMA
 // /////////////////////////////////////////////////////////////////////////////
 
 youtubeButton.addEventListener("click", () => {
@@ -83,14 +177,10 @@ youtubeButton.addEventListener("click", () => {
 
     spotifyButton.classList.remove("active-platform");
 
-    updatePlayer(document.querySelector(".track.active"));
+    updatePlayer();
 
 });
 
-
-// /////////////////////////////////////////////////////////////////////////////
-// BOTÓN SPOTIFY
-// /////////////////////////////////////////////////////////////////////////////
 
 spotifyButton.addEventListener("click", () => {
 
@@ -100,7 +190,7 @@ spotifyButton.addEventListener("click", () => {
 
     youtubeButton.classList.remove("active-platform");
 
-    updatePlayer(document.querySelector(".track.active"));
+    updatePlayer();
 
 });
 
@@ -109,10 +199,10 @@ spotifyButton.addEventListener("click", () => {
 // INICIALIZACIÓN
 // /////////////////////////////////////////////////////////////////////////////
 
-const firstTrack = document.querySelector(".track.active");
+albumYoutube.href = album.youtubePlaylist;
 
-if (firstTrack) {
+albumSpotify.href = album.spotifyPlaylist;
 
-    loadTrack(firstTrack);
+createPlaylist();
 
-}
+loadTrack(0);
