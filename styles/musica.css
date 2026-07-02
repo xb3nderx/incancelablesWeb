@@ -1,0 +1,224 @@
+/*////////////////////////////////////////////////////////////////////////////
+LAYOUT
+////////////////////////////////////////////////////////////////////////////*/
+.layout{
+    min-height:100vh;
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-rows:auto 1fr auto auto;
+    grid-template-areas:
+        "header"
+        "main"
+        "aside"
+        "footer";
+}
+
+.header{grid-area:header;}
+.main{grid-area:main;color:var(--text);background:var(--bg);}
+.aside{grid-area:aside;background:var(--bg-alt);color:var(--text);}
+.footer{grid-area:footer;}
+
+/*////////////////////////////////////////////////////////////////////////////
+ALBUM
+////////////////////////////////////////////////////////////////////////////*/
+.album{max-width:1200px;margin:0 auto;padding:2rem 1rem;}
+.album-header{display:flex;flex-direction:column;align-items:center;gap:1.5rem;margin-bottom:2rem;}
+.album-cover img{
+    width:min(100%,320px);
+    display:block;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+.album-info{text-align:center;}
+.album-info h1{margin:.5rem 0;font-size:2rem;}
+.album-description{color:#c8c8c8;line-height:1.6;}
+
+/*////////////////////////////////////////////////////////////////////////////
+ULTIMO LANZAMIENTO
+////////////////////////////////////////////////////////////////////////////*/
+.latest-release{
+    background:var(--bg-alt);
+    border-radius:14px;
+    padding:1.5rem;
+    margin-bottom:2rem;
+}
+.track-featured h3{font-size:1.6rem;margin:.5rem 0;}
+.release-date{opacity:.75;font-size:.9rem;}
+.track-description{margin:1rem 0 1.5rem;line-height:1.6;}
+.platform-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:.75rem;
+}
+.btn.secondary{
+    background:transparent;
+    border:1px solid #666;
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+PLAYLIST
+////////////////////////////////////////////////////////////////////////////*/
+.playlist{margin-bottom:2rem;}
+.playlist header{text-align:center;margin-bottom:1.25rem;}
+.track-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:.75rem;
+}
+.track{
+    display:grid;
+    grid-template-columns:48px 1fr auto;
+    align-items:center;
+    gap:1rem;
+    padding:1rem;
+    background:var(--bg-alt);
+    border-radius:12px;
+    transition:.25s;
+    cursor:pointer;
+}
+.track:hover{
+    transform:translateY(-2px);
+    background:#222;
+}
+.track.active{
+    border-left:4px solid #d81f26;
+}
+.track-number{
+    font-size:1.2rem;
+    font-weight:700;
+    text-align:center;
+}
+.track-info h3{
+    margin:0;
+    font-size:1rem;
+}
+.track-info p{
+    margin:.25rem 0 0;
+    opacity:.7;
+    font-size:.9rem;
+}
+.play-button{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:1rem;
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+PLAYER
+////////////////////////////////////////////////////////////////////////////*/
+.player-section{
+    margin-bottom:2rem;
+}
+.player-section header{
+    text-align:center;
+    margin-bottom:1rem;
+}
+.current-track{
+    opacity:.75;
+}
+.player-container{
+    overflow:hidden;
+    border-radius:12px;
+    background:#000;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.player-container iframe{
+    display:block;
+    width:100%;
+    aspect-ratio:16/9;
+    border:0;
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+ALBUM LINKS
+////////////////////////////////////////////////////////////////////////////*/
+.album-platforms{
+    background:var(--bg-alt);
+    padding:1.5rem;
+    border-radius:12px;
+    margin-bottom:2rem;
+    text-align:center;
+}
+.platform-links{
+    display:flex;
+    flex-direction:column;
+    gap:.75rem;
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+STORY
+////////////////////////////////////////////////////////////////////////////*/
+.album-story{
+    line-height:1.8;
+    margin-bottom:2rem;
+}
+.album-story h2{margin-bottom:1rem;}
+
+/*////////////////////////////////////////////////////////////////////////////
+ASIDE
+////////////////////////////////////////////////////////////////////////////*/
+.community{
+    padding:2rem 1rem;
+    text-align:center;
+}
+.community p{
+    margin:1rem 0 1.5rem;
+    line-height:1.6;
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+TABLET
+////////////////////////////////////////////////////////////////////////////*/
+@media(min-width:768px){
+.platform-buttons,
+.platform-links{
+    flex-direction:row;
+    justify-content:center;
+}
+.album-header{
+    flex-direction:row;
+    align-items:center;
+}
+.album-info{
+    text-align:left;
+}
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+DESKTOP
+////////////////////////////////////////////////////////////////////////////*/
+@media(min-width:1024px){
+.layout{
+grid-template-columns:1fr 320px;
+grid-template-rows:auto 1fr auto;
+grid-template-areas:
+"header header"
+"main aside"
+"footer footer";
+}
+.album{
+display:grid;
+grid-template-columns:340px 1fr;
+gap:2rem;
+align-items:start;
+}
+.album-header{
+position:sticky;
+top:2rem;
+flex-direction:column;
+}
+}
+
+/*////////////////////////////////////////////////////////////////////////////
+DESKTOP GRANDE
+////////////////////////////////////////////////////////////////////////////*/
+@media(min-width:1440px){
+.album{max-width:1400px;}
+.album-info h1{font-size:2.5rem;}
+}

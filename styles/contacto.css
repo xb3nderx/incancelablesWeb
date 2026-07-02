@@ -34,6 +34,29 @@ MAIN
     text-align: center;
 }
 
+.contact-card {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 12px;
+    background-color: var(--bg-dark);
+    /* background-color: #1b1b1b; */
+}
+
+.contact-card h3 {
+    margin-bottom: 1rem;
+}
+
+.contact-card p {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
 .contact-form {
     max-width: 600px;
     /* margin: 40px auto 0; */
@@ -74,7 +97,7 @@ ASIDE
 .aside {
     grid-area: aside;
     color: var(--text);
-    background-color: var(--bg);
+    background-color: var(--bg-alt);
     display: grid;
     justify-items: center;
 }
