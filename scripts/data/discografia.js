@@ -12,7 +12,7 @@ export const discografia = [
                 release: "Publicado el 15 de Agosto de 2026",
                 description: "Primer adelanto oficial de Live at Mujica.",
                 released: true,
-                youtube: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                youtube: "https://youtu.be/AJuXt10C3MM?si=_T6gNxzrnU9Fx8ro",
                 spotify: "https://open.spotify.com/intl-es/track/0aVwclUm2FsksllwpJRlaX?si=c6a8df8707c04b92"
             },
 
