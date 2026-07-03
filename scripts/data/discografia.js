@@ -18,13 +18,23 @@ export const discografia = [
 
             {
                 number: "02",
+                title: "En la ciudad de la furia",
+                release: "Agosto 2026",
+                description: "",
+                released: true,
+                youtube: "https://youtu.be/AWpA19OXPFk?si=5tHemFhlxpa2kzbY",
+                spotify: "https://open.spotify.com/intl-es/track/3gA85qTCk7q2KU1bnDBfPs?si=6ba433d996684a06"
+            },
+
+            {
+                number: "04",
                 title: "Próximo lanzamiento",
                 release: "Agosto 2026",
                 description: "",
                 released: false,
                 youtube: "",
                 spotify: ""
-            },
+            }
 
         ]
     }
