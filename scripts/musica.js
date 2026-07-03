@@ -149,6 +149,37 @@ function loadTrack(index) {
 
 }
 
+// /////////////////////////////////////////////////////////////////////////////
+// CAMBIA URL NORMAL DE YOUTUBE A EMBEDED
+// /////////////////////////////////////////////////////////////////////////////
+
+function getYoutubeEmbedUrl(url) {
+
+    if (!url) return "";
+
+    // Si ya es una URL de embed
+    if (url.includes("/embed/")) {
+        return url;
+    }
+
+    // URLs cortas: https://youtu.be/XXXX
+    if (url.includes("youtu.be/")) {
+
+        const id = url.split("youtu.be/")[1].split("?")[0];
+
+        return `https://www.youtube.com/embed/${id}`;
+    }
+
+    // URLs normales: https://www.youtube.com/watch?v=XXXX
+    if (url.includes("watch?v=")) {
+
+        const id = new URL(url).searchParams.get("v");
+
+        return `https://www.youtube.com/embed/${id}`;
+    }
+
+    return "";
+}
 
 // /////////////////////////////////////////////////////////////////////////////
 // ACTUALIZAR REPRODUCTOR
@@ -158,9 +189,16 @@ function updatePlayer() {
 
     const track = album.tracks[activeTrack];
 
-    iframe.src = currentPlatform === "youtube"
-        ? track.youtube
-        : track.spotify;
+    if (currentPlatform === "youtube") {
+
+        iframe.src = getYoutubeEmbedUrl(track.youtube);
+
+    } else {
+
+        iframe.src = track.spotify;
+
+    }
+    console.log(iframe.src);
 
 }
 
