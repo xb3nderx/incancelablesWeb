@@ -1,4 +1,4 @@
-:root {
+/* :root {
     --bg: #24284e;
     --bg-alt: #313764;
     --bg-dark: #1f223f;
@@ -6,9 +6,95 @@
     --text: #ffffff;
     --overlay: rgba(0, 0, 0, 0.45);
     --cat-v1: #fe019a;
-    /* --cat-v2: #ff0090; */
     --cat-v2: #EE00FF;
     --card: #ecece3;
+} */
+
+:root {
+
+    /* ==========================
+       MODO OSCURO (POR DEFECTO)
+       ========================== */
+
+    --page-bg: #17192d;
+
+    --bg: #24284e;
+    --bg-alt: #313764;
+    --bg-dark: #1f223f;
+
+    --accent: #d8830f;
+
+    --text: #ffffff;
+    --text-secondary: #d6d6d6;
+    --text-on-card: #1f223f;
+
+    --card: #ecece3;
+
+    --overlay: rgba(0, 0, 0, 0.45);
+
+    --cat-v1: #fe019a;
+    --cat-v2: #EE00FF;
+
+    --border: #4a4f74;
+
+    --shadow: 0 8px 25px rgba(0, 0, 0, .35);
+
+    /* Inputs */
+    --input-bg: #222222;
+    --input-text: #ffffff;
+    --input-border: #3a3a3a;
+    --focus-ring: var(--accent);
+
+    /* Música */
+    --text-muted: #c8c8c8;
+    --button-border: #666666;
+    --track-hover: #222222;
+    --track-active: #d81f26;
+    --player-bg: #000000;
+}
+
+
+/* ==========================
+   MODO CLARO
+   ========================== */
+
+body.light {
+
+    --page-bg: #f6f7fb;
+
+    --bg: #e6eaf5;
+    --bg-alt: #d7ddee;
+    --bg-dark: #c8d0e6;
+
+    --accent: #d8830f;
+
+    --text: #222222;
+    --text-secondary: #555555;
+    --text-on-card: #222;
+
+    --card: #ffffff;
+
+    --overlay: rgba(255, 255, 255, .45);
+
+    --cat-v1: #d30084;
+    --cat-v2: #c100d8;
+
+    --border: #d7dce8;
+
+    --shadow: 0 8px 25px rgba(0, 0, 0, .12);
+
+    /* Inputs */
+    --input-bg: #ffffff;
+    --input-text: #222222;
+    --input-border: #c8d0e6;
+    --focus-ring: var(--accent);
+
+    /* Música */
+    --text-muted: #666666;
+    --button-border: #999999;
+    --track-hover: #eceff5;
+    --track-active: #d81f26;
+    --player-bg: #000000;
 }
 
 * {
@@ -22,7 +108,13 @@ html {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+body {
+    color: var(--text);
 
+    transition:
+        background-color .35s ease,
+        color .35s ease;
+}
 
 /* ==========================
    ELEMENTOS GENERALES
@@ -88,6 +180,14 @@ h2 {
     font-size: 3rem;
 
     cursor: pointer;
+}
+
+.theme-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--accent);
 }
 
 .nav {

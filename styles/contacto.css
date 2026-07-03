@@ -11,12 +11,6 @@
         "footer";
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-HEADER
-///////////////////////////////////////////////////////////////////////////*/
-.header {
-    grid-area: header;
-}
 
 /*////////////////////////////////////////////////////////////////////////////
 MAIN
@@ -71,10 +65,10 @@ MAIN
 .form-group textarea {
     width: 100%;
     padding: 15px;
-    border: none;
+    border: 1px solid var(--input-border);
     border-radius: 30px;
-    background-color: #222;
-    color: #fff;
+    background-color: var(--input-bg);
+    color: var(--input-text);
     font-size: 16px;
     transition: all 0.3s ease;
 }
@@ -82,7 +76,7 @@ MAIN
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #ff0000;
+    box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .form-group textarea {
@@ -127,12 +121,6 @@ ASIDE
 
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-FOOTER
-///////////////////////////////////////////////////////////////////////////*/
-.footer {
-    grid-area: footer;
-}
 
 /* ==========================
    TABLET

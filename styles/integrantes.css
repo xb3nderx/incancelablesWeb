@@ -57,7 +57,7 @@ INTEGRANTE CARD
     display: flex;
     flex-direction: column;
 
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow);
 
     overflow: hidden;
 
@@ -90,6 +90,7 @@ INTEGRANTE CARD
     font-weight: bold;
 
     font-size: 1.2rem;
+    color: var(--text-on-card)
 }
 
 .integrante-nombre {
@@ -103,9 +104,7 @@ INTEGRANTE CARD
     text-align: center;
 
     white-space: nowrap;
-    /* white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; */
+
 }
 
 .integrante-nombre.largo {
@@ -147,10 +146,10 @@ INTEGRANTE CARD
 }
 
 .integrante-stats td {
-    /* border: 2px solid #222; */
     border-top: 2px solid #222;
     border-bottom: 2px solid #222;
     padding: 0.15rem 0.5rem;
+    color: var(--text-on-card);
 }
 
 
@@ -161,9 +160,6 @@ INTEGRANTE CARD
 
 
 
-/*////////////////////////////////////////////////////////////////////////////
-ASIDE
-///////////////////////////////////////////////////////////////////////////*/
 /*////////////////////////////////////////////////////////////////////////////
 ASIDE
 ///////////////////////////////////////////////////////////////////////////*/
@@ -218,8 +214,8 @@ ASIDE
         grid-template-columns: 2fr 6fr;
         grid-template-areas:
             "header header"
-            "aside" "main"
-            "footer" "footer";
+            "aside main"
+            "footer footer";
     }
 
     .integrantes-grid {

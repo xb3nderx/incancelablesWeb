@@ -4,346 +4,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <!-- SEO -->
     <meta name="description"
         content="Escuchá la música de Incancelables. Live at Mujica, lanzamientos y playlist oficial.">
-
     <meta name="keywords" content="Incancelables, Live at Mujica, Rock, Música, YouTube, Spotify">
-
     <meta name="robots" content="index, follow">
-
     <title>Incancelables - Música</title>
-
     <link rel="icon" type="image/x-icon" href="../assets/irrobafav.svg">
-
     <link rel="stylesheet" href="../styles/global.css">
-
     <link rel="stylesheet" href="../styles/musica.css">
-
 </head>
 
 <body>
-
     <div class="layout">
-
         <!-- ======================================================
                             HEADER
         ======================================================= -->
-
         <header class="header">
-
             <a href="../index.html" class="logo">
-
                 <img src="../assets/incan_logo.svg" alt="Incancelables">
-
             </a>
-
+            <button id="theme-toggle" class="theme-btn">
+                <img src="assets/icons/sun.svg" alt="Cambiar tema">
+            </button>
             <button class="menu-btn">
                 ☰
             </button>
-
             <nav class="nav">
-
                 <a href="../index.html">Inicio</a>
                 <a href="musica.html">Música</a>
                 <a href="shows.html">Shows</a>
                 <a href="integrantes.html">Integrantes</a>
                 <a href="contacto.html">Contacto</a>
-
             </nav>
-
         </header>
-
-
         <!-- ======================================================
                             MAIN
         ======================================================= -->
-
         <main class="main">
-
             <article class="album">
-
                 <!-- ==========================================
                             CABECERA
                 =========================================== -->
-
                 <header class="album-header">
-
                     <img class="album-cover" src="../assets/musica/live-at-mujica.png" alt="Portada Live at Mujica">
-
                     <div class="album-info">
-
                         <h1>Live at Mujica</h1>
-
                         <p class="album-description">
-
                             Un registro en vivo de una noche que quedó para siempre.
                             Cada mes liberamos una nueva canción hasta completar el disco.
-
                         </p>
-
                     </div>
-
                 </header>
-
-
-
                 <!-- ==========================================
                         ÚLTIMO LANZAMIENTO
                 =========================================== -->
-
                 <section class="latest-release">
-
                     <header>
-
                         <h2>🔥 Recién salido del horno</h2>
-
                     </header>
-
                     <article class="track-featured">
-
                         <h3 class="featured-title"></h3>
-
                         <p class="release-date"></p>
-
                         <p class="track-description"></p>
-
                         <div class="platform-buttons">
-
                             <button class="btn active-platform" data-platform="youtube">
-
                                 ▶ Reproducir en YouTube
-
                             </button>
-
                             <button class="btn secondary" data-platform="spotify">
-
                                 Escuchar en Spotify
-
                             </button>
-
                         </div>
-
                     </article>
-
                 </section>
-
-
-
                 <!-- ==========================================
                             PLAYLIST
                 =========================================== -->
-
                 <section class="playlist">
-
                     <header>
-
                         <h2>Live at Mujica</h2>
-
                         <p>
-
                             Playlist oficial del disco.
-
                         </p>
-
                     </header>
-
                     <ol class="track-list">
-
                         <!--
                             Se genera completamente
                             desde musica.js
                         -->
-
                     </ol>
-
                 </section>
-
-
-
-
                 <!-- ==========================================
                             REPRODUCTOR
                 =========================================== -->
-
                 <section class="player-section">
-
                     <header>
-
                         <h2>Reproduciendo</h2>
-
                         <p class="current-track"></p>
-
                     </header>
-
                     <div class="player-container">
-
                         <iframe src="" title="YouTube player" frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
                         </iframe>
-
                     </div>
-
                 </section>
-
-
-
-
                 <!-- ==========================================
                         ESCUCHAR EL ÁLBUM
                 =========================================== -->
-
                 <section class="album-platforms">
-
                     <header>
-
                         <h2>
-
                             Escuchá el álbum completo
-
                         </h2>
-
                     </header>
-
                     <div class="platform-links">
-
                         <a class="btn album-youtube" target="_blank">
-
                             Playlist en YouTube
-
                         </a>
-
                         <a class="btn secondary album-spotify" target="_blank">
-
                             Playlist en Spotify
-
                         </a>
-
                     </div>
-
                 </section>
-
-
-
-
                 <!-- ==========================================
                             HISTORIA
                 =========================================== -->
-
                 <section class="album-story">
-
                     <header>
-
                         <h2>
-
                             Acerca de Live at Mujica
-
                         </h2>
-
                     </header>
-
                     <p>
-
                         Live at Mujica registra una noche muy especial
                         para Incancelables.
-
                     </p>
-
                     <p>
-
                         En lugar de publicar el disco completo,
                         decidimos compartir una canción por mes.
-
                     </p>
-
                     <p>
-
                         Cada lanzamiento suma un nuevo capítulo
                         hasta completar el álbum.
-
                     </p>
-
                 </section>
-
             </article>
-
         </main>
-
-
-
-
         <!-- ======================================================
                             ASIDE
         ======================================================= -->
-
         <aside class="aside">
-
             <section class="community">
-
                 <h2>
-
                     Sé un Incancelable!!!
-
                 </h2>
-
                 <p>
-
                     Enterate antes que nadie de los próximos
                     lanzamientos y shows.
-
                 </p>
-
                 <a href="contacto.html" class="btn">
-
                     Quiero sumarme
-
                 </a>
-
             </section>
-
         </aside>
-
-
-
-
         <!-- ======================================================
                             FOOTER
         ======================================================= -->
-
         <footer class="footer">
-
             <p>
-
                 © 2026 Incancelables
-
             </p>
-
             <div class="w3c-validations">
-
                 <a href="https://validator.w3.org/">
-
                     <img src="https://www.w3.org/Icons/valid-html401" alt="HTML válido">
-
                 </a>
-
                 <a href="https://jigsaw.w3.org/css-validator/">
-
                     <img src="https://jigsaw.w3.org/css-validator/images/vcss" alt="CSS válido">
-
                 </a>
-
             </div>
-
         </footer>
-
     </div>
-
     <script src="../scripts/main.js"></script>
-
     <script type="module" src="../scripts/musica.js"></script>
-
 </body>
 
 </html>

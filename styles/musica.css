@@ -13,9 +13,6 @@ LAYOUT
         "footer";
 }
 
-.header {
-    grid-area: header;
-}
 
 .main {
     grid-area: main;
@@ -29,9 +26,6 @@ LAYOUT
     color: var(--text);
 }
 
-.footer {
-    grid-area: footer;
-}
 
 /*////////////////////////////////////////////////////////////////////////////
 ALBUM
@@ -54,7 +48,7 @@ ALBUM
     width: min(100%, 320px);
     display: block;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+    box-shadow: var(--shadow);
 }
 
 .album-info {
@@ -67,7 +61,7 @@ ALBUM
 }
 
 .album-description {
-    color: #c8c8c8;
+    color: var(--text-muted);
     line-height: 1.6;
 }
 
@@ -104,7 +98,7 @@ ULTIMO LANZAMIENTO
 
 .btn.secondary {
     background: transparent;
-    border: 1px solid #666;
+    border: 1px solid var(--button-border);
 }
 
 /*////////////////////////////////////////////////////////////////////////////
@@ -142,11 +136,11 @@ PLAYLIST
 
 .track:hover {
     transform: translateY(-2px);
-    background: #222;
+    background: var(--track-hover);
 }
 
 .track.active {
-    border-left: 4px solid #d81f26;
+    border-left: 4px solid var(--track-active);
 }
 
 .track-number {
@@ -203,8 +197,8 @@ PLAYER
 .player-container {
     overflow: hidden;
     border-radius: 12px;
-    background: #000;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+    background: var(--player-bg);
+    box-shadow: var(--shadow);
 }
 
 .player-container iframe {
