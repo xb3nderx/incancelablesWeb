@@ -10,10 +10,63 @@ MAIN
     align-items: center;
 }
 
+/* PROXIMO SHOW */
+.proximo-show {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    background: var(--card);
+    color: var(--text-on-card);
+
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+}
+
 .proximo-show img {
     border-radius: 16px;
     border: 2px solid var(--accent);
     box-shadow: var(--shadow);
+}
+
+.proximo-show header {
+    text-align: center;
+}
+
+.proximo-show h1 {
+    margin-top: .25rem;
+}
+
+.show-flyer {
+    display: block;
+}
+
+.show-flyer img {
+    width: 100%;
+    display: block;
+}
+
+.proximo-show .show-info {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+}
+
+.proximo-show .show-info p {
+    margin: 0;
+}
+
+/* PROXIMO SHOW */
+
+.acciones {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+}
+
+.acciones a {
+    text-align: center;
 }
 
 .historial {
@@ -79,16 +132,13 @@ ASIDE
 @media(min-width:768px) {
 
     .show-card {
-
+        width: min(600px, 100%);
         grid-template-columns: 300px 1fr;
-
-        align-items: center;
-
     }
 
-    .show-info {
+    /* .show-info {
         text-align: left;
-    }
+    } */
 
 }
 
