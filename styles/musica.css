@@ -92,13 +92,8 @@ ULTIMO LANZAMIENTO
 
 .platform-buttons {
     display: flex;
-    flex-direction: column;
-    gap: .75rem;
-}
-
-.btn.secondary {
-    background: transparent;
-    border: 1px solid var(--button-border);
+    justify-content: center;
+    margin-top: 1rem;
 }
 
 /*////////////////////////////////////////////////////////////////////////////
@@ -255,7 +250,6 @@ TABLET
 ////////////////////////////////////////////////////////////////////////////*/
 @media(min-width:768px) {
 
-    .platform-buttons,
     .platform-links {
         flex-direction: row;
         justify-content: center;
