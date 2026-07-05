@@ -136,6 +136,12 @@ ASIDE
 
     }
 
+    .contacto-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     .contact-form {
         width: 100%;
         max-width: 500px;
@@ -166,6 +172,22 @@ ASIDE
             "footer footer";
     }
 
+    /* Sección Contacto */
+    .contacto-body {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-evenly;
+        gap: 2rem;
+    }
+
+    .aside {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+    }
 }
 
 /* ==========================

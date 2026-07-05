@@ -203,6 +203,10 @@ ASIDE
     .integrantes-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .aside {
+        justify-content: center;
+    }
 }
 
 /* ==========================

@@ -90,11 +90,11 @@ ULTIMO LANZAMIENTO
     line-height: 1.6;
 }
 
-.platform-buttons {
+/* .platform-buttons {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
-}
+} */
 
 /*////////////////////////////////////////////////////////////////////////////
 PLAYLIST
@@ -248,56 +248,101 @@ ASIDE
 /*////////////////////////////////////////////////////////////////////////////
 TABLET
 ////////////////////////////////////////////////////////////////////////////*/
-@media(min-width:768px) {
+
+@media (min-width:768px) {
 
     .platform-links {
         flex-direction: row;
         justify-content: center;
     }
 
+    .album {
+
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        grid-template-areas:
+            "album-header album-header"
+            "playlist release"
+            "playlist player"
+            "platforms story";
+
+        gap: 2rem;
+
+        align-items: start;
+    }
+
     .album-header {
+        grid-area: album-header;
+
+        display: flex;
         flex-direction: row;
         align-items: center;
+        gap: 2rem;
+    }
+
+    .album-cover {
+        width: 280px;
+        flex-shrink: 0;
     }
 
     .album-info {
         text-align: left;
+    }
+
+    .latest-release {
+        grid-area: release;
+        margin-bottom: 0;
+    }
+
+    .playlist {
+        grid-area: playlist;
+        margin-bottom: 0;
+    }
+
+    .player-section {
+        grid-area: player;
+        margin-bottom: 0;
+    }
+
+    .album-platforms {
+        grid-area: platforms;
+        margin-bottom: 0;
+    }
+
+    .album-story {
+        grid-area: story;
+        margin-bottom: 0;
     }
 }
 
 /*////////////////////////////////////////////////////////////////////////////
 DESKTOP
 ////////////////////////////////////////////////////////////////////////////*/
-@media(min-width:1024px) {
-    .layout {
-        grid-template-columns: 1fr 320px;
-        grid-template-rows: auto 1fr auto;
-        grid-template-areas:
-            "header header"
-            "main aside"
-            "footer footer";
-    }
+@media (min-width:1024px) {
 
     .album {
-        display: grid;
-        grid-template-columns: 340px 1fr;
-        gap: 2rem;
-        align-items: start;
+        max-width: 1400px;
     }
 
-    .album-header {
-        position: sticky;
-        top: 2rem;
-        flex-direction: column;
+    .player-section {
+        position: static;
     }
 }
+
 
 /*////////////////////////////////////////////////////////////////////////////
 DESKTOP GRANDE
 ////////////////////////////////////////////////////////////////////////////*/
-@media(min-width:1440px) {
+@media (min-width:1440px) {
+
     .album {
-        max-width: 1400px;
+        max-width: 1500px;
+    }
+
+    .album-cover {
+        width: 320px;
     }
 
     .album-info h1 {

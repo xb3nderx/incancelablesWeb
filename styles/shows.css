@@ -136,10 +136,12 @@ ASIDE
         grid-template-columns: 300px 1fr;
     }
 
-    /* .show-info {
-        text-align: left;
-    } */
-
+    #shows-history {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 }
 
 /* ==========================
