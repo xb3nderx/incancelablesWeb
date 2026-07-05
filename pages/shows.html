@@ -39,16 +39,15 @@
             <section class="proximo-show">
                 <header>
                     <span class="show-badge">● PRÓXIMO SHOW</span>
-                    <h1>Strummer Bar</h1>
+                    <h1 id="upcoming-show-title"></h1>
                 </header>
                 <picture class="show-flyer">
-                    <source media="(min-width:768px)" srcset="../assets/shows/Strummer-22-08-26-desktop.png"
-                        type="image/png">
-                    <img src="../assets/shows/Strummer-22-08-26-mobile.png" alt="Flyer del show en Strummer Bar">
+                    <source id="upcoming-show-desktop" media="(min-width:768px)" srcset="" type="image/png">
+                    <img id="upcoming-show-mobile" src="" alt="Flyer del próximo show">
                 </picture>
                 <article class="show-info">
-                    <p class="show-fecha">22 de Agosto · 23:00 hs</p>
-                    <p class="show-lugar">Godoy Cruz 1631 · CABA</p>
+                    <p id="upcoming-show-date" class="show-fecha"></p>
+                    <p id="upcoming-show-location" class="show-lugar"></p>
                 </article>
                 <div class="acciones">
                     <a class="btn" href="#">Entradas</a>
@@ -131,5 +130,6 @@
             </div>
         </footer>
         <script src="../scripts/main.js"></script>
+        <script type="module" src="../scripts/shows.js"></script>
     </div>
 </body>

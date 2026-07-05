@@ -19,11 +19,21 @@ export const proximoShow = {
 //funcion que renderiza en la pagina los datos del proximo show
 export function renderProximoShow() {
 
-    document.querySelector("#upcoming-show-title").textContent = proximoShow.titulo;
-    document.querySelector("#upcoming-show-date").textContent = proximoShow.fecha;
-    document.querySelector("#upcoming-show-location").textContent = proximoShow.lugar;
-    document.querySelector("#upcoming-show-mobile").src = proximoShow.flyer.mobile;
-    document.querySelector("#upcoming-show-desktop").srcset = proximoShow.flyer.desktop;
-    document.querySelector("#upcoming-show-link").href = proximoShow.link;
+    const title = document.querySelector("#upcoming-show-title");
+    const date = document.querySelector("#upcoming-show-date");
+    const location = document.querySelector("#upcoming-show-location");
+    const mobile = document.querySelector("#upcoming-show-mobile");
+    const desktop = document.querySelector("#upcoming-show-desktop");
+    const link = document.querySelector("#upcoming-show-link");
 
+    if (title) title.textContent = proximoShow.titulo;
+    if (date) date.textContent = proximoShow.fecha;
+    if (location) location.textContent = proximoShow.lugar;
+    if (mobile) mobile.src = proximoShow.flyer.mobile;
+    if (desktop) desktop.srcset = proximoShow.flyer.desktop;
+
+    // Solo existe en index.html
+    if (link) {
+        link.href = proximoShow.link;
+    }
 }
