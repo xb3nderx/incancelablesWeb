@@ -128,8 +128,63 @@
 
 .proximo-show {
     grid-area: proximo-show;
-    background-color: var(--bg);
-    color: var(--text);
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    background: var(--card);
+    color: var(--text-on-card);
+
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.proximo-show h2 {
+    margin: 0;
+    text-align: center;
+    color: var(--text-on-card);
+}
+
+.show-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    text-decoration: none;
+    color: inherit;
+}
+
+.show-preview picture {
+    display: block;
+}
+
+.show-preview img {
+    width: 100%;
+    display: block;
+
+    border-radius: 1rem;
+    border: 2px solid var(--accent);
+    box-shadow: var(--shadow);
+}
+
+.show-preview-info {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+
+    text-align: center;
+}
+
+.show-preview-info h3,
+.show-preview-info p {
+    margin: 0;
+}
+
+.show-preview:hover {
+    transform: translateY(-4px);
+    transition: transform .2s ease;
 }
 
 /* ==========================
@@ -154,6 +209,9 @@
         font-size: 4rem;
     }
 
+    /* ==========================
+   ULTIMO LANZAMIENTO
+   ========================== */
     .ultimo-lanzamiento {
         grid-template-columns: auto auto;
         grid-template-areas:
@@ -186,16 +244,22 @@
         grid-area: imagen;
         width: 500px;
     }
-}
 
-/* ==========================
+    /* ==========================
+   PROXIMO SHOW
+   ========================== */
+    .show-preview {
+        gap: 1.25rem;
+    }
+
+    /* ==========================
    DESKTOP
    ========================== */
 
-@media (min-width: 1024px) {}
+    @media (min-width: 1024px) {}
 
-/* ==========================
+    /* ==========================
    DESKTOP GRANDE
    ========================== */
 
-@media (min-width: 1440px) {}
+    @media (min-width: 1440px) {}

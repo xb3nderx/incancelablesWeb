@@ -1,8 +1,10 @@
 
+// constante que se usa para ver si 
 const basePath = window.location.pathname.includes("/pages/")
     ? "../"
     : "";
 
+// estructura de datos que contiene el proximo show de la banda    
 export const proximoShow = {
     titulo: "Strummer Bar",
     fecha: "22 de Agosto · 23:00 hs",
@@ -14,6 +16,7 @@ export const proximoShow = {
     link: `${basePath}pages/shows.html`
 }
 
+//funcion que renderiza en la pagina los datos del proximo show
 export function renderProximoShow() {
 
     document.querySelector("#upcoming-show-title").textContent = proximoShow.titulo;
