@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba API</title>
+</head>
+
+<body>
+
+    <button id="probar">Probar API</button>
+
+    <pre id="resultado"></pre>
+
+    <script>
+
+        const URL = "https://script.google.com/macros/s/AKfycbwCdemjNBvYsy6MsqtEpfqjfctOGdxCK_S2ukxLQmCfM6TKXAwvPODOrruMngm9r5C8/exec";
+
+        document.querySelector("#probar").addEventListener("click", async () => {
+
+            const datos = new FormData();
+            // contacto 
+            datos.append("tipo", "comunidad");
+            datos.append("nombre", "Facundo");
+            datos.append("email", "facundo@gmail.com");
+            datos.append("ciudad", "Buenos Aires");
+            datos.append("website", "");
+
+            //comunidad 
+            // datos.append("tipo", "contacto");
+            // datos.append("nombre", "Facundo");
+            // datos.append("email", "facundo@gmail.com");
+            // datos.append("mensaje", "Prueba de envío de correo.");
+            // datos.append("website", "");
+            const respuesta = await fetch(URL, {
+                method: "POST",
+                body: datos
+            });
+
+            const json = await respuesta.json();
+
+            document.querySelector("#resultado").textContent =
+                JSON.stringify(json, null, 2);
+
+        });
+
+    </script>
+
+</body>
+
+</html>
