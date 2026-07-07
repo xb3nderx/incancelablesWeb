@@ -1,12 +1,12 @@
+/* ==========================
+   LAYOUT PRINCIPAL
+   ========================== */
 .layout {
     display: grid;
     min-height: 100vh;
-
     grid-template-columns: 1fr;
-
     grid-template-rows:
         auto 1fr auto;
-
     grid-template-areas:
         "header"
         "main"
@@ -19,15 +19,10 @@
 
 .main {
     grid-area: main;
-
     background-color: var(--bg);
-
     display: grid;
-
     grid-template-columns: 1fr;
-
     gap: 1rem;
-
     grid-template-areas:
         "hero"
         "manifiesto"
@@ -45,11 +40,23 @@
     min-height: unset;
 }
 
+/* Oculta contenido visualmente pero lo mantiene accesible para lectores de pantalla */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Imagen principal */
 .hero img {
     width: 100%;
     height: auto;
     display: block;
-
     mix-blend-mode: luminosity;
     opacity: 0.7;
 }
@@ -60,22 +67,20 @@
 
 .manifiesto {
     grid-area: manifiesto;
-
     display: flex;
     flex-direction: column;
 }
 
+/* Título del manifiesto */
 .manifiesto h1 {
     padding: 2rem;
-
     color: var(--text);
-
     text-align: center;
 }
 
+/* Párrafos del manifiesto */
 .manifiesto p {
     padding: 0.5rem 2rem;
-
     color: var(--text);
 }
 
@@ -97,16 +102,19 @@
     text-align: center;
 }
 
+/* Título de la sección */
 .ultimo-lanzamiento h2 {
     grid-area: titulo;
 }
 
+/* Texto descriptivo del lanzamiento */
 .lanzamiento-texto {
     grid-area: texto;
     margin: 1rem;
     text-align: center;
 }
 
+/* Contenedor de la portada */
 .lanzamiento-disco {
 
     grid-area: imagen;
@@ -114,7 +122,7 @@
     justify-items: center;
 }
 
-
+/* Imagen de la portada */
 .lanzamiento-disco img {
     width: 180px;
     max-width: 100%;
@@ -147,6 +155,7 @@
     color: var(--text-on-card);
 }
 
+/* Enlace que contiene la vista previa del show */
 .show-preview {
     display: flex;
     flex-direction: column;
@@ -156,10 +165,12 @@
     color: inherit;
 }
 
+/* Contenedor de la imagen responsiva */
 .show-preview picture {
     display: block;
 }
 
+/* Flyer del próximo show */
 .show-preview img {
     width: 100%;
     display: block;
@@ -169,6 +180,7 @@
     box-shadow: var(--shadow);
 }
 
+/* Información del show */
 .show-preview-info {
     display: flex;
     flex-direction: column;
@@ -177,11 +189,13 @@
     text-align: center;
 }
 
+/* Elimina márgenes por defecto */
 .show-preview-info h3,
 .show-preview-info p {
     margin: 0;
 }
 
+/* Animación al pasar el mouse */
 .show-preview:hover {
     transform: translateY(-4px);
     transition: transform .2s ease;
@@ -205,6 +219,8 @@
    ========================== */
 
 @media (min-width: 768px) {
+
+    /* Ajustes para el hero */
     .hero h1 {
         font-size: 4rem;
     }
@@ -251,15 +267,16 @@
     .show-preview {
         gap: 1.25rem;
     }
+}
 
-    /* ==========================
+/* ==========================
    DESKTOP
    ========================== */
 
-    @media (min-width: 1024px) {}
+@media (min-width: 1024px) {}
 
-    /* ==========================
+/* ==========================
    DESKTOP GRANDE
    ========================== */
 
-    @media (min-width: 1440px) {}
+@media (min-width: 1440px) {}

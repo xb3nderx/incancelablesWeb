@@ -1,18 +1,21 @@
+/* ==========================
+   TÍTULO PRINCIPAL
+   ========================== */
 h1 {
     margin: 1rem;
     color: var(--text);
     text-align: center;
 }
 
+/* ==========================
+   LAYOUT PRINCIPAL
+   ========================== */
 .layout {
     display: grid;
     min-height: 100vh;
-
     grid-template-columns: 1fr;
-
     grid-template-rows:
         auto 1fr auto auto;
-
     grid-template-areas:
         "header"
         "main"
@@ -20,101 +23,87 @@ h1 {
         "footer";
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-MAIN
-///////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   MAIN
+   ========================== */
 .main {
     grid-area: main;
-
     background-color: var(--bg);
-
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-INTEGRANTE CARD
-///////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   TARJETAS DE INTEGRANTES
+   ========================== */
+/* Contenedor de tarjetas */
 .integrantes-grid {
     display: grid;
-
     grid-template-columns: 1fr;
-
     gap: 2rem;
-
     justify-items: center;
 }
 
+/* Tarjeta del integrante */
 .integrante {
     width: min(90vw, 320px);
-
     aspect-ratio: 2 / 3;
-
     background: var(--card);
-
     border-radius: 24px;
-
     padding: 1rem;
-
     display: flex;
     flex-direction: column;
-
     box-shadow: var(--shadow);
-
     overflow: hidden;
-
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
+/* Animación al pasar el mouse */
 .integrante:hover {
     transform: translateY(-10px);
     scale: 110%;
 }
 
+/* Cabecera de la tarjeta */
 .integrante-header {
     border: 2px solid #222;
     display: grid;
-
     grid-template-columns:
         auto 1fr auto;
-
     align-items: center;
-
     gap: 0.5rem;
-
     margin-bottom: 0.75rem;
 }
 
+/* Número del integrante */
 .integrante-numero {
     padding: 0.1rem 0.4rem;
-
     font-weight: bold;
-
     font-size: 1.2rem;
     color: var(--text-on-card)
 }
 
+/* Nombre del integrante */
 .integrante-nombre {
+    margin: 0;
+    padding: 0;
     color: #c63d2d;
-
-    /* font-size: 1rem; */
     font-size: 1.4rem;
-
     font-weight: bold;
-
     text-align: center;
-
     white-space: nowrap;
-
 }
 
+/* Ajuste para nombres largos */
 .integrante-nombre.largo {
     font-size: 1rem;
 }
 
+/* Logo de la tarjeta */
 .integrante-logo {
     width: 36px;
 }
 
+/* Fotografía del integrante */
 .integrante-foto {
     width: 90%;
     display: block;
@@ -126,25 +115,23 @@ INTEGRANTE CARD
     border-radius: 5px;
 }
 
+/* Apodo del integrante */
 .integrante-apodo {
     text-align: center;
-
     margin: 0.6rem 0;
-
     color: #c63d2d;
-
     font-size: 1.5rem;
 }
 
+/* Tabla de estadísticas */
 .integrante-stats {
     width: 100%;
-
     border-collapse: collapse;
-
     font-weight: bold;
     border: 2px solid #222;
 }
 
+/* Celdas de la tabla */
 .integrante-stats td {
     border-top: 2px solid #222;
     border-bottom: 2px solid #222;
@@ -152,17 +139,14 @@ INTEGRANTE CARD
     color: var(--text-on-card);
 }
 
-
-
+/* Alineación de la segunda columna */
 .integrante-stats td:last-child {
     text-align: right;
 }
 
-
-
-/*////////////////////////////////////////////////////////////////////////////
-ASIDE
-///////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   ASIDE
+   ========================== */
 .aside {
     color: var(--text);
     background-color: var(--bg);
@@ -171,6 +155,7 @@ ASIDE
     align-items: center;
 }
 
+/* Botón del aside */
 .btn {
     padding: 1rem;
     margin: 1rem;
@@ -181,6 +166,8 @@ ASIDE
     ========================== */
 
 @media (min-width: 768px) {
+
+    /* Dos columnas de tarjetas */
     .integrantes-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -191,6 +178,8 @@ ASIDE
     ========================== */
 
 @media (min-width: 1024px) {
+
+    /* Layout de escritorio */
     .layout {
         grid-template-columns: 1fr 5fr;
         grid-template-rows: auto 1fr auto;
@@ -200,10 +189,12 @@ ASIDE
             "footer footer";
     }
 
+    /* Mantiene dos columnas */
     .integrantes-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    /* Centra el contenido del aside */
     .aside {
         justify-content: center;
     }
@@ -214,6 +205,8 @@ ASIDE
     ========================== */
 
 @media (min-width: 1440px) {
+
+    /* Layout para pantallas grandes */
     .layout {
         grid-template-columns: 2fr 6fr;
         grid-template-areas:
@@ -222,6 +215,7 @@ ASIDE
             "footer footer";
     }
 
+    /* Tres columnas de tarjetas */
     .integrantes-grid {
         grid-template-columns: repeat(3, 1fr);
     }

@@ -2,8 +2,8 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- SEO -->
   <meta name="description" content="Incancelables">
@@ -12,23 +12,28 @@
 
   <!-- Insert your favicon here -->
   <title>Incancelables</title>
-  <link rel="icon" type="image/x-icon" href="assets/irrobafav.svg" />
-  <link rel="stylesheet" href="styles/global.css" />
-  <link rel="stylesheet" href="styles/index.css" />
+  <link rel="icon" type="image/x-icon" href="assets/irrobafav.svg">
+  <link rel="stylesheet" href="styles/global.css">
+  <link rel="stylesheet" href="styles/index.css">
 </head>
 
 <body>
   <div class="layout">
+    <!-- CABECERA -->
     <header class="header">
+      <!-- LOGO -->
       <a href="index.html" class="logo">
         <img src="assets/incan_logo.svg" alt="Incancelables">
       </a>
+      <!-- BOTÓN CAMBIO DE TEMA -->
       <button id="theme-toggle" class="theme-btn">
         <img id="theme-icon" src="assets/icons/sun.svg" alt="Cambiar tema">
       </button>
+      <!-- BOTÓN MENÚ MÓVIL -->
       <button class="menu-btn">
         ☰
       </button>
+      <!-- MENÚ DE NAVEGACIÓN -->
       <nav class="nav">
         <a href="index.html">Inicio</a>
         <a href="pages/musica.html">Música</a>
@@ -37,58 +42,74 @@
         <a href="pages/contacto.html">Contacto</a>
       </nav>
     </header>
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="main">
+      <!-- HERO / IMAGEN PRINCIPAL -->
       <section class="hero">
+        <h1 class="visually-hidden">Incancelables</h1>
+        <!-- IMAGEN RESPONSIVA -->
         <picture>
           <source media="(min-width: 768px)" srcset="assets/index/incan_hero_desktop.png">
 
           <img src="assets/index/incan_hero_mobile.png" alt="foto de incancelables">
         </picture>
       </section>
+      <!-- MANIFIESTO DE LA BANDA -->
       <section class="manifiesto">
-        <h1>UN PASO ATRAS PARA ESTAR EN LA VANGUARDIA</h1>
+        <h2>UN PASO ATRAS PARA ESTAR EN LA VANGUARDIA</h2>
         <p>Dios-like baja su pulgar y una vez mas vuelve a arder la hoguera digital en cyber-salem.</p>
         <p>El humo del hate, escala en agonizantes espirales la conciencia colectiva, parasitando ideas que se vuelven
           consignas machacadas a fuerza de reposts y views.</p>
         <p>No existe un click salvador que te libere... Solo la <a href="pages/musica.html"
             class="call-to-action">música</a></p>
       </section>
+      <!-- ÚLTIMO LANZAMIENTO -->
       <section class="ultimo-lanzamiento">
-        <H2>ULTIMO LANZAMIENTO</H2>
+        <h2>ULTIMO LANZAMIENTO</h2>
+        <!-- DESCRIPCIÓN DEL LANZAMIENTO -->
         <div class="lanzamiento-texto">
           <p>Mirá y escuchá nuestro último disco "Live at Mujica" filmado y grabado en vivo en nuestra sala</p>
           <p>Todos los meses vamos a ir subiendo 1 tema nuevo hasta completar los 11 grabados</p>
         </div>
+        <!-- PORTADA DEL DISCO -->
         <a href="pages/musica.html" class="lanzamiento-disco">
           <img src="assets/musica/live-at-mujica.png" alt="live at mujica cover de disco">
         </a>
       </section>
+      <!-- PRÓXIMO SHOW -->
       <section class="proximo-show">
-        <H2>PROXIMO SHOW</H2>
+        <h2>PROXIMO SHOW</h2>
+        <!-- VISTA PREVIA DEL SHOW -->
         <a id="upcoming-show-link" class="show-preview">
+          <!-- FLYER RESPONSIVO -->
           <picture>
-            <source id="upcoming-show-desktop" media="(min-width:768px)" srcset="">
+            <source id="upcoming-show-desktop" media="(min-width:768px)"
+              srcset="assets/shows/Strummer-22-08-26-desktop.png">
 
-            <img id="upcoming-show-mobile" src="" alt="Próximo show">
+            <img id="upcoming-show-mobile" src="assets/shows/Strummer-22-08-26-mobile.png" alt="Próximo show">
           </picture>
-
+          <!-- INFORMACIÓN DEL SHOW -->
           <div class="show-preview-info">
-            <h3 id="upcoming-show-title"></h3>
+            <h3 id="upcoming-show-title">Upcoming</h3>
             <p id="upcoming-show-date"></p>
             <p id="upcoming-show-location"></p>
           </div>
         </a>
       </section>
+      <!-- LLAMADO A LA ACCIÓN -->
       <section class="seguinos-whats">
+        <h2 class="visually-hidden">WhatsApp QR</h2>
         <a href="pages/contacto.html" class="btn">
           Seguinos
         </a>
       </section>
     </main>
+    <!-- PIE DE PÁGINA -->
     <footer class="footer">
       <p>
         © 2026 Incancelables
       </p>
+      <!-- VALIDADORES W3C -->
       <div class="w3c-validations">
         <a href="https://validator.w3.org/">
           <img src="https://www.w3.org/Icons/valid-html401" alt="HTML válido">
@@ -98,8 +119,8 @@
           <img src="https://jigsaw.w3.org/css-validator/images/vcss" alt="CSS válido">
         </a>
       </div>
-
     </footer>
+    <!-- SCRIPTS -->
     <script src="scripts/main.js"></script>
     <script type="module" src="scripts/index.js"></script>
   </div>

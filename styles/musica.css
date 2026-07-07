@@ -1,6 +1,6 @@
-/*////////////////////////////////////////////////////////////////////////////
-LAYOUT
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   LAYOUT PRINCIPAL
+   ========================== */
 .layout {
     min-height: 100vh;
     display: grid;
@@ -13,29 +13,31 @@ LAYOUT
         "footer";
 }
 
-
+/* Contenido principal */
 .main {
     grid-area: main;
     color: var(--text);
     background: var(--bg);
 }
 
+/* Barra lateral */
 .aside {
     grid-area: aside;
     background: var(--bg-alt);
     color: var(--text);
 }
 
-
-/*////////////////////////////////////////////////////////////////////////////
-ALBUM
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   ÁLBUM
+   ========================== */
+/* Contenedor del álbum */
 .album {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
 }
 
+/* Cabecera del álbum */
 .album-header {
     display: flex;
     flex-direction: column;
@@ -44,6 +46,7 @@ ALBUM
     margin-bottom: 2rem;
 }
 
+/* Portada del álbum */
 .album-cover {
     width: min(100%, 320px);
     display: block;
@@ -51,23 +54,27 @@ ALBUM
     box-shadow: var(--shadow);
 }
 
+/* Información del álbum */
 .album-info {
     text-align: center;
 }
 
+/* Título del álbum */
 .album-info h1 {
     margin: .5rem 0;
     font-size: 2rem;
 }
 
+/* Descripción del álbum */
 .album-description {
     color: var(--text-muted);
     line-height: 1.6;
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-ULTIMO LANZAMIENTO
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   ÚLTIMO LANZAMIENTO
+   ========================== */
+/* Tarjeta del lanzamiento destacado */
 .latest-release {
     background: var(--bg-alt);
     border-radius: 14px;
@@ -75,39 +82,39 @@ ULTIMO LANZAMIENTO
     margin-bottom: 2rem;
 }
 
+/* Título del tema */
 .track-featured h3 {
     font-size: 1.6rem;
     margin: .5rem 0;
 }
 
+/* Fecha de lanzamiento */
 .release-date {
     opacity: .75;
     font-size: .9rem;
 }
 
+/* Descripción del tema */
 .track-description {
     margin: 1rem 0 1.5rem;
     line-height: 1.6;
 }
 
-/* .platform-buttons {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem;
-} */
-
-/*////////////////////////////////////////////////////////////////////////////
-PLAYLIST
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   PLAYLIST
+   ========================== */
+/* Contenedor de la playlist */
 .playlist {
     margin-bottom: 2rem;
 }
 
+/* Cabecera de la playlist */
 .playlist header {
     text-align: center;
     margin-bottom: 1.25rem;
 }
 
+/* Lista de canciones */
 .track-list {
     list-style: none;
     padding: 0;
@@ -117,6 +124,7 @@ PLAYLIST
     gap: .75rem;
 }
 
+/* Canción */
 .track {
     display: grid;
     grid-template-columns: 48px 1fr auto;
@@ -129,32 +137,38 @@ PLAYLIST
     cursor: pointer;
 }
 
+/* Efecto hover */
 .track:hover {
     transform: translateY(-2px);
     background: var(--track-hover);
 }
 
+/* Canción seleccionada */
 .track.active {
     border-left: 4px solid var(--track-active);
 }
 
+/* Número de pista */
 .track-number {
     font-size: 1.2rem;
     font-weight: 700;
     text-align: center;
 }
 
+/* Información de la canción */
 .track-info h3 {
     margin: 0;
     font-size: 1rem;
 }
 
+/* Datos adicionales de la canción */
 .track-info p {
     margin: .25rem 0 0;
     opacity: .7;
     font-size: .9rem;
 }
 
+/* Botón de reproducción */
 .play-button {
     width: 42px;
     height: 42px;
@@ -164,31 +178,37 @@ PLAYLIST
     font-size: 1rem;
 }
 
+/* Canción no disponible */
 .track.disabled {
     opacity: 0.6;
     cursor: default;
 }
 
+/* Sin efecto hover para canciones no disponibles */
 .track.disabled:hover {
     transform: none;
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-PLAYER
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   PLAYER
+   ========================== */
+/* Contenedor del reproductor */
 .player-section {
     margin-bottom: 2rem;
 }
 
+/* Cabecera del reproductor */
 .player-section header {
     text-align: center;
     margin-bottom: 1rem;
 }
 
+/* Tema actualmente seleccionado */
 .current-track {
     opacity: .75;
 }
 
+/* Contenedor del reproductor multimedia */
 .player-container {
     overflow: hidden;
     border-radius: 12px;
@@ -196,6 +216,7 @@ PLAYER
     box-shadow: var(--shadow);
 }
 
+/* Video embebido */
 .player-container iframe {
     display: block;
     width: 100%;
@@ -203,9 +224,9 @@ PLAYER
     border: 0;
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-ALBUM LINKS
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   PLATAFORMAS DEL ÁLBUM
+   ========================== */
 .album-platforms {
     background: var(--bg-alt);
     padding: 1.5rem;
@@ -214,137 +235,150 @@ ALBUM LINKS
     text-align: center;
 }
 
+/* Enlaces a plataformas */
 .platform-links {
     display: flex;
     flex-direction: column;
     gap: .75rem;
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-STORY
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   HISTORIA DEL ÁLBUM
+   ========================== */
+/* Contenido de la historia */
 .album-story {
     line-height: 1.8;
     margin-bottom: 2rem;
 }
 
+/* Título de la historia */
 .album-story h2 {
     margin-bottom: 1rem;
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-ASIDE
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   ASIDE
+   ========================== */
+/* Sección de comunidad */
 .community {
     padding: 2rem 1rem;
     text-align: center;
 }
 
+/* Texto descriptivo */
 .community p {
     margin: 1rem 0 1.5rem;
     line-height: 1.6;
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-TABLET
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   TABLET
+   ========================== */
 
 @media (min-width:768px) {
 
+    /* Distribución horizontal de plataformas */
     .platform-links {
         flex-direction: row;
         justify-content: center;
     }
 
+    /* Reorganización del contenido del álbum */
     .album {
-
         display: grid;
-
         grid-template-columns: 1fr 1fr;
-
         grid-template-areas:
             "album-header album-header"
             "playlist release"
             "playlist player"
             "platforms story";
-
         gap: 2rem;
-
         align-items: start;
     }
 
+    /* Cabecera horizontal */
     .album-header {
         grid-area: album-header;
-
         display: flex;
         flex-direction: row;
         align-items: center;
         gap: 2rem;
     }
 
+    /* Ajuste de la portada */
     .album-cover {
         width: 280px;
         flex-shrink: 0;
     }
 
+    /* Alineación del texto */
     .album-info {
         text-align: left;
     }
 
+    /* Posición del último lanzamiento */
     .latest-release {
         grid-area: release;
         margin-bottom: 0;
     }
 
+    /* Posición de la playlist */
     .playlist {
         grid-area: playlist;
         margin-bottom: 0;
     }
 
+    /* Posición del reproductor */
     .player-section {
         grid-area: player;
         margin-bottom: 0;
     }
 
+    /* Posición de las plataformas */
     .album-platforms {
         grid-area: platforms;
         margin-bottom: 0;
     }
 
+    /* Posición de la historia */
     .album-story {
         grid-area: story;
         margin-bottom: 0;
     }
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-DESKTOP
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   DESKTOP
+   ========================== */
 @media (min-width:1024px) {
 
+    /* Aumenta el ancho máximo */
     .album {
         max-width: 1400px;
     }
 
+    /* Reproductor en posición normal */
     .player-section {
         position: static;
     }
 }
 
-
-/*////////////////////////////////////////////////////////////////////////////
-DESKTOP GRANDE
-////////////////////////////////////////////////////////////////////////////*/
+/* ==========================
+   DESKTOP GRANDE
+   ========================== */
 @media (min-width:1440px) {
 
+    /* Mayor ancho del álbum */
     .album {
         max-width: 1500px;
     }
 
+    /* Portada de mayor tamaño */
     .album-cover {
         width: 320px;
     }
 
+    /* Título más grande */
     .album-info h1 {
         font-size: 2.5rem;
     }

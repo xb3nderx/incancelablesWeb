@@ -1,27 +1,14 @@
-/* :root {
-    --bg: #24284e;
-    --bg-alt: #313764;
-    --bg-dark: #1f223f;
-    --accent: #d8830f;
-    --text: #ffffff;
-    --overlay: rgba(0, 0, 0, 0.45);
-    --cat-v1: #fe019a;
-    --cat-v2: #EE00FF;
-    --card: #ecece3;
-} */
-
+/* ==========================
+   VARIABLES GLOBALES
+   ========================== */
 :root {
-
     /* ==========================
        MODO OSCURO (POR DEFECTO)
        ========================== */
-
     --page-bg: #17192d;
-
     --bg: #24284e;
     --bg-alt: #313764;
     --bg-dark: #1f223f;
-
     --accent: #d8830f;
 
     --text: #ffffff;
@@ -97,17 +84,20 @@ body.light {
     --player-bg: #000000;
 }
 
+/* Restablece márgenes, rellenos y el modelo de caja */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Configuración general del documento */
 html {
     scroll-behavior: smooth;
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Configuración general del cuerpo de la página */
 body {
     color: var(--text);
 
@@ -119,16 +109,18 @@ body {
 /* ==========================
    ELEMENTOS GENERALES
    ========================== */
-
+/* Imágenes responsivas */
 img {
     width: 100%;
     display: block;
 }
 
+/* Enlaces */
 a {
     text-decoration: none;
 }
 
+/* Encabezados de segundo nivel */
 h2 {
     padding: 1rem;
     text-align: center;
@@ -137,51 +129,44 @@ h2 {
 /* ==========================
    HEADER
    ========================== */
-
 .header {
     grid-area: header;
-
     position: sticky;
     top: 0;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     padding: 1rem;
-
     background: var(--bg-dark);
-
     z-index: 1000;
 }
 
+/* Logo de la banda */
 .logo {
     width: clamp(250px, 45vw, 350px);
     height: auto;
-
     color: var(--accent);
-
     position: relative;
     top: 15px;
 }
 
+/* Imagen del logo */
 .logo img {
     width: 100%;
     height: auto;
     /* padding-left: 1rem; */
 }
 
+/* Botón del menú móvil */
 .menu-btn {
     border: none;
     background: none;
-
     color: var(--accent);
-
     font-size: 3rem;
-
     cursor: pointer;
 }
 
+/* Botón para cambiar el tema */
 .theme-btn {
     background: none;
     border: none;
@@ -190,25 +175,23 @@ h2 {
     color: var(--accent);
 }
 
+/* Menú de navegación */
 .nav {
     position: absolute;
-
     top: 100%;
     left: 0;
-
     width: 100%;
-
     background: var(--bg-dark);
-
     display: none;
-
     flex-direction: column;
 }
 
+/* Estado activo del menú móvil */
 .nav.active {
     display: flex;
 }
 
+/* Enlaces del menú */
 .nav a {
     color: var(--text);
     font-size: 1rem;
@@ -217,24 +200,23 @@ h2 {
     transition: all 0.3s ease;
 }
 
+/* Efecto al pasar el mouse sobre el menú */
 .nav a:hover {
     color: var(--accent);
     transform: translateX(8px) scale(1.5);
 }
 
+/* Botones principales */
 .btn {
     display: inline-block;
-
     padding: .8rem 1.5rem;
-
     background: var(--accent);
-
     color: var(--text);
-
     border-radius: 5px;
     transition: all 0.3s ease;
 }
 
+/* Efecto hover del botón */
 .btn:hover {
     transform: scale(1.2);
     -webkit-transform: scale(1.2);
@@ -243,24 +225,23 @@ h2 {
     -o-transform: scale(1.2);
 }
 
+/* Estado al hacer clic */
 .btn:active {
     background: var(--text);
-
     color: var(--accent);
 }
 
 /* ==========================
-   call-to-action
+   CALL TO ACTION
    ========================== */
-
 .call-to-action {
     color: var(--cat-v2);
     font-weight: bold;
     display: inline-block;
-
     transition: all 0.3s ease;
 }
 
+/* Efecto hover del enlace */
 .call-to-action:hover {
     color: var(--text);
     text-transform: uppercase;
@@ -272,6 +253,7 @@ h2 {
     -o-transform: translateY(-5px) scale(1.8);
 }
 
+/* Estado al hacer clic */
 .call-to-action:active {
     color: var(--cat-v2);
     text-shadow: 0 0 10px var(--text)
@@ -283,31 +265,25 @@ h2 {
 
 footer {
     grid-area: footer;
-
     color: var(--accent);
-
     text-align: center;
-
     padding: 2rem;
-
     background: var(--bg-dark);
 }
 
+/* Contenedor de validaciones W3C */
 .w3c-validations {
     display: flex;
-
     justify-content: center;
     align-items: center;
-
     padding: 1rem;
 }
 
+/* Logos de validación */
 .w3c-validations img {
     height: 31px;
     width: auto;
-
     padding: 0.1rem;
-
     mix-blend-mode: luminosity;
     opacity: 0.4;
 }
@@ -317,24 +293,23 @@ footer {
    ========================== */
 
 @media (min-width: 768px) {
+
+    /* Oculta el botón hamburguesa */
     .menu-btn {
         display: none;
     }
 
+    /* Navegación horizontal */
     .nav {
         position: static;
-
         display: flex;
-
         flex-direction: row;
-
         gap: 1rem;
-
         width: auto;
-
         background: none;
     }
 
+    /* Animación de los enlaces */
     .nav a:hover {
         transform: translateY(-4px);
     }
@@ -345,6 +320,8 @@ footer {
    ========================== */
 
 @media (min-width: 1024px) {
+
+    /* Aumenta el tamaño del texto */
     p {
         font-size: 1.5rem;
     }

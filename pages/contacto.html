@@ -2,8 +2,8 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- SEO -->
     <meta name="description" content="Incancelables - Contacto">
@@ -12,23 +12,30 @@
 
     <!-- Insert your favicon here -->
     <title>Incancelables - Contacto</title>
-    <link rel="icon" type="image/x-icon" href="../assets/irrobafav.svg" />
-    <link rel="stylesheet" href="../styles/global.css" />
-    <link rel="stylesheet" href="../styles/contacto.css" />
+    <link rel="icon" type="image/x-icon" href="../assets/irrobafav.svg">
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/contacto.css">
 </head>
 
 <body>
     <div class="layout">
+        <!-- ====================================================== 
+                                        HEADER 
+        ======================================================= -->
         <header class="header">
+            <!-- LOGO -->
             <a href="../index.html" class="logo">
                 <img src="../assets/incan_logo.svg" alt="Incancelables">
             </a>
+            <!-- BOTÓN CAMBIO DE TEMA -->
             <button id="theme-toggle" class="theme-btn">
                 <img id="theme-icon" src="../assets/icons/sun.svg" alt="Cambiar tema">
             </button>
+            <!-- BOTÓN MENÚ MÓVIL -->
             <button class="menu-btn">
                 ☰
             </button>
+            <!-- MENÚ DE NAVEGACIÓN -->
             <nav class="nav">
                 <a href="../index.html">Inicio</a>
                 <a href="musica.html">Música</a>
@@ -37,61 +44,76 @@
                 <a href="contacto.html">Contacto</a>
             </nav>
         </header>
+        <!-- ====================================================== 
+                                    MAIN 
+        ======================================================= -->
         <main class="main">
+            <!-- SECCIÓN DE CONTACTO -->
             <section class="contacto">
-                <h2 class="contacto-head">Contacto</h2>
+                <h1 class="contacto-head">Contacto</h1>
+                <!-- CONTENEDOR DE TARJETAS -->
                 <div class="contacto-body">
                     <!-- ===========================
-                UNITE A LA COMUNIDAD
-                ============================ -->
+                        UNITE A LA COMUNIDAD
+                    ============================ -->
                     <section class="contact-card">
-                        <h3>🤘 Unite a la comunidad</h3>
+                        <h2>🤘 Unite a la comunidad</h2>
                         <p>
                             Enterate primero de los próximos shows, lanzamientos y novedades de la banda.
                             No enviamos spam, solo noticias importantes.
                         </p>
+                        <!-- FORMULARIO DE LA COMUNIDAD -->
                         <form class="contact-form" action="#" method="post">
+                            <!-- CAMPO NOMBRE -->
                             <p class="form-group">
                                 <label for="nombre-comunidad">Nombre</label>
                                 <input type="text" id="nombre-comunidad" name="nombre" placeholder="Tu nombre">
                             </p>
+                            <!-- CAMPO EMAIL -->
                             <p class="form-group">
                                 <label for="email-comunidad">Email</label>
                                 <input type="email" id="email-comunidad" name="email" placeholder="tu@email.com"
                                     required>
                             </p>
+                            <!-- CAMPO CIUDAD -->
                             <p class="form-group">
                                 <label for="ciudad">Ciudad</label>
                                 <input type="text" id="ciudad" name="ciudad" placeholder="¿De dónde sos?">
                             </p>
+                            <!-- BOTÓN DE SUSCRIPCIÓN -->
                             <button type="submit" class="btn">
                                 Quiero recibir novedades
                             </button>
                         </form>
                     </section>
                     <!-- ===========================
-                 ESCRIBINOS
-                ============================ -->
+                                ESCRIBINOS
+                    ============================ -->
                     <section class="contact-card">
-                        <h3>✉️ Escribinos</h3>
+                        <h2>✉️ Escribinos</h2>
                         <p>
                             ¿Querés invitarnos a tocar, hacer una consulta o simplemente decirnos algo?
                             Te leemos.
                         </p>
+                        <!-- FORMULARIO DE CONTACTO -->
                         <form class="contact-form" action="#" method="post">
+                            <!-- CAMPO NOMBRE -->
                             <p class="form-group">
                                 <label for="nombre-contacto">Nombre</label>
                                 <input type="text" id="nombre-contacto" name="nombre" placeholder="Tu nombre" required>
                             </p>
+                            <!-- CAMPO EMAIL -->
                             <p class="form-group">
                                 <label for="email-contacto">Email</label>
                                 <input type="email" id="email-contacto" name="email" placeholder="tu@email.com"
                                     required>
                             </p>
+                            <!-- CAMPO MENSAJE -->
                             <p class="form-group">
                                 <label for="mensaje">Mensaje</label>
                                 <textarea id="mensaje" name="mensaje" placeholder="Escribinos..." required></textarea>
                             </p>
+                            <!-- BOTÓN DE ENVÍO -->
                             <button type="submit" class="btn">
                                 Enviar mensaje
                             </button>
@@ -100,15 +122,23 @@
                 </div>
             </section>
         </main>
+        <!-- ====================================================== 
+                                ASIDE 
+        ======================================================= -->
         <aside class="aside">
             <h2>💬Seguinos en <span class="whats-text">WhatsApp</span></h2>
+            <!-- ENLACE AL CANAL DE WHATSAPP -->
             <a href="https://whatsapp.com/channel/0029VbAzdq8CBtxAI4YGe426" target="_blank" class="qrwhats"><img
                     src="../assets/contacto/whatsQR.jpg" alt=""></a>
         </aside>
+        <!-- ====================================================== 
+                                    FOOTER 
+        ======================================================= -->
         <footer class="footer">
             <p>
                 © 2026 Incancelables
             </p>
+            <!-- VALIDADORES W3C -->
             <div class="w3c-validations">
                 <a href="https://validator.w3.org/">
                     <img src="https://www.w3.org/Icons/valid-html401" alt="HTML válido">
@@ -118,6 +148,7 @@
                 </a>
             </div>
         </footer>
+        <!-- SCRIPTS -->
         <script src="../scripts/main.js"></script>
     </div>
 </body>

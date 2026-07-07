@@ -1,6 +1,7 @@
-/*////////////////////////////////////////////////////////////////////////////
-MAIN
-///////////////////////////////////////////////////////////////////////////*/
+/* ========================== 
+   MAIN 
+   ========================== */
+/* Contenido principal */
 .main {
     background-color: var(--bg-alt);
     color: var(--text);
@@ -10,71 +11,85 @@ MAIN
     align-items: center;
 }
 
-/* PROXIMO SHOW */
+/* ========================== 
+   PRÓXIMO SHOW 
+   ========================== */
 .proximo-show {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-
     background: var(--card);
     color: var(--text-on-card);
-
     padding: 1.5rem;
     border-radius: 1rem;
     box-shadow: var(--shadow);
 }
 
+/* Imagen del próximo show */
 .proximo-show img {
     border-radius: 16px;
     border: 2px solid var(--accent);
     box-shadow: var(--shadow);
 }
 
+/* Cabecera del show */
 .proximo-show header {
     text-align: center;
 }
 
+/* Título del show */
 .proximo-show h1 {
     margin-top: .25rem;
 }
 
+/* Flyer del show */
 .show-flyer {
     display: block;
 }
 
+/* Imagen del flyer */
 .show-flyer img {
     width: 100%;
     display: block;
 }
 
+/* Información del show */
 .proximo-show .show-info {
     display: flex;
     flex-direction: column;
     gap: .4rem;
 }
 
+/* Párrafos de información */
 .proximo-show .show-info p {
     margin: 0;
 }
 
-/* PROXIMO SHOW */
-
+/* ========================== 
+   ACCIONES
+   ========================== */
+/* Contenedor de acciones */
 .acciones {
     display: flex;
     flex-direction: column;
     gap: .75rem;
 }
 
+/* Enlaces de acciones */
 .acciones a {
     text-align: center;
 }
 
+/* ========================== 
+   AHISTORIAL DE SHOWS
+   ========================== */
 .historial {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
+/* Tarjeta de show */
 .show-card {
     display: grid;
     gap: 1rem;
@@ -87,10 +102,12 @@ MAIN
 
 }
 
+/* Animación al pasar el mouse */
 .show-card:hover {
     transform: translateY(10px) scale(110%);
 }
 
+/* Imagen del show */
 .show-card img {
     width: 100%;
     height: auto;
@@ -98,21 +115,21 @@ MAIN
     border-radius: 1rem;
 }
 
+/* Información del show */
 .show-info {
     color: var(--text-on-card);
     text-align: center;
 }
 
+/* Botón de la tarjeta */
 .show-info a {
-
     display: inline-block;
-
     margin-top: 1rem;
 }
 
-/*////////////////////////////////////////////////////////////////////////////
-ASIDE
-///////////////////////////////////////////////////////////////////////////*/
+/* ========================== 
+   ASIDE
+   ========================== */
 .aside {
     color: var(--text);
     background-color: var(--bg);
@@ -121,6 +138,7 @@ ASIDE
     align-items: center;
 }
 
+/* Botón del aside */
 .btn {
     padding: 1rem;
     margin: 1rem;
@@ -131,11 +149,13 @@ ASIDE
    ========================== */
 @media(min-width:768px) {
 
+    /* Tarjetas en dos columnas */
     .show-card {
         width: min(600px, 100%);
         grid-template-columns: 300px 1fr;
     }
 
+    /* Distribución del historial */
     #shows-history {
         display: flex;
         flex-direction: row;

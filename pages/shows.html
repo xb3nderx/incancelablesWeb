@@ -2,31 +2,38 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO -->
     <meta name="description" content="Incancelables - Shows">
     <meta name="keywords" content="Musica, en vivo, online, rock, cancion, contacto">
     <meta name="robots" content="index, follow, shows">
     <!-- Insert your favicon here -->
     <title>Incancelables - Contacto</title>
-    <link rel="icon" type="image/x-icon" href="../assets/irrobafav.svg" />
-    <link rel="stylesheet" href="../styles/global.css" />
-    <link rel="stylesheet" href="../styles/shows.css" />
+    <link rel="icon" type="image/x-icon" href="../assets/irrobafav.svg">
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/shows.css">
 </head>
 
 <body>
     <div class="layout">
+        <!-- ====================================================== 
+                                HEADER 
+        ======================================================= -->
         <header class="header">
+            <!-- LOGO -->
             <a href="../index.html" class="logo">
                 <img src="../assets/incan_logo.svg" alt="Incancelables">
             </a>
+            <!-- BOTÓN CAMBIO DE TEMA -->
             <button id="theme-toggle" class="theme-btn">
                 <img id="theme-icon" src="../assets/icons/sun.svg" alt="Cambiar tema">
             </button>
+            <!-- BOTÓN MENÚ MÓVIL -->
             <button class="menu-btn">
                 ☰
             </button>
+            <!-- MENÚ DE NAVEGACIÓN -->
             <nav class="nav">
                 <a href="../index.html">Inicio</a>
                 <a href="musica.html">Música</a>
@@ -35,40 +42,63 @@
                 <a href="contacto.html">Contacto</a>
             </nav>
         </header>
+        <!-- ====================================================== 
+                                MAIN 
+        ======================================================= -->
         <main class="main">
+            <!-- ====================================================== 
+                                    PRÓXIMO SHOW 
+            ======================================================= -->
             <section class="proximo-show">
+                <!-- CABECERA DEL SHOW -->
                 <header>
                     <span class="show-badge">● PRÓXIMO SHOW</span>
-                    <h1 id="upcoming-show-title"></h1>
+                    <h1 id="upcoming-show-title">placeholder</h1>
                 </header>
+                <!-- FLYER DEL SHOW -->
                 <picture class="show-flyer">
-                    <source id="upcoming-show-desktop" media="(min-width:768px)" srcset="" type="image/png">
-                    <img id="upcoming-show-mobile" src="" alt="Flyer del próximo show">
+                    <source id="upcoming-show-desktop" media="(min-width:768px)" srcset="placeholder" type="image/png">
+                    <img id="upcoming-show-mobile" src="placeholder" alt="Flyer del próximo show">
                 </picture>
+                <!-- INFORMACIÓN DEL SHOW -->
                 <article class="show-info">
+                    <h2 class="visually-hidden">Show Info</h2>
                     <p id="upcoming-show-date" class="show-fecha"></p>
                     <p id="upcoming-show-location" class="show-lugar"></p>
                 </article>
+                <!-- ACCIONES -->
                 <div class="acciones">
                     <a class="btn" href="#">Entradas</a>
                     <a class="btn-secundario" href="#">Agregar al calendario</a>
                 </div>
             </section>
+            <!-- ====================================================== 
+                                HISTORIAL DE SHOWS 
+            ======================================================= -->
             <section class="historial">
                 <h2>Shows anteriores</h2>
+                <!-- LISTA DE SHOWS GENERADA DINÁMICAMENTE -->
                 <div id="shows-history"></div>
             </section>
         </main>
+        <!-- ====================================================== 
+                                 ASIDE 
+        ======================================================= -->
         <aside class="aside">
             <h2>Que no se corte...</h2>
+            <!-- BOTÓN DE CONTACTO -->
             <a href="../pages/contacto.html" class="btn">
                 Seguinos
             </a>
         </aside>
+        <!-- ====================================================== 
+                                FOOTER 
+        ======================================================= -->
         <footer class="footer">
             <p>
                 © 2026 Incancelables
             </p>
+            <!-- VALIDADORES W3C -->
             <div class="w3c-validations">
                 <a href="https://validator.w3.org/">
                     <img src="https://www.w3.org/Icons/valid-html401" alt="HTML válido">
@@ -78,6 +108,7 @@
                 </a>
             </div>
         </footer>
+        <!-- SCRIPTS -->
         <script src="../scripts/main.js"></script>
         <script type="module" src="../scripts/shows.js"></script>
     </div>
