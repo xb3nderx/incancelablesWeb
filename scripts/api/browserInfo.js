@@ -13,8 +13,6 @@ function getBrowserInfo() {
 
         language: navigator.language,
 
-        platform: navigator.platform,
-
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 
         screen: `${screen.width}x${screen.height}`,
