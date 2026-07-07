@@ -62,8 +62,18 @@
                             Enterate primero de los próximos shows, lanzamientos y novedades de la banda.
                             No enviamos spam, solo noticias importantes.
                         </p>
-                        <!-- FORMULARIO DE LA COMUNIDAD -->
-                        <form class="contact-form" action="#" method="post">
+                        <!-- FORMULARIO DE LA COMUNIDAD-->
+                        <form id="community-form" class="contact-form" novalidate>
+                            <!-- CAMPO HONEYPOT PARA DETECTAR BOTS -->
+                            <input type="hidden" name="tipo" value="comunidad">
+                            <p class="honeypot">
+                                <label for="website-community">
+                                    No completar
+                                </label>
+
+                                <input id="website-community" type="text" name="website" tabindex="-1"
+                                    autocomplete="off">
+                            </p>
                             <!-- CAMPO NOMBRE -->
                             <p class="form-group">
                                 <label for="nombre-comunidad">Nombre</label>
@@ -77,14 +87,16 @@
                             </p>
                             <!-- CAMPO CIUDAD -->
                             <p class="form-group">
-                                <label for="ciudad">Ciudad</label>
-                                <input type="text" id="ciudad" name="ciudad" placeholder="¿De dónde sos?">
+                                <label for="ciudad-comunidad">Ciudad</label>
+                                <input type="text" id="ciudad-comunidad" name="ciudad" placeholder="¿De dónde sos?">
                             </p>
                             <!-- BOTÓN DE SUSCRIPCIÓN -->
                             <button type="submit" class="btn">
                                 Quiero recibir novedades
                             </button>
                         </form>
+                        <!--PARA MOSTRAR MENSAJE DE EXITO/ERROR-->
+                        <div class="form-message" hidden aria-live="polite"></div>
                     </section>
                     <!-- ===========================
                                 ESCRIBINOS
@@ -96,7 +108,16 @@
                             Te leemos.
                         </p>
                         <!-- FORMULARIO DE CONTACTO -->
-                        <form class="contact-form" action="#" method="post">
+                        <form id="contact-form" class="contact-form" novalidate>
+                            <!-- CAMPO HONEYPOT PARA DETECTAR BOTS -->
+                            <input type="hidden" name="tipo" value="contacto">
+                            <p class="honeypot">
+                                <label for="website-contact">
+                                    No completar
+                                </label>
+
+                                <input id="website-contact" type="text" name="website" tabindex="-1" autocomplete="off">
+                            </p>
                             <!-- CAMPO NOMBRE -->
                             <p class="form-group">
                                 <label for="nombre-contacto">Nombre</label>
@@ -118,6 +139,8 @@
                                 Enviar mensaje
                             </button>
                         </form>
+                        <!--PARA MOSTRAR MENSAJE DE EXITO/ERROR-->
+                        <div class="form-message" hidden aria-live="polite"></div>
                     </section>
                 </div>
             </section>
@@ -150,6 +173,12 @@
         </footer>
         <!-- SCRIPTS -->
         <script src="../scripts/main.js"></script>
+
+        <script src="../scripts/api/apiConfig.js"></script>
+        <script src="../scripts/api/browserInfo.js"></script>
+        <script src="../scripts/api/forms.js"></script>
+
+        <script src="../scripts/contacto.js"></script>
     </div>
 </body>
 
