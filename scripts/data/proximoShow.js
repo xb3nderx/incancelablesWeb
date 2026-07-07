@@ -10,8 +10,8 @@ export const proximoShow = {
     fecha: "22 de Agosto · 23:00 hs",
     lugar: "Godoy Cruz 1631 · CABA",
     flyer: {
-        mobile: `${basePath}assets/shows/Strummer-22-08-26-mobile.png`,
-        desktop: `${basePath}assets/shows/Strummer-22-08-26-desktop.png`
+        mobile: `${basePath}assets/shows/Strummer-22-08-26-mobile.webp`,
+        desktop: `${basePath}assets/shows/Strummer-22-08-26-desktop.webp`
     },
     link: `${basePath}pages/shows.html`
 }

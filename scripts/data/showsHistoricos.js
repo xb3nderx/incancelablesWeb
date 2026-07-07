@@ -8,7 +8,7 @@ export const showsHistoricos = [
         titulo: "Mamita Bar",
         fecha: "31 de Enero de 2026",
         lugar: "Av. Alvarez Tomas 487 · CABA",
-        flyer: `${basePath}assets/shows/mamita 31-01-26.jpeg`,
+        flyer: `${basePath}assets/shows/mamita 31-01-26.webp`,
         alt: "Mamita Bar 31/01/26"
     },
 
@@ -16,7 +16,7 @@ export const showsHistoricos = [
         titulo: "Rodney Bar",
         fecha: "26 de Abril de 2025",
         lugar: "Rodney 400 · CABA",
-        flyer: `${basePath}assets/shows/rodney 26-04-25.jpeg`,
+        flyer: `${basePath}assets/shows/rodney 26-04-25.webp`,
         alt: "Rodney Bar 26/04/25"
     },
 
@@ -24,7 +24,7 @@ export const showsHistoricos = [
         titulo: "Rodney Bar",
         fecha: "02 de Noviembre de 2024",
         lugar: "Rodney 400 · CABA",
-        flyer: `${basePath}assets/shows/Rodney 02-11-24.jpeg`,
+        flyer: `${basePath}assets/shows/Rodney 02-11-24.webp`,
         alt: "Rodney Bar 02/11/24"
     },
 
@@ -32,7 +32,7 @@ export const showsHistoricos = [
         titulo: "Kif Bar",
         fecha: "22 de Junio de 2024",
         lugar: "Av. Cordoba 5600 · CABA",
-        flyer: `${basePath}assets/shows/kif 22-06-24.jpeg`,
+        flyer: `${basePath}assets/shows/kif 22-06-24.webp`,
         alt: "Kif Bar 22/06/24"
     }
 

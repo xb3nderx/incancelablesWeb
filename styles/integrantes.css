@@ -44,7 +44,7 @@ h1 {
 
 /* Tarjeta del integrante */
 .integrante {
-    width: min(90vw, 320px);
+    width: min(90vw, 330px);
     aspect-ratio: 2 / 3;
     background: var(--card);
     border-radius: 24px;
