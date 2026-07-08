@@ -1,9 +1,7 @@
-const menuBtn = document.querySelector(".menu-btn");
-const nav = document.querySelector(".nav");
-
-const themeToggle = document.querySelector("#theme-toggle");
-const themeIcon = document.querySelector("#theme-icon");
-
+// /////////////////////////////////////////////////////////////////////////////
+// ICONOS
+// /////////////////////////////////////////////////////////////////////////////
+//cambia el path segun la pagina esta dentro de pages o no
 const iconPath = window.location.pathname.includes("/pages/")
     ? "../assets/icons/"
     : "assets/icons/";
@@ -13,24 +11,32 @@ const iconPath = window.location.pathname.includes("/pages/")
 // MENÚ
 // /////////////////////////////////////////////////////////////////////////////
 
-menuBtn?.addEventListener("click", () => {
-    nav.classList.toggle("active");
-});
+function initMenu() {
+
+    //obtiene los elementos menuBtn y nav
+    const menuBtn = document.querySelector(".menu-btn");
+    const nav = document.querySelector(".nav");
+
+    //si no existe alguno de los dos sale de la funcion
+    if (!menuBtn || !nav) return;
+
+    //aagrega un listener y ejecuta togle con el click 
+    menuBtn.addEventListener("click", () => {
+
+        nav.classList.toggle("active");
+
+    });
+
+}
 
 
 // /////////////////////////////////////////////////////////////////////////////
 // TEMA
 // /////////////////////////////////////////////////////////////////////////////
 
-themeToggle?.addEventListener("click", () => {
-
-    const isLight = document.body.classList.contains("light");
-
-    setTheme(isLight ? "dark" : "light");
-
-});
-
 function updateThemeIcon(theme) {
+
+    const themeIcon = document.querySelector("#theme-icon");
 
     if (!themeIcon) return;
 
@@ -53,18 +59,42 @@ function setTheme(theme) {
 
 function initTheme() {
 
+    const themeToggle = document.querySelector("#theme-toggle");
+
     const saved = localStorage.getItem("theme");
 
     if (saved) {
 
         setTheme(saved);
 
-        return;
+    } else {
+
+        setTheme("dark");
 
     }
 
-    setTheme("dark");
+    if (!themeToggle) return;
+
+    themeToggle.addEventListener("click", () => {
+
+        const isLight =
+            document.body.classList.contains("light");
+
+        setTheme(isLight ? "dark" : "light");
+
+    });
 
 }
 
-initTheme();
+
+// /////////////////////////////////////////////////////////////////////////////
+// INICIALIZACIÓN
+// /////////////////////////////////////////////////////////////////////////////
+
+function initMain() {
+
+    initMenu();
+
+    initTheme();
+
+}
