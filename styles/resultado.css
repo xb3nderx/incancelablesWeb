@@ -1,0 +1,126 @@
+/* ==========================
+   RESULTADO
+   ========================== */
+
+.resultado-page {
+
+    min-height:
+        100vh;
+
+    display:
+        flex;
+
+    justify-content:
+        center;
+
+    align-items:
+        center;
+
+    padding:
+        1.5rem;
+
+    background:
+        var(--bg);
+
+}
+
+
+.resultado-card {
+
+    width:
+        100%;
+
+    max-width:
+        600px;
+
+    background:
+        var(--bg-alt);
+
+    border-radius:
+        10px;
+
+    padding:
+        2rem 1.5rem;
+
+    text-align:
+        center;
+
+    box-shadow:
+        var(--shadow);
+
+}
+
+
+.resultado-card h1 {
+
+    color:
+        var(--accent);
+
+    font-size:
+        2.5rem;
+
+    line-height:
+        1.2;
+
+    margin-bottom:
+        1rem;
+
+}
+
+
+.resultado-card p {
+
+    font-size:
+        1.25rem;
+
+    line-height:
+        1.6;
+
+    margin-bottom:
+        2rem;
+
+}
+
+
+.resultado-card .btn {
+
+    width:
+        100%;
+
+}
+
+
+@media (min-width: 768px) {
+
+    .resultado-card {
+
+        padding:
+            2.5rem;
+
+    }
+
+
+    .resultado-card h1 {
+
+        font-size:
+            2rem;
+
+    }
+
+
+    .resultado-card p {
+
+        font-size:
+            1.1rem;
+
+    }
+
+
+    .resultado-card .btn {
+
+        width:
+            auto;
+
+    }
+
+}
