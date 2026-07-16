@@ -86,3 +86,13 @@ switch (status) {
             "La operación solicitada no es válida.";
 
 }
+
+console.log(
+    "window.innerWidth:",
+    window.innerWidth
+);
+
+console.log(
+    "screen.width:",
+    screen.width
+);
