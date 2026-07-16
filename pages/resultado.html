@@ -49,10 +49,17 @@
     </main>
     <script>
 
-        alert(
-            window === top
-        );
+        try {
 
+            top.location.href =
+                "https://xb3nderx.github.io/incancelables/";
+
+        }
+        catch (e) {
+
+            alert(e);
+
+        }
     </script>
 
     <script src="../scripts/resultado.js">
