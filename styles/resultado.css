@@ -2,6 +2,10 @@
    RESULTADO
    ========================== */
 
+header {
+    background-color: var(--bg);
+}
+
 .resultado-page {
 
     min-height:
