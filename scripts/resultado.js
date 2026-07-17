@@ -203,9 +203,6 @@ if (
     !status
 ) {
 
-    // Ocultar botón mientras
-    // el usuario decide si desea
-    // continuar con la desuscripción.
     btnVolver.style.display =
         "none";
 
@@ -226,6 +223,66 @@ if (
 
     acciones.appendChild(
         btnConfirmar
+    );
+
+
+    // =================================
+    // CONFIRMAR DESUSCRIPCIÓN
+    // =================================
+
+    btnConfirmar.addEventListener(
+        "click",
+        () => {
+
+            btnConfirmar.disabled =
+                true;
+
+            mensaje.textContent =
+                "Procesando desuscripción...";
+
+
+            fetch(
+
+                API.URL +
+
+                "?action=unsubscribe-json&token=" +
+
+                encodeURIComponent(
+                    token
+                )
+
+            )
+
+                .then(
+                    response =>
+                        response.json()
+                )
+
+                .then(
+                    data => {
+
+                        mostrarEstado(
+                            data.status
+                        );
+
+                    }
+                )
+
+                .catch(
+                    error => {
+
+                        console.error(
+                            error
+                        );
+
+                        mostrarEstado(
+                            "error"
+                        );
+
+                    }
+                );
+
+        }
     );
 
 }
