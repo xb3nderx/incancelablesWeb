@@ -23,7 +23,68 @@ const albumSpotify = document.querySelector(".album-spotify");
 
 let activeTrack = 0;
 
+// /////////////////////////////////////////////////////////////////////////////
+// CARGAR DATOS DEL ÁLBUM
+// /////////////////////////////////////////////////////////////////////////////
 
+function loadAlbumInfo() {
+
+    const albumCover =
+        document.querySelector(".album-cover");
+
+    const albumTitle =
+        document.querySelector(".album-info h1");
+
+    const albumDescription =
+        document.querySelector(".album-description");
+
+    const playlistTitle =
+        document.querySelector(".playlist h2");
+
+    const storyTitle =
+        document.querySelector(".album-story h2");
+
+    const storyContent =
+        document.querySelector(".album-story-content");
+
+    // ------------------------------------------------------------------------
+    // CABECERA
+    // ------------------------------------------------------------------------
+
+    albumCover.src = album.portada;
+    albumCover.alt = `Portada ${album.titulo}`;
+
+    albumTitle.textContent =
+        album.titulo;
+
+    albumDescription.textContent =
+        album.descripcionLarga;
+
+    // ------------------------------------------------------------------------
+    // PLAYLIST
+    // ------------------------------------------------------------------------
+
+    playlistTitle.textContent =
+        album.titulo;
+
+    // ------------------------------------------------------------------------
+    // HISTORIA
+    // ------------------------------------------------------------------------
+
+    storyTitle.textContent =
+        `Acerca de ${album.titulo}`;
+
+    storyContent.innerHTML = "";
+
+    album.historia.forEach(parrafo => {
+
+        storyContent.innerHTML += `
+            <p>${parrafo}</p>
+        `;
+
+    });
+
+}
 // /////////////////////////////////////////////////////////////////////////////
 // GENERAR PLAYLIST
 // /////////////////////////////////////////////////////////////////////////////
@@ -160,6 +221,8 @@ function updatePlayer() {
 // /////////////////////////////////////////////////////////////////////////////
 // INICIALIZACIÓN
 // /////////////////////////////////////////////////////////////////////////////
+
+loadAlbumInfo();
 
 albumYoutube.href = album.youtubePlaylist;
 albumSpotify.href = album.spotifyPlaylist;
