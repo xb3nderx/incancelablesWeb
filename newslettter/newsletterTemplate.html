@@ -1,0 +1,31 @@
+<!-- titulo en el cuerpo -->
+<h2>
+    {{TITULO}}
+</h2>
+
+<!-- texto que va abajo del titulo -->
+<p>
+    {{INTRO}}
+</p>
+
+<!-- si quiero enviar una imagen -->
+<img src="{{IMAGEN_URL}}" alt="{{IMAGEN_ALT}}" style="
+        width:100%;
+        height:auto;
+        border-radius:8px;
+    ">
+<!-- texto al pie de la imagen -->
+<p>
+    {{CONTENIDO}}
+</p>
+
+<!-- si quiero un CTA con boton -->
+${emailButton(
+"{{CTA_TEXTO}}",
+"{{CTA_URL}}"
+)}
+
+<!-- texto abajo del boton -->
+<p>
+    {{CIERRE}}
+</p>
