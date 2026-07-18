@@ -57,6 +57,10 @@ export function renderShowsHistoricos() {
                     <p>${show.fecha}</p>
                     <p>${show.lugar}</p>
                 </div>
+                <!-- boton preparado para modal de fotos -->
+                <!-- comentado x ahora 
+                <button class="ver-fotos btn" commandFor="my-modal" command="show-modal">📷 Ver fotos</button>
+                -->
             </section>
         `;
     });

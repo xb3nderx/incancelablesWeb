@@ -1,11 +1,43 @@
+// /////////////////////////////////////////////////////////////////////////////
+// DISCOGRAFÍA OFICIAL
+// Fuente única de datos para Home + Música
+// /////////////////////////////////////////////////////////////////////////////
+
 export const discografia = [
     {
         id: "live-at-mujica",
+
+        // ----------------------------------------------------------------------
+        // DATOS GENERALES DEL ÁLBUM
+        // ----------------------------------------------------------------------
+
         titulo: "Live at Mujica",
-        portada: "...",
-        youtubePlaylist: "https://www.youtube.com/playlist?list=PLQEFwX0MhHFyOLqtELjoj4SJyTccZUqQI",
-        spotifyPlaylist: "https://open.spotify.com/intl-es/album/269fg0y6CZLjYoWgTiIad0?si=f3f199ee9f1740f8",
+
+        descripcionCorta:
+            "Mirá y escuchá nuestro último disco 'Live at Mujica' filmado y grabado en vivo en nuestra sala.",
+
+        descripcionHome:
+            "Todos los meses vamos a ir subiendo 1 tema nuevo hasta completar los 11 grabados.",
+
+        descripcionLarga:
+            "El show que siempre quisimos dar, ahora grabado en vivo desde nuestra sala. Cada mes liberamos una nueva canción hasta completar el disco.",
+
+        portada: "assets/musica/live-at-mujica.webp",
+
+        enlace: "pages/musica.html",
+
+        youtubePlaylist:
+            "https://www.youtube.com/playlist?list=PLQEFwX0MhHFyOLqtELjoj4SJyTccZUqQI",
+
+        spotifyPlaylist:
+            "https://open.spotify.com/intl-es/album/269fg0y6CZLjYoWgTiIad0?si=f3f199ee9f1740f8",
+
+        // ----------------------------------------------------------------------
+        // TRACKS
+        // ----------------------------------------------------------------------
+
         tracks: [
+
             {
                 number: "01",
                 title: "Invisible",

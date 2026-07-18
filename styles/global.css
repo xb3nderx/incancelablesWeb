@@ -91,6 +91,11 @@ body.light {
     box-sizing: border-box;
 }
 
+/*anima la navegacion entre paginas */
+@view-transition {
+    navigation: auto;
+}
+
 /* Configuración general del documento */
 html {
     scroll-behavior: smooth;
