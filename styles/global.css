@@ -244,7 +244,11 @@ h2 {
 /* Efecto al pasar el mouse sobre el menú */
 .nav a:hover {
     color: var(--accent);
-    transform: translateX(8px) scale(1.5);
+    transform: translateX(-5px) scale(1.8);
+    -webkit-transform: translateX(-5px) scale(1.8);
+    -moz-transform: translateX(-5px) scale(1.8);
+    -ms-transform: translateX(-5px) scale(1.8);
+    -o-transform: translateX(-5px) scale(1.8);
 }
 
 /* Botones principales */
@@ -352,7 +356,11 @@ footer {
 
     /* Animación de los enlaces */
     .nav a:hover {
-        transform: translateY(-4px);
+        transform: translateY(-4px) scale(2.0);
+        -webkit-transform: translateY(-4px) scale(2.0);
+        -moz-transform: translateY(-4px) scale(2.0);
+        -ms-transform: translateY(-4px) scale(2.0);
+        -o-transform: translateY(-4px) scale(2.0);
     }
 }
 
