@@ -96,6 +96,42 @@ body.light {
     navigation: auto;
 }
 
+::view-transition-group(main) {
+    animation-duration: .45s;
+    animation-timing-function: ease-in-out;
+}
+
+::view-transition-old(main) {
+    animation: page-out .45s both;
+}
+
+::view-transition-new(main) {
+    animation: page-in .45s both;
+}
+
+@keyframes page-out {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes page-in {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
 /* Configuración general del documento */
 html {
     scroll-behavior: smooth;
