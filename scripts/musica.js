@@ -23,6 +23,10 @@ const albumSpotify = document.querySelector(".album-spotify");
 
 let activeTrack = 0;
 
+const comingSoon = document.querySelector(".album-coming-soon");
+
+const musicSections = document.querySelectorAll(".music-content");
+
 // /////////////////////////////////////////////////////////////////////////////
 // CARGAR DATOS DEL ÁLBUM
 // /////////////////////////////////////////////////////////////////////////////
@@ -59,6 +63,9 @@ function loadAlbumInfo() {
 
     albumDescription.textContent =
         album.descripcionLarga;
+
+    document.querySelector(".coming-soon-title").textContent =
+        album.titulo;
 
     // ------------------------------------------------------------------------
     // PLAYLIST
@@ -217,6 +224,21 @@ function updatePlayer() {
 
 }
 
+// /////////////////////////////////////////////////////////////////////////////
+// MOSTRAR ESTADO "PRÓXIMAMENTE"
+// /////////////////////////////////////////////////////////////////////////////
+
+function showComingSoon() {
+
+    comingSoon.classList.remove("hidden");
+
+    musicSections.forEach(section => {
+
+        section.classList.add("hidden");
+
+    });
+
+}
 
 // /////////////////////////////////////////////////////////////////////////////
 // INICIALIZACIÓN
@@ -224,8 +246,20 @@ function updatePlayer() {
 
 loadAlbumInfo();
 
-albumYoutube.href = album.youtubePlaylist;
-albumSpotify.href = album.spotifyPlaylist;
+if (!album.publicado) {
 
-createPlaylist();
-loadTrack(0);
+    showComingSoon();
+
+} else {
+
+    albumYoutube.href =
+        album.youtubePlaylist;
+
+    albumSpotify.href =
+        album.spotifyPlaylist;
+
+    createPlaylist();
+
+    loadTrack(0);
+
+}

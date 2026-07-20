@@ -29,36 +29,36 @@ export const showsListado = [
     // PRÓXIMO SHOW
     // =========================================================================
 
-    {
-        id: "strummer-22-08-26",
+    // {
+    //     id: "strummer-22-08-26",
 
-        estado: "PROXIMO",
+    //     estado: "PROXIMO",
 
-        titulo: "Strummer Bar",
+    //     titulo: "Strummer Bar",
 
-        fecha:
-            "22 de Agosto · 23:00 hs",
+    //     fecha:
+    //         "22 de Agosto · 23:00 hs",
 
-        lugar:
-            "Godoy Cruz 1631 · CABA",
+    //     lugar:
+    //         "Godoy Cruz 1631 · CABA",
 
-        flyer: {
+    //     flyer: {
 
-            mobile:
-                `${BASE_PATH}assets/shows/Strummer-22-08-26-mobile.webp`,
+    //         mobile:
+    //             `${BASE_PATH}assets/shows/Strummer-22-08-26-mobile.webp`,
 
-            desktop:
-                `${BASE_PATH}assets/shows/Strummer-22-08-26-desktop.webp`
+    //         desktop:
+    //             `${BASE_PATH}assets/shows/Strummer-22-08-26-desktop.webp`
 
-        },
+    //     },
 
-        alt:
-            "Strummer Bar 22/08/26",
+    //     alt:
+    //         "Strummer Bar 22/08/26",
 
-        link:
-            `${BASE_PATH}pages/shows.html`
+    //     link:
+    //         `${BASE_PATH}pages/shows.html`
 
-    },
+    // },
 
 
     // =========================================================================
