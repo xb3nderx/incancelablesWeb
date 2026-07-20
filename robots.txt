@@ -1,0 +1,14 @@
+# robots.txt - Incancelables
+
+User-agent: *
+
+# Permitir el rastreo de todo el sitio
+Allow: /
+
+# Bloquear recursos que no deben indexarse
+Disallow: /api-dev/
+Disallow: /documentacion/
+Disallow: /newsletter/
+
+# Informar la ubicación del sitemap
+Sitemap: https://incancelables.com.ar/sitemap.xml
