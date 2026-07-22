@@ -142,3 +142,5 @@ Decisiones:
 - Actualiza NOMBRE y CIUDAD.
 - Genera nuevo TOKEN_BAJA.
 - Conserva FECHA_BAJA histórica.
+
+- Configuración de entornos DEV/PROD separada mediante apiConfig.js.
