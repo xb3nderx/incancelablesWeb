@@ -144,3 +144,5 @@ Decisiones:
 - Conserva FECHA_BAJA histórica.
 
 - Configuración de entornos DEV/PROD separada mediante apiConfig.js.
+- hacemos un cambio para ver si funciona el merge de dev a prod
+- segunda prueba de merge desde dev a master
