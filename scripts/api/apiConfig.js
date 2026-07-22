@@ -10,7 +10,7 @@ const API = {
     URL_PROD:
         "https://script.google.com/macros/s/AKfycbwCdemjNBvYsy6MsqtEpfqjfctOGdxCK_S2ukxLQmCfM6TKXAwvPODOrruMngm9r5C8/exec",
 
-    ENVIRONMENT: "PROD",
+    ENVIRONMENT: "DEV",
 
     TIMEOUT: 10000
 
