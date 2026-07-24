@@ -1,0 +1,133 @@
+/* ==========================
+PÁGINA 404
+========================== */
+
+/* Contenedor principal */
+.resultado-page {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 2rem;
+
+    background: var(--page-bg);
+
+}
+
+/* Tarjeta principal */
+.resultado-card {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    padding: 2rem;
+
+    text-align: center;
+
+    background: var(--bg);
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    box-shadow: var(--shadow);
+
+}
+
+/* Logo */
+.resultado-card picture {
+
+    display: block;
+
+    margin-bottom: 2rem;
+
+}
+
+/* Imagen del logo */
+.resultado-card img {
+
+    width: min(100%, 350px);
+
+    height: auto;
+
+    margin: 0 auto;
+
+}
+
+/* Código de error */
+.resultado-card h1 {
+
+    margin-bottom: 1rem;
+
+    color: var(--accent);
+
+    font-size: clamp(4rem, 15vw, 8rem);
+
+    line-height: 1;
+
+}
+
+/* Título */
+.resultado-card h2 {
+
+    margin-bottom: 1rem;
+
+    padding: 0;
+
+    color: var(--text);
+
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+
+}
+
+/* Mensaje */
+.resultado-card p {
+
+    margin-bottom: 2rem;
+
+    color: var(--text-secondary);
+
+    line-height: 1.6;
+
+}
+
+/* Botón */
+.resultado-card .btn {
+
+    margin-top: 1rem;
+
+}
+
+/* ==========================
+TABLET
+========================== */
+
+@media (min-width: 768px) {
+
+    .resultado-card {
+
+        padding: 3rem;
+
+    }
+
+}
+
+/* ==========================
+DESKTOP
+========================== */
+
+@media (min-width: 1024px) {
+
+    .resultado-card {
+
+        max-width: 700px;
+
+    }
+
+}
