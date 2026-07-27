@@ -229,10 +229,11 @@
    ULTIMO LANZAMIENTO
    ========================== */
     .ultimo-lanzamiento {
-        grid-template-columns: auto auto;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto auto;
         grid-template-areas:
             "titulo titulo"
-            "texto imagen";
+            "imagen texto";
 
         align-items: center;
         gap: 1rem;

@@ -35,7 +35,10 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
+    line-height: 1.6;
 }
+
+
 
 /* Cabecera del álbum */
 .album-header {
@@ -66,10 +69,10 @@
 }
 
 /* Descripción del álbum */
-.album-description {
+/* .album-description {
     color: var(--text-muted);
     line-height: 1.6;
-}
+} */
 
 /* ==========================
    ÚLTIMO LANZAMIENTO
@@ -247,7 +250,7 @@
    ========================== */
 /* Contenido de la historia */
 .album-story {
-    line-height: 1.8;
+    /* line-height: 1.8; */
     margin-bottom: 2rem;
 }
 
