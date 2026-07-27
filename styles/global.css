@@ -92,14 +92,14 @@ body.light {
 }
 
 /*anima la navegacion entre paginas */
-@view-transition {
+/* @view-transition {
     navigation: auto;
 }
 
 ::view-transition-group(main) {
     animation-duration: .45s;
     animation-timing-function: ease-in-out;
-}
+} */
 
 /* ::view-transition-old(main) {
     animation: page-out .45s both;
