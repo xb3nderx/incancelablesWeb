@@ -338,6 +338,18 @@ else if (
         .then(
             data => {
 
+                // Registrar el evento únicamente
+                // cuando el backend confirma
+                // exitosamente la suscripción.
+                if (data.status === "confirmado") {
+
+                    Analytics.trackEvent(
+                        "community_signup_confirmed"
+                    );
+
+                }
+
+                // Actualizar la interfaz.
                 mostrarEstado(
                     data.status
                 );
