@@ -50,12 +50,31 @@ function bindForm(id) {
         message.textContent = result.message;
 
         if (result.ok) {
-            message.className = "form-message success";
-            form.reset();
-        } else {
-            message.className = "form-message error";
-        }
 
+            // Mensaje de éxito
+            message.className = "form-message success";
+
+            // Registrar evento en Google Analytics
+            switch (form.id) {
+
+                case "community-form":
+                    Analytics.trackEvent("community_signup_requested");
+                    break;
+
+                case "contact-form":
+                    Analytics.trackEvent("contact_form_submitted");
+                    break;
+
+            }
+
+            // Limpiar formulario
+            form.reset();
+
+        } else {
+
+            message.className = "form-message error";
+
+        }
         // Restaura el botón
         button.disabled = false;
         button.textContent = originalText;

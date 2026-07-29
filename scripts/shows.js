@@ -17,7 +17,9 @@ import {
     getShowsHistoricos
 } from "./data/showsListado.js";
 
-
+import {
+    galerias
+} from "./data/galerias.js";
 
 // /////////////////////////////////////////////////////////////////////////////
 // ELEMENTOS
@@ -41,7 +43,19 @@ const proximoDesktop =
 const historialContainer =
     document.querySelector("#shows-history");
 
+// /////////////////////////////////////////////////////////////////////////////
+// MODAL GALERÍA
+// /////////////////////////////////////////////////////////////////////////////
 
+const modal =
+    document.querySelector("#my-modal");
+
+
+const modalGallery =
+    document.querySelector("#modal-gallery");
+
+const closeModal =
+    document.querySelector("#close-modal");
 
 // /////////////////////////////////////////////////////////////////////////////
 // RENDER PRÓXIMO SHOW
@@ -119,7 +133,6 @@ function renderProximoShow() {
 }
 
 
-
 // /////////////////////////////////////////////////////////////////////////////
 // RENDER SHOWS HISTÓRICOS
 // /////////////////////////////////////////////////////////////////////////////
@@ -143,6 +156,45 @@ function renderShowsHistoricos() {
     shows.forEach(show => {
 
 
+        // =========================================================
+        // GALERÍA
+        //
+        // Solo se consulta porque este listado
+        // contiene únicamente shows HISTORICO.
+        //
+        // La información viene de:
+        //
+        // scripts/data/galerias.js
+        //
+        // =========================================================
+
+
+        const galeria =
+            galerias[show.id];
+
+
+
+        const botonGaleria =
+            galeria?.tieneGaleria
+
+                ?
+
+                `
+                <button
+                    class="btn-galeria"
+                    data-show="${show.id}">
+                    
+                    Ver imágenes
+                    
+                </button>
+            `
+
+                :
+
+                "";
+
+
+
         historialContainer.innerHTML += `
 
             <section class="show-card">
@@ -157,9 +209,11 @@ function renderShowsHistoricos() {
 
                 <div class="show-info">
 
+
                     <h2>
                         ${show.titulo}
                     </h2>
+
 
 
                     <p>
@@ -167,25 +221,18 @@ function renderShowsHistoricos() {
                     </p>
 
 
+
                     <p>
                         ${show.lugar}
                     </p>
 
 
+
+                    ${botonGaleria}
+
+
                 </div>
 
-
-
-                <!--
-                =================================================
-                GALERÍA FUTURA
-
-                Se activará cuando:
-
-                show.fotos.length > 0
-
-                =================================================
-                -->
 
 
             </section>
@@ -198,7 +245,134 @@ function renderShowsHistoricos() {
 
 }
 
+// /////////////////////////////////////////////////////////////////////////////
+// ABRIR GALERÍA
+//
+// Recibe el id del show.
+// Busca sus imágenes en galerias.js.
+// Genera las imágenes dentro del dialog.
+//
+// /////////////////////////////////////////////////////////////////////////////
 
+function abrirGaleria(showId) {
+
+
+    if (!modal || !modalGallery) return;
+
+
+
+    const galeria =
+        galerias[showId];
+
+
+
+    if (!galeria?.tieneGaleria) return;
+
+
+
+    modalGallery.innerHTML = "";
+
+
+
+    galeria.imagenes.forEach(imagen => {
+
+
+        const figure =
+            document.createElement("figure");
+
+
+        const img =
+            document.createElement("img");
+
+
+
+        img.src =
+            `../assets/shows/galerias/${showId}/${imagen}`;
+
+
+        img.alt =
+            `Galería ${showId}`;
+
+
+        img.loading =
+            "lazy";
+
+
+
+        figure.appendChild(img);
+
+
+        modalGallery.appendChild(figure);
+
+
+    });
+
+
+
+    modal.showModal();
+
+
+}
+
+// /////////////////////////////////////////////////////////////////////////////
+// EVENTOS GALERÍA
+// /////////////////////////////////////////////////////////////////////////////
+
+function activarBotonesGaleria() {
+
+
+    const botones =
+        document.querySelectorAll(".btn-galeria");
+
+
+
+    botones.forEach(boton => {
+
+
+        boton.addEventListener(
+            "click",
+            () => {
+
+
+                const showId =
+                    boton.dataset.show;
+
+
+                abrirGaleria(showId);
+
+
+            }
+        );
+
+
+    });
+
+
+}
+
+// /////////////////////////////////////////////////////////////////////////////
+// CERRAR MODAL
+// /////////////////////////////////////////////////////////////////////////////
+
+function activarCierreModal() {
+
+
+    if (!modal || !closeModal) return;
+
+
+
+    closeModal.addEventListener(
+        "click",
+        () => {
+
+            modal.close();
+
+            modalGallery.innerHTML = "";
+
+        }
+    );
+
+}
 
 // /////////////////////////////////////////////////////////////////////////////
 // INICIALIZACIÓN
@@ -207,3 +381,7 @@ function renderShowsHistoricos() {
 renderProximoShow();
 
 renderShowsHistoricos();
+
+activarBotonesGaleria();
+
+activarCierreModal();
