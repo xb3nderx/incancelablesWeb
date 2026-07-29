@@ -1,3 +1,10 @@
+/*Esto evita que cuando abrís la galería, el usuario pueda seguir moviendo la página de atrás.*/
+body:has(dialog[open]) {
+
+    overflow: hidden;
+
+}
+
 /* ========================== 
    MAIN 
    ========================== */
@@ -102,10 +109,7 @@
 
 }
 
-/* Animación al pasar el mouse */
-.show-card:hover {
-    transform: translateY(10px) scale(110%);
-}
+
 
 /* Imagen del show */
 .show-card img {
@@ -125,6 +129,91 @@
 .show-info a {
     display: inline-block;
     margin-top: 1rem;
+}
+
+/* ========================== 
+   MODAL GALERÍA
+   ========================== */
+
+
+#my-modal {
+
+    width: min(95vw, 900px);
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+
+    border: none;
+
+    border-radius: 1rem;
+
+
+    padding: 1rem;
+
+
+    background: var(--card);
+
+    color: var(--text-on-card);
+
+
+    /*
+       Centrado horizontal y vertical
+       controlado por nosotros
+    */
+
+    margin: auto;
+
+}
+
+
+/* Fondo detrás del modal */
+
+#my-modal::backdrop {
+
+    background: rgba(0, 0, 0, .75);
+
+}
+
+
+
+/* Botón cerrar */
+
+#close-modal {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 10;
+
+
+    display: block;
+
+    margin-left: auto;
+
+}
+
+/* ========================== 
+   GALERIA DE FOTOS
+   ========================== */
+
+#modal-gallery {
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+}
+
+
+#modal-gallery img {
+
+    width: 100%;
+    height: auto;
+    display: block;
+
 }
 
 /* ========================== 
@@ -155,6 +244,11 @@
         grid-template-columns: 300px 1fr;
     }
 
+    /* Animación al pasar el mouse */
+    .show-card:hover {
+        transform: translateY(10px) scale(110%);
+    }
+
     /* Distribución del historial */
     #shows-history {
         display: flex;
@@ -162,6 +256,14 @@
         flex-wrap: wrap;
         justify-content: center;
         gap: 1rem;
+    }
+
+    /* Distribución de la galeria en el modal */
+    #modal-gallery {
+
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+
     }
 }
 

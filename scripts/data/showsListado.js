@@ -12,11 +12,16 @@ import { BASE_PATH } from "../config/paths.js";
 // - Próximo show (index.html)
 // - Shows históricos (shows.html)
 //
+// Las galerías de fotos se administran por separado
+// mediante scripts/data/galerias.json
+//
 // La diferencia entre ambos es solamente el estado.
 //
 // estados posibles:
 // PROXIMO   -> aparece en Home
 // HISTORICO -> aparece en archivo de shows
+//
+// Las fotos se consultan solamente para shows HISTORICO
 //
 // Cuando un show pasa, solo se cambia el estado.
 // No hay que copiar ni mover datos.
@@ -45,10 +50,10 @@ export const showsListado = [
     //     flyer: {
 
     //         mobile:
-    //             `${BASE_PATH}assets/shows/Strummer-22-08-26-mobile.webp`,
+    //             `${BASE_PATH}assets/shows/flyers/strummer-22-08-26-mobile.webp`,
 
     //         desktop:
-    //             `${BASE_PATH}assets/shows/Strummer-22-08-26-desktop.webp`
+    //             `${BASE_PATH}assets/shows/flyers/strummer-22-08-26-desktop.webp`
 
     //     },
 
@@ -82,32 +87,15 @@ export const showsListado = [
         flyer: {
 
             mobile:
-                `${BASE_PATH}assets/shows/mamita 31-01-26.webp`,
+                `${BASE_PATH}assets/shows/flyers/mamita-31-01-26.webp`,
 
             desktop:
-                `${BASE_PATH}assets/shows/mamita 31-01-26.webp`
+                `${BASE_PATH}assets/shows/flyers/mamita-31-01-26.webp`
 
         },
 
         alt:
-            "Mamita Bar 31/01/26",
-
-        // =========================================================
-        // GALERÍA DE FOTOS
-        //
-        // Actualmente vacía.
-        //
-        // En el futuro puede contener:
-        //
-        // - rutas locales
-        // - URLs externas
-        // - imágenes de un CMS
-        // - API
-        //
-        // =========================================================
-
-        fotos: []
-
+            "Mamita Bar 31/01/26"
     },
 
 
@@ -127,31 +115,15 @@ export const showsListado = [
         flyer: {
 
             mobile:
-                `${BASE_PATH}assets/shows/rodney 26-04-25.webp`,
+                `${BASE_PATH}assets/shows/flyers/rodney-26-04-25.webp`,
 
             desktop:
-                `${BASE_PATH}assets/shows/rodney 26-04-25.webp`
+                `${BASE_PATH}assets/shows/flyers/rodney-26-04-25.webp`
 
         },
 
         alt:
-            "Rodney Bar 26/04/25",
-
-        // =========================================================
-        // GALERÍA DE FOTOS
-        //
-        // Actualmente vacía.
-        //
-        // En el futuro puede contener:
-        //
-        // - rutas locales
-        // - URLs externas
-        // - imágenes de un CMS
-        // - API
-        //
-        // =========================================================
-
-        fotos: []
+            "Rodney Bar 26/04/25"
 
     },
 
@@ -172,31 +144,15 @@ export const showsListado = [
         flyer: {
 
             mobile:
-                `${BASE_PATH}assets/shows/Rodney 02-11-24.webp`,
+                `${BASE_PATH}assets/shows/flyers/rodney-02-11-24.webp`,
 
             desktop:
-                `${BASE_PATH}assets/shows/Rodney 02-11-24.webp`
+                `${BASE_PATH}assets/shows/flyers/rodney-02-11-24.webp`
 
         },
 
         alt:
-            "Rodney Bar 02/11/24",
-
-        // =========================================================
-        // GALERÍA DE FOTOS
-        //
-        // Actualmente vacía.
-        //
-        // En el futuro puede contener:
-        //
-        // - rutas locales
-        // - URLs externas
-        // - imágenes de un CMS
-        // - API
-        //
-        // =========================================================
-
-        fotos: []
+            "Rodney Bar 02/11/24"
 
     },
 
@@ -217,31 +173,15 @@ export const showsListado = [
         flyer: {
 
             mobile:
-                `${BASE_PATH}assets/shows/kif 22-06-24.webp`,
+                `${BASE_PATH}assets/shows/flyers/kif-22-06-24.webp`,
 
             desktop:
-                `${BASE_PATH}assets/shows/kif 22-06-24.webp`
+                `${BASE_PATH}assets/shows/flyers/kif-22-06-24.webp`
 
         },
 
         alt:
-            "Kif Bar 22/06/24",
-
-        // =========================================================
-        // GALERÍA DE FOTOS
-        //
-        // Actualmente vacía.
-        //
-        // En el futuro puede contener:
-        //
-        // - rutas locales
-        // - URLs externas
-        // - imágenes de un CMS
-        // - API
-        //
-        // =========================================================
-
-        fotos: []
+            "Kif Bar 22/06/24"
 
     }
 
