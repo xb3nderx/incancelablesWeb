@@ -54,8 +54,26 @@ const modal =
 const modalGallery =
     document.querySelector("#modal-gallery");
 
+const imageViewer =
+    document.querySelector("#image-viewer");
+
+const viewerImage =
+    document.querySelector("#viewer-image");
+
 const closeModal =
     document.querySelector("#close-modal");
+
+//para guardar el punto de scroll de la galeria antes de ir a una foto
+let modalScrollPosition = 0;
+
+//para saber si la foto esta en modo zoom 
+let zoomActivo = false;
+
+//para llevar control del tap en mobile (reemplaza doble click)
+let ultimoTap = 0;
+
+//cantidad de dedos activos en el gesture
+let dedosActivos = 0;
 
 // /////////////////////////////////////////////////////////////////////////////
 // RENDER PRÓXIMO SHOW
@@ -180,14 +198,15 @@ function renderShowsHistoricos() {
                 ?
 
                 `
-                <button
-                    class="btn-galeria"
-                    data-show="${show.id}">
-                    
-                    Ver imágenes
-                    
-                </button>
-            `
+        <button
+            class="btn-galeria"
+            data-show="${show.id}"
+            aria-label="Ver fotos del show">
+
+            📷 Ver fotos
+
+        </button>
+        `
 
                 :
 
@@ -297,9 +316,19 @@ function abrirGaleria(showId) {
         img.loading =
             "lazy";
 
-
-
         figure.appendChild(img);
+
+
+        // Abrir visor al tocar la foto
+
+        img.addEventListener(
+            "click",
+            () => {
+
+                abrirVisor(img.src);
+
+            }
+        );
 
 
         modalGallery.appendChild(figure);
@@ -310,6 +339,89 @@ function abrirGaleria(showId) {
 
 
     modal.showModal();
+
+
+}
+
+// /////////////////////////////////////////////////////////////////////////////
+// ABRIR VISOR DE FOTO
+//
+// Muestra una imagen individual
+// dentro del modal.
+// /////////////////////////////////////////////////////////////////////////////
+
+function abrirVisor(src) {
+
+
+    if (!imageViewer || !viewerImage) return;
+
+    modalScrollPosition = modal.scrollTop;
+
+    viewerImage.src = src;
+
+    zoomActivo = false;
+
+    viewerImage.style.transform = "scale(1)";
+    viewerImage.style.transformOrigin = "center center";
+    viewerImage.style.cursor = "zoom-in";
+
+
+    modalGallery.style.display = "none";
+
+
+    imageViewer.classList.add("active");
+
+
+}
+
+
+
+function toggleZoom(x = 50, y = 50) {
+
+
+    if (!viewerImage) return;
+
+
+
+    zoomActivo = !zoomActivo;
+
+
+
+    if (zoomActivo) {
+
+
+        viewerImage.style.transformOrigin =
+            `${x}% ${y}%`;
+
+
+
+        viewerImage.style.transform =
+            "scale(2)";
+
+
+
+        viewerImage.style.cursor =
+            "zoom-out";
+
+
+    } else {
+
+
+        viewerImage.style.transform =
+            "scale(1)";
+
+
+
+        viewerImage.style.transformOrigin =
+            "center center";
+
+
+
+        viewerImage.style.cursor =
+            "zoom-in";
+
+
+    }
 
 
 }
@@ -351,6 +463,166 @@ function activarBotonesGaleria() {
 }
 
 // /////////////////////////////////////////////////////////////////////////////
+// ZOOM BÁSICO
+// /////////////////////////////////////////////////////////////////////////////
+
+function activarZoom() {
+
+
+    if (!viewerImage) return;
+
+
+
+    // Desktop
+    viewerImage.addEventListener(
+        "dblclick",
+        (event) => {
+
+            //si no esta activo el visor de foto no toma el evento
+            if (!imageViewer.classList.contains("active")) {
+                return;
+            }
+
+            const rect =
+                viewerImage.getBoundingClientRect();
+
+
+
+            const x =
+                ((event.clientX - rect.left) / rect.width) * 100;
+
+
+
+            const y =
+                ((event.clientY - rect.top) / rect.height) * 100;
+
+
+
+            toggleZoom(x, y);
+
+
+        }
+    );
+
+
+
+    // Detectar inicio de touch
+    viewerImage.addEventListener(
+        "touchstart",
+        (event) => {
+
+            //si no esta activo el visor de foto no toma el evento
+            if (!imageViewer.classList.contains("active")) {
+                return;
+            }
+
+            dedosActivos =
+                event.touches.length;
+
+
+
+        },
+        {
+            passive: true
+        }
+    );
+
+
+
+    // Detectar doble tap mobile
+
+    viewerImage.addEventListener(
+        "touchend",
+        (event) => {
+
+
+
+            // Si hubo más de un dedo
+            // durante el gesto ignoramos
+
+            if (dedosActivos > 1) {
+
+
+                ultimoTap = 0;
+
+                dedosActivos = 0;
+
+
+                return;
+
+            }
+
+
+
+            const ahora =
+                Date.now();
+
+
+
+            const diferencia =
+                ahora - ultimoTap;
+
+
+
+            if (diferencia < 300) {
+
+
+                const touch =
+                    event.changedTouches[0];
+
+
+                const rect =
+                    viewerImage.getBoundingClientRect();
+
+
+
+                const x =
+                    ((touch.clientX - rect.left) / rect.width) * 100;
+
+
+
+                const y =
+                    ((touch.clientY - rect.top) / rect.height) * 100;
+
+
+
+                toggleZoom(x, y);
+
+
+
+                ultimoTap = 0;
+
+
+            } else {
+
+
+                ultimoTap = ahora;
+
+
+            }
+
+
+
+            dedosActivos = 0;
+
+
+
+        }
+    );
+
+    //si se cancela el gesto
+    viewerImage.addEventListener(
+        "touchcancel",
+        () => {
+
+            dedosActivos = 0;
+            ultimoTap = 0;
+
+        }
+    );
+}
+
+// /////////////////////////////////////////////////////////////////////////////
 // CERRAR MODAL
 // /////////////////////////////////////////////////////////////////////////////
 
@@ -365,9 +637,40 @@ function activarCierreModal() {
         "click",
         () => {
 
+
+            // Si estamos en el visor de una foto
+            if (imageViewer.classList.contains("active")) {
+
+
+                imageViewer.classList.remove("active");
+
+
+                viewerImage.src = "";
+
+
+                zoomActivo = false;
+
+                viewerImage.style.transform = "scale(1)";
+                viewerImage.style.transformOrigin = "center center";
+                viewerImage.style.cursor = "zoom-in";
+
+
+                modalGallery.style.display = "";
+
+                modal.scrollTop = modalScrollPosition;
+
+                return;
+
+            }
+
+
+
+            // Si estamos en la galería
             modal.close();
 
+
             modalGallery.innerHTML = "";
+
 
         }
     );
@@ -383,5 +686,7 @@ renderProximoShow();
 renderShowsHistoricos();
 
 activarBotonesGaleria();
+
+activarZoom();
 
 activarCierreModal();
