@@ -212,9 +212,49 @@ body:has(dialog[open]) {
 
 }
 
+/* ==========================================================
+   MODO VISOR
+   ----------------------------------------------------------
+   Cuando se visualiza una fotografía individual el dialog
+   deja de comportarse como una ventana modal y pasa a ocupar
+   toda la pantalla.
+
+   De esta forma desaparecen:
+
+   - bordes redondeados
+   - padding interno
+   - ancho máximo
+   - alto máximo
+   - fondo tipo "card"
+
+   El resultado es una experiencia similar a Google Photos o
+   Apple Photos, donde solamente se observa la fotografía.
+   ========================================================== */
+
+#my-modal.viewer-mode {
+
+    /* Ocupa toda la ventana */
+    width: 100vw;
+    height: 100vh;
+
+    /* Elimina las restricciones del modo galería */
+    max-width: none;
+    max-height: none;
+
+    /* La imagen utilizará todo el espacio disponible */
+    padding: 0;
+
+    /* Sin bordes redondeados */
+    border-radius: 0;
+
+    /* Fondo negro para que la fotografía destaque */
+    background: #000;
+
+}
 
 
-/* Botón cerrar */
+
+/* Botón cerrar para la galeria */
 
 #close-modal {
     position: sticky;
@@ -252,6 +292,33 @@ body:has(dialog[open]) {
 
 #close-modal:active {
     transform: scale(.95);
+}
+
+/* ==========================================================
+   BOTÓN CERRAR EN MODO VISOR
+   ----------------------------------------------------------
+   Cuando se visualiza una fotografía individual el botón
+   deja de formar parte del flujo del documento.
+
+   De esta forma:
+
+   - no desplaza la imagen hacia abajo.
+   - permanece superpuesto sobre la fotografía.
+   - continúa siendo visible durante toda la visualización.
+   ========================================================== */
+
+#my-modal.viewer-mode #close-modal {
+
+    /* Superponer el botón sobre la fotografía */
+    position: absolute;
+
+    /* Separación respecto del borde superior derecho */
+    top: 1rem;
+    right: 1rem;
+
+    /* Anular el comportamiento del modo galería */
+    margin-left: 0;
+
 }
 
 /* ========================== 
@@ -295,9 +362,8 @@ body:has(dialog[open]) {
     justify-content: center;
     align-items: center;
 
-    width: 100%;
-    height: 80vh;
-
+    position: absolute;
+    inset: 0;
     overflow: hidden;
 
 }
@@ -318,7 +384,7 @@ body:has(dialog[open]) {
 #viewer-image {
 
     max-width: 100%;
-    max-height: 80vh;
+    max-height: 100vh;
 
     object-fit: contain;
 
@@ -332,7 +398,7 @@ body:has(dialog[open]) {
 
     /* transform-origin: center center; */
 
-    /* transition: transform .25s ease; */
+    transition: transform .25s ease;
 
     cursor: zoom-in;
 

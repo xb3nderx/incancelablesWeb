@@ -66,33 +66,23 @@ const closeModal =
 //para guardar el punto de scroll de la galeria antes de ir a una foto
 let modalScrollPosition = 0;
 
-// Indica si el visor se encuentra
-// en modo zoom.
-//
-// En este modo se habilitan:
-//
-// - paneo
-// - zoom continuo
-//
-// Se activa con doble click/tap
-// y finaliza con:
-//
-// - doble click/tap
-// - zoom hasta escala 1.
-let modoZoom = false;
+
 
 
 // Escala actual aplicada a la imagen.
 //
 // 1 representa el tamaño normal.
 // Valores mayores representan
-// distintos niveles de ampliación.
+// distintos niveles de ampliación si escala >1 permite paneo, sino no
 let escala = 1;
 
-//para llevar control del tap en mobile (reemplaza doble click)
-let ultimoTap = 0;
 
-//cantidad de dedos activos en el gesture
+// Cantidad de dedos activos
+// durante un gesto touch.
+//
+// Más adelante será utilizado para:
+// - pinch zoom
+// - distinguir gestos multitouch
 let dedosActivos = 0;
 
 // Desplazamiento actual de la imagen
@@ -146,9 +136,6 @@ let arrastrando = false;
 // /////////////////////////////////////////////////////////////////////////////
 
 function resetViewerZoom() {
-
-    // Salir del modo zoom.
-    modoZoom = false;
 
     // Restaurar la escala inicial.
     escala = 1;
@@ -572,159 +559,109 @@ function abrirVisor(src) {
     resetViewerZoom();
 
 
+    // Ocultar la galería para mostrar
+    // únicamente la fotografía.
     modalGallery.style.display = "none";
 
+    // El dialog deja temporalmente de comportarse como una ventana de galería y pasa a ocupar 
+    // toda la pantalla.  La apariencia visual queda definida por la clase CSS:
+    //
+    // #my-modal.viewer-mode
+    modal.classList.add("viewer-mode");
 
+    // Mostrar el visor de fotografía.
     imageViewer.classList.add("active");
 
 
 }
 
 // /////////////////////////////////////////////////////////////////////////////
-// ALTERNAR MODO ZOOM
+// ACTUALIZAR ESCALA
 //
-// Permite entrar o salir del modo zoom.
+// Centraliza todos los cambios de zoom del visor.
 //
-// Nuevo comportamiento:
+// La escala puede modificarse desde:
 //
-// Al ingresar:
+// - mouse wheel (desktop)
+// - pinch (mobile)
 //
-// - mantiene el centro como origen.
-// - aplica escala 2.
-// - calcula un desplazamiento inicial.
-// - mueve la imagen para que la zona
-//   seleccionada quede centrada.
+// Estados:
 //
-// Ya no utiliza transform-origin.
+// escala = 1
+// -> imagen en tamaño normal
+// -> no permite paneo
 //
-// El posicionamiento se controla únicamente
-// mediante:
+// escala > 1
+// -> imagen ampliada
+// -> permite paneo
 //
-// translate()
-// scale()
+// La función actualiza:
+// - escala
+// - cursor
+// - límites de desplazamiento
 //
-// Al salir:
+// El render final siempre pasa por:
+// actualizarTransform()
 //
-// - vuelve al estado inicial.
 // /////////////////////////////////////////////////////////////////////////////
 
-function toggleZoom(x = 0, y = 0) {
+function actualizarEscala(nuevaEscala) {
 
 
-    if (!viewerImage) return;
+    // Guardar la nueva escala.
+    escala = nuevaEscala;
 
 
 
-    // =========================================================
-    // ENTRAR EN ZOOM
-    // =========================================================
+    // La escala mínima permitida
+    // es el tamaño original.
+    if (escala < 1) {
 
-    if (!modoZoom) {
-
-        // Activar el modo zoom.
-        modoZoom = true;
-
-        // Escala inicial del visor.
-        //
-        // Más adelante podrá modificarse
-        // mediante wheel o pinch.
-        escala = 2;
-
-        // Comenzar el modo zoom sin
-        // desplazamiento.
-        //
-        // Primero queremos que el navegador
-        // dibuje únicamente la imagen ampliada.
-        desplazamientoX = 0;
-        desplazamientoY = 0;
-
-        // Aplicar solamente la nueva escala.
-        //
-        // Todavía no calculamos la posición
-        // inicial de la imagen.
-        actualizarTransform();
-
-        // Esperar al siguiente repaint.
-        //
-        // Recién en ese momento el navegador
-        // habrá terminado de dibujar la imagen
-        // ampliada y podremos medir su tamaño
-        // real para calcular correctamente
-        // el desplazamiento inicial.
-        requestAnimationFrame(() => {
-
-            // Obtener el tamaño visible
-            // del visor.
-            const visorRect =
-                imageViewer.getBoundingClientRect();
-
-            // Obtener el tamaño real de la
-            // imagen ya ampliada.
-            const imagenRect =
-                viewerImage.getBoundingClientRect();
-
-            // Centro del visor.
-            const centroVisorX =
-                visorRect.width / 2;
-
-            const centroVisorY =
-                visorRect.height / 2;
-
-            // Centro de la imagen ampliada.
-            const centroImagenX =
-                imagenRect.width / 2;
-
-            const centroImagenY =
-                imagenRect.height / 2;
-
-            // Calcular cuánto se encuentra
-            // el punto seleccionado respecto
-            // del centro de la imagen.
-            const diferenciaX =
-                (x * escala) -
-                centroImagenX;
-
-            const diferenciaY =
-                (y * escala) -
-                centroImagenY;
-
-            // Desplazar la imagen para que
-            // el punto seleccionado quede
-            // centrado dentro del visor.
-            desplazamientoX =
-                -diferenciaX;
-
-            desplazamientoY =
-                -diferenciaY;
-
-            // Corregir el desplazamiento
-            // para evitar mostrar fondo
-            // fuera de la imagen.
-            limitarDesplazamiento();
-
-            // Aplicar la posición final.
-            actualizarTransform();
-
-        });
-
-        // Cambiar el cursor indicando
-        // que ahora la imagen puede
-        // desplazarse mediante paneo.
-        viewerImage.style.cursor =
-            "grab";
-
-        return;
+        escala = 1;
 
     }
 
 
 
-    // =========================================================
-    // SALIR DEL ZOOM
-    // =========================================================
+    // Si volvemos al tamaño original,
+    // eliminamos completamente
+    // cualquier paneo acumulado.
+    if (escala === 1) {
 
 
-    resetViewerZoom();
+        desplazamientoX = 0;
+
+        desplazamientoY = 0;
+
+
+        viewerImage.style.cursor =
+            "zoom-in";
+
+
+    } else {
+
+
+        // Si la imagen está ampliada,
+        // puede desplazarse.
+        viewerImage.style.cursor =
+            "grab";
+
+
+        // Ajustar el paneo existente
+        // al nuevo tamaño de imagen.
+        //
+        // Evita que al reducir escala
+        // quede parte de la imagen fuera
+        // del área visible.
+        limitarDesplazamiento();
+
+
+    }
+
+
+
+    // Dibujar la transformación final.
+    actualizarTransform();
 
 
 }
@@ -788,70 +725,17 @@ function activarZoom() {
 
 
 
-    // Desktop
-    viewerImage.addEventListener(
-        "dblclick",
-        (event) => {
 
-            //si no esta activo el visor de foto no toma el evento
-            if (!imageViewer.classList.contains("active")) {
-                return;
-            }
-
-            // Obtener el área visible actual
-            // de la imagen.
-            // Como el zoom inicial siempre ocurre
-            // desde escala 1, estas coordenadas
-            // representan correctamente el punto
-            // donde el usuario hizo click.
-            const rect =
-                viewerImage.getBoundingClientRect();
-
-            // Calcular la posición del doble click
-            // dentro de la imagen.
-            //
-            // A diferencia de la versión anterior,
-            // ahora trabajaremos en píxeles y no
-            // en porcentajes, ya que el origen de
-            // la transformación permanecerá fijo.
-            const x =
-                event.clientX - rect.left;
-
-            const y =
-                event.clientY - rect.top;
-
-
-            // ======================================
-            // DEBUG
-            // ======================================
-
-            console.log("hola mundo");
-            console.log({
-
-                x,
-                y,
-
-                rectWidth: rect.width,
-                rectHeight: rect.height,
-
-                clientWidth: viewerImage.clientWidth,
-                clientHeight: viewerImage.clientHeight,
-
-                naturalWidth: viewerImage.naturalWidth,
-                naturalHeight: viewerImage.naturalHeight
-
-            });
-
-            // Entrar o salir del modo zoom.
-            toggleZoom(x, y);
-
-
-        }
-    );
-
-
-
-    // Detectar inicio de touch
+    // /////////////////////////////////////////////////////////////////////////////
+    // CONTROL DE GESTOS TOUCH
+    //
+    // Guarda la cantidad de dedos activos.
+    //
+    // Más adelante será utilizado para:
+    // - pinch zoom
+    // - distinguir gestos multitouch
+    //
+    // /////////////////////////////////////////////////////////////////////////////
     viewerImage.addEventListener(
         "touchstart",
         (event) => {
@@ -861,10 +745,11 @@ function activarZoom() {
                 return;
             }
 
-            // Guardamos cantidad de dedos.
+            // Guardamos cantidad de dedos activos.
             //
-            // Esto permite ignorar gestos
-            // multitouch como pinch zoom.
+            // Ejemplos:
+            // 1 dedo  -> posible paneo
+            // 2 dedos -> posible pinch zoom
             dedosActivos =
                 event.touches.length;
         },
@@ -873,92 +758,164 @@ function activarZoom() {
         }
     );
 
-    // Detectar doble tap mobile
 
-    viewerImage.addEventListener(
-        "touchend",
-        (event) => {
-
-            // Si hubo más de un dedo
-            // durante el gesto ignoramos
-
-            if (dedosActivos > 1) {
-
-
-                ultimoTap = 0;
-
-                dedosActivos = 0;
-
-
-                return;
-
-            }
-
-
-
-            const ahora =
-                Date.now();
-
-
-
-            const diferencia =
-                ahora - ultimoTap;
-
-
-
-            if (diferencia < 300) {
-
-
-                const touch =
-                    event.changedTouches[0];
-
-
-                // Obtener el área visible actual
-                // de la imagen.
-                const rect =
-                    viewerImage.getBoundingClientRect();
-
-                // Calcular la posición del doble tap
-                // dentro de la imagen.
-                const x =
-                    touch.clientX - rect.left;
-
-                const y =
-                    touch.clientY - rect.top;
-
-                // Entrar o salir del modo zoom.
-                toggleZoom(x, y);
-
-
-
-                ultimoTap = 0;
-
-
-            } else {
-
-
-                ultimoTap = ahora;
-
-
-            }
-
-
-
-            dedosActivos = 0;
-
-
-
-        }
-    );
-
-    //si se cancela el gesto
+    // Si el navegador cancela el gesto,
+    // limpiamos el estado interno.
     viewerImage.addEventListener(
         "touchcancel",
         () => {
 
             dedosActivos = 0;
-            ultimoTap = 0;
 
+        }
+    );
+
+    // /////////////////////////////////////////////////////////////////////////////
+    // ZOOM CON RUEDA DEL MOUSE (DESKTOP)
+    //
+    // La rueda modifica la escala.
+    // El zoom se realiza manteniendo
+    // como referencia el punto donde está
+    // el cursor.
+    //
+    // /////////////////////////////////////////////////////////////////////////////
+
+    viewerImage.addEventListener(
+        "wheel",
+        (event) => {
+
+
+            // Solo funciona cuando el visor
+            // está activo.
+            if (!imageViewer.classList.contains("active")) {
+                return;
+            }
+
+
+            // Evitar que la página haga scroll
+            // mientras estamos sobre la imagen.
+            event.preventDefault();
+
+
+
+            // Obtener posición del cursor
+            // dentro de la imagen.
+            const rect =
+                viewerImage.getBoundingClientRect();
+
+
+            const x =
+                event.clientX - rect.left;
+
+
+            const y =
+                event.clientY - rect.top;
+
+
+            const escalaAnterior =
+                escala;
+
+
+            // Calcular cuánto cambia la escala
+            // según la intensidad de la rueda.
+            //
+            // deltaY negativo = rueda arriba = zoom in
+            // deltaY positivo = rueda abajo = zoom out
+
+            const cambio =
+                event.deltaY * -0.003;
+
+
+            escala += cambio;
+
+
+
+            // Limitar escala mínima.
+            if (escala < 1) {
+
+                escala = 1;
+
+            }
+
+
+            // Limitar escala máxima.
+            if (escala > 5) {
+
+                escala = 5;
+
+            }
+
+
+
+            // Actualizar cursor según estado.
+            if (escala > 1) {
+
+                viewerImage.style.cursor =
+                    "grab";
+
+            } else {
+
+                desplazamientoX = 0;
+                desplazamientoY = 0;
+
+                viewerImage.style.cursor =
+                    "zoom-in";
+
+            }
+
+            // Aplicar la nueva escala.
+            actualizarTransform();
+
+
+            // Obtener el centro actual de la imagen.
+            // Usamos getBoundingClientRect porque
+            // necesitamos la posición real en pantalla.
+
+            const imagenRect =
+                viewerImage.getBoundingClientRect();
+
+
+            const centroImagenX =
+                imagenRect.width / 2;
+
+
+            const centroImagenY =
+                imagenRect.height / 2;
+
+
+
+            // Compensar el desplazamiento provocado
+            // por cambiar la escala.
+            //
+            // Como transform-origin está fijo en el centro,
+            // movemos la imagen en sentido contrario
+            // para que el punto del cursor permanezca fijo.
+
+            desplazamientoX +=
+                (x - centroImagenX) *
+                (1 - escala / escalaAnterior);
+
+
+            desplazamientoY +=
+                (y - centroImagenY) *
+                (1 - escala / escalaAnterior);
+
+
+            // Aplicar la nueva posición.
+            actualizarTransform();
+
+            // Evitar que aparezca fondo fuera
+            // de la imagen.
+            if (escala > 1) {
+
+                limitarDesplazamiento();
+                // Aplicar posición final.
+                actualizarTransform();
+            }
+
+        },
+        {
+            passive: false
         }
     );
 
@@ -969,9 +926,12 @@ function activarZoom() {
         (event) => {
 
             // El paneo solamente está disponible
-            // cuando el visor se encuentra
-            // en modo zoom.
-            if (!modoZoom) {
+            // cuando la imagen está ampliada.
+            //
+            // La escala 1 representa la imagen normal.
+            // Cuando la escala es mayor a 1,
+            // existe zoom y se permite mover la imagen.
+            if (escala <= 1) {
                 return;
             }
 
@@ -1023,8 +983,11 @@ function activarZoom() {
             }
 
             // El paneo solamente está disponible
-            // cuando la imagen está ampliada.
-            if (!modoZoom) {
+            // cuando la imagen continúa ampliada.
+            //
+            // Si la escala vuelve a 1,
+            // no se permite desplazar la imagen.
+            if (escala <= 1) {
                 return;
             }
 
@@ -1078,7 +1041,7 @@ function activarZoom() {
 
             // Solo cambiar el cursor si la imagen
             // continúa ampliada.
-            if (modoZoom) {
+            if (escala > 1) {
 
                 viewerImage.style.cursor =
                     "grab";
@@ -1137,17 +1100,21 @@ function activarCierreModal() {
             if (imageViewer.classList.contains("active")) {
 
 
+                // Ocultar el visor de fotografía.
                 imageViewer.classList.remove("active");
 
+                // El modal vuelve a comportarse
+                // como una galería de imágenes.
+                modal.classList.remove("viewer-mode");
 
+                // Eliminar la fotografía cargada.
                 viewerImage.src = "";
 
-
-                // Restablecer el visor antes de volver
-                // a la galería de imágenes.
+                // Restablecer completamente el
+                // estado interno del visor.
                 resetViewerZoom();
 
-
+                // Volver a mostrar la galería.
                 modalGallery.style.display = "";
 
                 // Restaurar la posición donde el usuario
