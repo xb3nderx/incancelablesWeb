@@ -131,6 +131,42 @@ body:has(dialog[open]) {
     margin-top: 1rem;
 }
 
+/* ==========================
+   BOTÓN GALERÍA
+   ========================== */
+
+.btn-galeria {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+
+    margin-top: 1.5rem;
+
+    padding: .75rem 1.25rem;
+
+    background: var(--accent);
+    color: var(--text);
+
+    border-radius: 999px;
+
+    text-decoration: none;
+    font-weight: 600;
+
+    transition:
+        transform .15s ease,
+        background-color .2s ease;
+}
+
+.btn-galeria:hover {
+    transform: scale(1.05);
+}
+
+.btn-galeria:active {
+    transform: scale(.97);
+}
+
+
 /* ========================== 
    MODAL GALERÍA
    ========================== */
@@ -176,22 +212,112 @@ body:has(dialog[open]) {
 
 }
 
+/* ==========================================================
+   MODO VISOR
+   ----------------------------------------------------------
+   Cuando se visualiza una fotografía individual el dialog
+   deja de comportarse como una ventana modal y pasa a ocupar
+   toda la pantalla.
+
+   De esta forma desaparecen:
+
+   - bordes redondeados
+   - padding interno
+   - ancho máximo
+   - alto máximo
+   - fondo tipo "card"
+
+   El resultado es una experiencia similar a Google Photos o
+   Apple Photos, donde solamente se observa la fotografía.
+   ========================================================== */
+
+#my-modal.viewer-mode {
+
+    /* Ocupa toda la ventana */
+    width: 100vw;
+    height: 100vh;
+
+    /* Elimina las restricciones del modo galería */
+    max-width: none;
+    max-height: none;
+
+    /* La imagen utilizará todo el espacio disponible */
+    padding: 0;
+
+    /* Sin bordes redondeados */
+    border-radius: 0;
+
+    /* Fondo negro para que la fotografía destaque */
+    background: #000;
+
+}
 
 
-/* Botón cerrar */
+
+/* Botón cerrar para la galeria */
 
 #close-modal {
-
     position: sticky;
-
     top: 0;
-
+    margin-left: auto;
+    display: block;
     z-index: 10;
 
+    width: 3rem;
+    height: 2rem;
 
-    display: block;
+    border: none;
+    border-radius: 999px;
 
-    margin-left: auto;
+    background: var(--accent);
+    color: var(--text);
+
+    font-size: 1.4rem;
+    font-weight: bold;
+    line-height: 1;
+
+    cursor: pointer;
+
+    user-select: none;
+    -webkit-user-select: none;
+
+    transition:
+        background-color .2s ease,
+        transform .15s ease;
+}
+
+#close-modal:hover {
+    transform: scale(1.08);
+}
+
+#close-modal:active {
+    transform: scale(.95);
+}
+
+/* ==========================================================
+   BOTÓN CERRAR EN MODO VISOR
+   ----------------------------------------------------------
+   Cuando se visualiza una fotografía individual el botón
+   deja de formar parte del flujo del documento.
+
+   De esta forma:
+
+   - no desplaza la imagen hacia abajo.
+   - permanece superpuesto sobre la fotografía.
+   - continúa siendo visible durante toda la visualización.
+   ========================================================== */
+
+#my-modal.viewer-mode #close-modal {
+
+    /* Superponer el botón sobre la fotografía */
+    position: absolute;
+
+    /* Separación respecto del borde superior derecho */
+    top: 1rem;
+    right: 1rem;
+
+    /* Anular el comportamiento del modo galería */
+    margin-left: 0;
 
 }
 
@@ -213,6 +339,57 @@ body:has(dialog[open]) {
     width: 100%;
     height: auto;
     display: block;
+    cursor: pointer;
+}
+
+/* ==========================
+   VISOR DE FOTO
+   ========================== */
+
+/* Oculto por defecto */
+#image-viewer {
+
+    display: none;
+    position: relative;
+
+}
+
+/* Visible cuando el visor está activo */
+#image-viewer.active {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+
+}
+
+/* Imagen ampliada */
+#viewer-image {
+
+    max-width: 100%;
+    max-height: 100vh;
+
+    object-fit: contain;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+
+    touch-action: none;
+
+    transform: scale(1);
+
+    /* El zoom siempre parte del centro de la imagen.
+       La posición la controla exclusivamente
+       translate() desde actualizarTransform() */
+    transform-origin: center center;
+
+    cursor: zoom-in;
 
 }
 
