@@ -988,7 +988,10 @@ function activarZoom() {
 
             // Un puntero sobre la imagen ampliada:
             // comienza el paneo.
-            if (escala > 1) {
+            //
+            // Si ya hay un pinch en curso (tercer dedo),
+            // no se inicia ningún paneo.
+            if (escala > 1 && !pinchActivo) {
 
                 // Guardar la posición inicial
                 // del puntero.
