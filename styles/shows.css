@@ -368,18 +368,6 @@ body:has(dialog[open]) {
 
 }
 
-/* Cuando el visor entra en modo zoom,
-   la imagen deja de centrarse mediante flex.
-   A partir de este momento la posición la
-   controla exclusivamente translate(). */
-
-#image-viewer.zoom-mode {
-
-    justify-content: flex-start;
-    align-items: flex-start;
-
-}
-
 /* Imagen ampliada */
 #viewer-image {
 
@@ -396,9 +384,10 @@ body:has(dialog[open]) {
 
     transform: scale(1);
 
-    /* transform-origin: center center; */
-
-    transition: transform .25s ease;
+    /* El zoom siempre parte del centro de la imagen.
+       La posición la controla exclusivamente
+       translate() desde actualizarTransform() */
+    transform-origin: center center;
 
     cursor: zoom-in;
 

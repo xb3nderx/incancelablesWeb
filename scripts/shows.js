@@ -77,14 +77,6 @@ let modalScrollPosition = 0;
 let escala = 1;
 
 
-// Cantidad de dedos activos
-// durante un gesto touch.
-//
-// Más adelante será utilizado para:
-// - pinch zoom
-// - distinguir gestos multitouch
-let dedosActivos = 0;
-
 // Desplazamiento actual de la imagen
 // cuando está ampliada.
 let desplazamientoX = 0;
@@ -123,6 +115,43 @@ let inicioDesplazamientoY = 0;
 let arrastrando = false;
 
 // /////////////////////////////////////////////////////////////////////////////
+// CONTROL DEL PINCH ZOOM
+//
+// El pinch utiliza Pointer Events.
+//
+// pointers: punteros activos sobre la imagen.
+//
+// pinchInicio: guarda el estado al comenzar
+// el gesto de dos dedos:
+//
+// - distancia entre los dedos
+// - punto medio entre los dedos
+// - escala inicial
+// - desplazamiento inicial
+// - centro de la imagen en pantalla
+//
+// Todo el cálculo del gesto se hace desde
+// ese estado inicial, sin acumular errores.
+//
+// /////////////////////////////////////////////////////////////////////////////
+
+const pointers = new Map();
+
+let pinchActivo = false;
+
+let pinchInicio = null;
+
+// Distancia entre dos punteros.
+function distanciaEntre(a, b) {
+
+    return Math.hypot(
+        a.x - b.x,
+        a.y - b.y
+    );
+
+}
+
+// /////////////////////////////////////////////////////////////////////////////
 // RESETEAR ZOOM
 //
 // Restablece el visor al estado inicial.
@@ -142,11 +171,6 @@ function resetViewerZoom() {
     // Restablecer el desplazamiento de la imagen.
     desplazamientoX = 0;
     desplazamientoY = 0;
-
-    // Restaurar el origen de la transformación
-    // al centro de la imagen.
-    // viewerImage.style.transformOrigin =
-    //     "center center";
 
     // Aplicar la transformación inicial.
     actualizarTransform();
@@ -192,8 +216,13 @@ function actualizarTransform() {
 // La función trabaja siempre sobre el estado
 // realmente renderizado por el navegador.
 //
-// Si al corregir un eje modifica el otro,
-// vuelve a medir antes de continuar.
+// Casos:
+//
+// - Si la imagen es más grande que el visor
+//   en un eje, no debe quedar fondo visible.
+//
+// - Si la imagen entra completa en un eje,
+//   se mantiene centrada en ese eje.
 //
 // /////////////////////////////////////////////////////////////////////////////
 
@@ -212,7 +241,7 @@ function limitarDesplazamiento() {
 
     // Obtener la posición real de la imagen
     // ya transformada.
-    let imagen =
+    const imagen =
         viewerImage.getBoundingClientRect();
 
 
@@ -220,49 +249,81 @@ function limitarDesplazamiento() {
     // EJE X
     // =====================================================
 
-    // Si aparece fondo por la izquierda.
-    if (imagen.left > visor.left) {
+    if (imagen.width >= visor.width) {
 
-        desplazamientoX -=
-            imagen.left - visor.left;
+        // La imagen es más ancha que el visor.
+        //
+        // Si aparece fondo por la izquierda.
+        if (imagen.left > visor.left) {
 
-    }
+            desplazamientoX -=
+                imagen.left - visor.left;
 
-    // Si aparece fondo por la derecha.
-    if (imagen.right < visor.right) {
+        }
+
+        // Si aparece fondo por la derecha.
+        if (imagen.right < visor.right) {
+
+            desplazamientoX +=
+                visor.right - imagen.right;
+
+        }
+
+    } else {
+
+        // La imagen entra completa en el ancho
+        // del visor: se mantiene centrada.
+        const centroVisor =
+            visor.left + (visor.width / 2);
+
+
+        const centroImagen =
+            imagen.left + (imagen.width / 2);
+
 
         desplazamientoX +=
-            visor.right - imagen.right;
+            centroVisor - centroImagen;
 
     }
-
-
-    // Como acabamos de modificar X,
-    // volvemos a aplicar la transformación
-    // antes de medir nuevamente.
-    actualizarTransform();
-
-    imagen =
-        viewerImage.getBoundingClientRect();
 
 
     // =====================================================
     // EJE Y
     // =====================================================
 
-    // Si aparece fondo arriba.
-    if (imagen.top > visor.top) {
+    if (imagen.height >= visor.height) {
 
-        desplazamientoY -=
-            imagen.top - visor.top;
+        // La imagen es más alta que el visor.
+        // Si aparece fondo arriba.
+        if (imagen.top > visor.top) {
 
-    }
+            desplazamientoY -=
+                imagen.top - visor.top;
 
-    // Si aparece fondo abajo.
-    if (imagen.bottom < visor.bottom) {
+        }
+
+        // Si aparece fondo abajo.
+        if (imagen.bottom < visor.bottom) {
+
+            desplazamientoY +=
+                visor.bottom - imagen.bottom;
+
+        }
+
+    } else {
+
+        // La imagen entra en el alto del visor:
+        // se mantiene centrada.
+        const centroVisorY =
+            visor.top + (visor.height / 2);
+
+
+        const centroImagenY =
+            imagen.top + (imagen.height / 2);
+
 
         desplazamientoY +=
-            visor.bottom - imagen.bottom;
+            centroVisorY - centroImagenY;
 
     }
 
@@ -705,16 +766,15 @@ function activarBotonesGaleria() {
 // /////////////////////////////////////////////////////////////////////////////
 // ACTIVAR ZOOM
 //
-// Desktop:
-// - doble click
+// El zoom se controla exclusivamente con:
 //
-// Mobile:
-// - doble tap personalizado
+// - rueda del mouse (desktop)
+// - pinch con dos dedos (mobile)
 //
-// El zoom utiliza transform-origin para
-// ampliar desde el punto seleccionado.
+// Ambos terminan en actualizarEscala().
 //
-// También ignora gestos multitáctiles.
+// El paneo con un puntero
+// solamente está disponible cuando escala > 1.
 //
 // /////////////////////////////////////////////////////////////////////////////
 
@@ -727,56 +787,21 @@ function activarZoom() {
 
 
     // /////////////////////////////////////////////////////////////////////////////
-    // CONTROL DE GESTOS TOUCH
-    //
-    // Guarda la cantidad de dedos activos.
-    //
-    // Más adelante será utilizado para:
-    // - pinch zoom
-    // - distinguir gestos multitouch
-    //
-    // /////////////////////////////////////////////////////////////////////////////
-    viewerImage.addEventListener(
-        "touchstart",
-        (event) => {
-
-            //si no esta activo el visor de foto no toma el evento
-            if (!imageViewer.classList.contains("active")) {
-                return;
-            }
-
-            // Guardamos cantidad de dedos activos.
-            //
-            // Ejemplos:
-            // 1 dedo  -> posible paneo
-            // 2 dedos -> posible pinch zoom
-            dedosActivos =
-                event.touches.length;
-        },
-        {
-            passive: true
-        }
-    );
-
-
-    // Si el navegador cancela el gesto,
-    // limpiamos el estado interno.
-    viewerImage.addEventListener(
-        "touchcancel",
-        () => {
-
-            dedosActivos = 0;
-
-        }
-    );
-
-    // /////////////////////////////////////////////////////////////////////////////
     // ZOOM CON RUEDA DEL MOUSE (DESKTOP)
     //
-    // La rueda modifica la escala.
-    // El zoom se realiza manteniendo
-    // como referencia el punto donde está
-    // el cursor.
+    // Comportamiento asimétrico:
+    //
+    // ZOOM IN (rueda arriba)
+    // -> el punto donde está el cursor
+    //   permanece aproximadamente bajo el cursor.
+    //
+    // ZOOM OUT (rueda abajo)
+    // -> el puntero no controla el centro.
+    // -> el desplazamiento se reduce proporcional
+    //   a la escala, por lo que la imagen vuelve
+    //   al centro de forma gradual.
+    // -> al llegar a escala 1 queda perfectamente
+    //   centrada.
     //
     // /////////////////////////////////////////////////////////////////////////////
 
@@ -797,121 +822,83 @@ function activarZoom() {
             event.preventDefault();
 
 
-
-            // Obtener posición del cursor
-            // dentro de la imagen.
-            const rect =
-                viewerImage.getBoundingClientRect();
-
-
-            const x =
-                event.clientX - rect.left;
-
-
-            const y =
-                event.clientY - rect.top;
-
-
             const escalaAnterior =
                 escala;
 
-
-            // Calcular cuánto cambia la escala
-            // según la intensidad de la rueda.
-            //
             // deltaY negativo = rueda arriba = zoom in
             // deltaY positivo = rueda abajo = zoom out
 
-            const cambio =
-                event.deltaY * -0.003;
+            let nuevaEscala =
+                escalaAnterior + event.deltaY * -0.003;
 
+            // Límites de la escala.
+            nuevaEscala =
+                Math.min(5, Math.max(1, nuevaEscala));
 
-            escala += cambio;
-
-
-
-            // Limitar escala mínima.
-            if (escala < 1) {
-
-                escala = 1;
-
+            // Si la escala no cambia,
+            // no hay nada que redibujar.
+            if (nuevaEscala === escalaAnterior) {
+                return;
             }
 
 
-            // Limitar escala máxima.
-            if (escala > 5) {
-
-                escala = 5;
-
-            }
+            const factor =
+                nuevaEscala / escalaAnterior;
 
 
+            if (nuevaEscala > escalaAnterior) {
 
-            // Actualizar cursor según estado.
-            if (escala > 1) {
+                // =========================================
+                // ZOOM IN
+                //
+                // La zona sobre el cursor permanece
+                // aproximadamente bajo el cursor.
+                // =========================================
 
-                viewerImage.style.cursor =
-                    "grab";
+                const rect =
+                    viewerImage.getBoundingClientRect();
+
+
+                const punteroX =
+                    event.clientX - (rect.left + rect.width / 2);
+
+
+                const punteroY =
+                    event.clientY - (rect.top + rect.height / 2);
+
+
+                desplazamientoX +=
+                    punteroX * (1 - factor);
+
+
+                desplazamientoY +=
+                    punteroY * (1 - factor);
 
             } else {
 
-                desplazamientoX = 0;
-                desplazamientoY = 0;
+                // =========================================
+                // ZOOM OUT
+                //
+                // El puntero no controla el centro.
+                //
+                // El desplazamiento se multiplica por el
+                // factor de escala: mientras la imagen
+                // se achica, vuelve al centro de forma
+                // gradual. Al llegar a escala 1
+                // ya es exactamente 0.
+                // =========================================
 
-                viewerImage.style.cursor =
-                    "zoom-in";
+                desplazamientoX *= factor;
+                desplazamientoY *= factor;
 
             }
 
-            // Aplicar la nueva escala.
-            actualizarTransform();
 
-
-            // Obtener el centro actual de la imagen.
-            // Usamos getBoundingClientRect porque
-            // necesitamos la posición real en pantalla.
-
-            const imagenRect =
-                viewerImage.getBoundingClientRect();
-
-
-            const centroImagenX =
-                imagenRect.width / 2;
-
-
-            const centroImagenY =
-                imagenRect.height / 2;
-
-
-
-            // Compensar el desplazamiento provocado
-            // por cambiar la escala.
-            //
-            // Como transform-origin está fijo en el centro,
-            // movemos la imagen en sentido contrario
-            // para que el punto del cursor permanezca fijo.
-
-            desplazamientoX +=
-                (x - centroImagenX) *
-                (1 - escala / escalaAnterior);
-
-
-            desplazamientoY +=
-                (y - centroImagenY) *
-                (1 - escala / escalaAnterior);
-
-
-            // Aplicar la nueva posición.
-            actualizarTransform();
-
-            // Evitar que aparezca fondo fuera
-            // de la imagen.
-            if (escala > 1) {
-
-                limitarDesplazamiento();
-                // Aplicar posición final.
-                actualizarTransform();
-            }
+            // Centralizar el cambio:
+            // - cursor
+            // - límites de desplazamiento
+            // - transformación final
+            actualizarEscala(nuevaEscala);
 
         },
         {
@@ -919,62 +906,205 @@ function activarZoom() {
         }
     );
 
-    // Detectar el inicio de un arrastre
-    // sobre la imagen ampliada.
+    // /////////////////////////////////////////////////////////////////////////////
+    // PANEO Y PINCH ZOOM (POINTER EVENTS)
+    //
+    // Un puntero (dedo o mouse):
+    // -> paneo cuando escala > 1
+    //
+    // Dos punteros (dos dedos):
+    // -> pinch zoom
+    // -> el paneo se cancela mientras dura el gesto
+    // -> al soltar un dedo, el paneo puede retomar
+    //   desde el dedo restante
+    //
+    // /////////////////////////////////////////////////////////////////////////////
+
+    // Registrar el inicio de un puntero.
     viewerImage.addEventListener(
         "pointerdown",
         (event) => {
 
-            // El paneo solamente está disponible
-            // cuando la imagen está ampliada.
-            //
-            // La escala 1 representa la imagen normal.
-            // Cuando la escala es mayor a 1,
-            // existe zoom y se permite mover la imagen.
-            if (escala <= 1) {
-                return;
-            }
-
-            // Guardar la posición inicial
-            // del puntero.
-            inicioX = event.clientX;
-            inicioY = event.clientY;
-
-            // Guardamos la posición actual
-            // de la imagen antes del movimiento.
-            //
-            // Después pointermove calculará:
-            // desplazamiento inicial
-            // +
-            // movimiento realizado
-            //
-            // Esto evita acumulación de errores.
-            inicioDesplazamientoX =
-                desplazamientoX;
-
-            inicioDesplazamientoY =
-                desplazamientoY;
-
-            // Indicar que comenzó un arrastre.
-            arrastrando = true;
-
-            // Indicar visualmente que la imagen
-            // está siendo tomada para moverla.
-            viewerImage.style.cursor =
-                "grabbing";
+            pointers.set(
+                event.pointerId,
+                {
+                    x: event.clientX,
+                    y: event.clientY
+                }
+            );
 
             // Mantener la captura del puntero
             // aunque salga de la imagen.
             viewerImage.setPointerCapture(event.pointerId);
 
+
+            // Dos punteros activos: comienza el pinch.
+            if (pointers.size === 2) {
+
+                // Cancelar cualquier paneo en curso.
+                arrastrando = false;
+
+                // Guardar el estado inicial del gesto.
+                const [p1, p2] =
+                    [...pointers.values()];
+
+                const rect =
+                    viewerImage.getBoundingClientRect();
+
+                pinchInicio = {
+
+                    // Distancia entre los dos dedos.
+                    distancia:
+                        distanciaEntre(p1, p2),
+
+                    // Punto medio entre los dos dedos.
+                    medioX:
+                        (p1.x + p2.x) / 2,
+
+                    medioY:
+                        (p1.y + p2.y) / 2,
+
+                    // Estado de la imagen al comenzar.
+                    escala: escala,
+
+                    desplazamientoX: desplazamientoX,
+                    desplazamientoY: desplazamientoY,
+
+                    // Centro de la imagen en pantalla.
+                    centroX:
+                        rect.left + rect.width / 2,
+
+                    centroY:
+                        rect.top + rect.height / 2
+
+                };
+
+                pinchActivo = true;
+
+                return;
+
+            }
+
+
+            // Un puntero sobre la imagen ampliada:
+            // comienza el paneo.
+            if (escala > 1) {
+
+                // Guardar la posición inicial
+                // del puntero.
+                inicioX = event.clientX;
+                inicioY = event.clientY;
+
+                // Guardamos la posición actual
+                // de la imagen antes del movimiento.
+                //
+                // Después pointermove calculará:
+                // desplazamiento inicial
+                // +
+                // movimiento realizado
+                //
+                // Esto evita acumulación de errores.
+                inicioDesplazamientoX =
+                    desplazamientoX;
+
+                inicioDesplazamientoY =
+                    desplazamientoY;
+
+                // Indicar que comenzó un arrastre.
+                arrastrando = true;
+
+                // Indicar visualmente que la imagen
+                // está siendo tomada para moverla.
+                viewerImage.style.cursor =
+                    "grabbing";
+
+            }
+
         }
     );
 
-    // Desplazar la imagen mientras
-    // el usuario la está arrastrando.
+    // Mover punteros y aplicar gestos.
     viewerImage.addEventListener(
         "pointermove",
         (event) => {
+
+            // Solo punteros registrados sobre la imagen.
+            if (!pointers.has(event.pointerId)) {
+                return;
+            }
+
+            // Actualizar la posición del puntero.
+            pointers.set(
+                event.pointerId,
+                {
+                    x: event.clientX,
+                    y: event.clientY
+                }
+            );
+
+
+            // =========================================
+            // PINCH ZOOM
+            // =========================================
+
+            if (pinchActivo && pointers.size === 2) {
+
+                const [p1, p2] =
+                    [...pointers.values()];
+
+                const distancia =
+                    distanciaEntre(p1, p2);
+
+                const medioX =
+                    (p1.x + p2.x) / 2;
+
+                const medioY =
+                    (p1.y + p2.y) / 2;
+
+                // La escala sigue la distancia de los
+                // dedos respecto del inicio del gesto.
+                let nuevaEscala =
+                    pinchInicio.escala *
+                    (distancia / pinchInicio.distancia);
+
+                nuevaEscala =
+                    Math.min(5, Math.max(1, nuevaEscala));
+
+                if (nuevaEscala === escala) {
+                    return;
+                }
+
+                const factor =
+                    nuevaEscala / pinchInicio.escala;
+
+                // El punto medio de los dedos actúa como
+                // referencia del zoom: la zona entre los
+                // dedos permanece aproximadamente fija.
+                //
+                // desplazamiento final =
+                //   desplazamiento inicial
+                //   + movimiento del punto medio
+                //   + compensación por cambio de escala
+                desplazamientoX =
+                    pinchInicio.desplazamientoX +
+                    (medioX - pinchInicio.medioX) +
+                    (pinchInicio.centroX - pinchInicio.medioX) * (factor - 1);
+
+                desplazamientoY =
+                    pinchInicio.desplazamientoY +
+                    (medioY - pinchInicio.medioY) +
+                    (pinchInicio.centroY - pinchInicio.medioY) * (factor - 1);
+
+                actualizarEscala(nuevaEscala);
+
+                return;
+
+            }
+
+
+            // =========================================
+            // PANEO
+            // =========================================
 
             // Solo permitir el paneo cuando
             // existe un arrastre en curso.
@@ -996,7 +1126,6 @@ function activarZoom() {
             const movimientoX =
                 event.clientX - inicioX;
 
-
             const movimientoY =
                 event.clientY - inicioY;
 
@@ -1005,48 +1134,76 @@ function activarZoom() {
             // posición inicial
             // +
             // movimiento actual
-            //
             desplazamientoX =
                 inicioDesplazamientoX +
                 movimientoX;
-
 
             desplazamientoY =
                 inicioDesplazamientoY +
                 movimientoY;
 
-
             // Mantener el desplazamiento dentro
             // de los límites permitidos.
             limitarDesplazamiento();
 
-            // Aplicamos:
-            //
-            // translate()
-            // scale()
             // Aplicar la nueva transformación.
             actualizarTransform();
 
         }
     );
 
-    // Finalizar el arrastre cuando
-    // el usuario suelta el puntero.
+    // Finalizar el gesto cuando
+    // el usuario suelta un puntero.
     viewerImage.addEventListener(
         "pointerup",
         (event) => {
 
-            // Ya no hay un arrastre activo.
-            arrastrando = false;
+            pointers.delete(event.pointerId);
 
-            // Solo cambiar el cursor si la imagen
-            // continúa ampliada.
-            if (escala > 1) {
+            // Si quedan menos de dos punteros,
+            // el pinch termina.
+            if (pointers.size < 2) {
+                pinchActivo = false;
+                pinchInicio = null;
+            }
+
+            // Queda un dedo sobre la imagen ampliada:
+            // retomar el paneo desde ese punto.
+            if (pointers.size === 1 && escala > 1) {
+
+                const [p] =
+                    [...pointers.values()];
+
+                arrastrando = true;
+
+                inicioX = p.x;
+                inicioY = p.y;
+
+                inicioDesplazamientoX =
+                    desplazamientoX;
+
+                inicioDesplazamientoY =
+                    desplazamientoY;
 
                 viewerImage.style.cursor =
-                    "grab";
+                    "grabbing";
+
+            } else if (pointers.size === 0) {
+
+                // Ya no hay punteros activos.
+                arrastrando = false;
+
+                // Solo cambiar el cursor si la imagen
+                // continúa ampliada.
+                if (escala > 1) {
+
+                    viewerImage.style.cursor =
+                        "grab";
+
+                }
 
             }
+
             // Liberar la captura del puntero.
             if (
                 viewerImage.hasPointerCapture(
@@ -1063,16 +1220,33 @@ function activarZoom() {
         }
     );
 
-    // Cancelar el arrastre si el navegador
-    // interrumpe el gesto.
+    // Cancelar el gesto si el navegador
+    // interrumpe los punteros.
     viewerImage.addEventListener(
         "pointercancel",
         () => {
 
-            // Finalizar cualquier arrastre activo.
+            // Finalizar cualquier arrastre o pinch activo.
             arrastrando = false;
 
-            // console.log("pointercancel");
+            pinchActivo = false;
+            pinchInicio = null;
+
+            pointers.clear();
+
+            // Devolver el cursor correcto
+            // según el estado de la escala.
+            if (escala > 1) {
+
+                viewerImage.style.cursor =
+                    "grab";
+
+            } else {
+
+                viewerImage.style.cursor =
+                    "zoom-in";
+
+            }
 
         }
     );
