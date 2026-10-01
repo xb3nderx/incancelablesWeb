@@ -1,5 +1,78 @@
 # Incancelables — Roadmap del proyecto
 
+## Cambio de orden evolutivo — septiembre 2026
+
+A partir de septiembre de 2026 se modifica temporalmente el orden previsto para las siguientes etapas de evolución del sitio.
+
+Las versiones **v1.0, v1.1, v1.2 y v1.2.1 permanecen cerradas y funcionalmente validadas**.
+
+La etapa de **auditoría técnica integral**, originalmente prevista como v1.3, queda **postergada** hasta después de la etapa de e-commerce y de su estabilización.
+
+### Nuevo orden
+
+**v1.3 — E-commerce e infraestructura**
+
+Esta etapa surge a partir de un trabajo académico sobre e-commerce y se utilizará, en la medida de lo posible, para avanzar simultáneamente en la evolución real del sitio de Incancelables.
+
+#### Estado de v1.3
+
+* **Diseño técnico y funcional:** definido.
+* **Backend MVP (PHP + MariaDB):** implementado.
+* **Frontend del e-commerce:** próximo trabajo de la etapa, a implementar en la rama `dev`.
+* **Entorno académico:** no habrá ventas ni cobros reales.
+
+#### Arquitectura y alcance
+
+* Incancelables Web y Incancelables E-Commerce son **proyectos separados**, que se integran mediante **API REST**.
+* El alcance del MVP incluye: catálogo de productos, detalle de producto, carrito, gestión de pedidos, clientes/usuarios (si corresponde), persistencia en base de datos y API propia en PHP.
+* Google Apps Script y Google Sheets del sitio/newsletter **no se reemplazan ni se migran como parte del MVP**. Cualquier reemplazo o migración queda fuera del alcance del MVP y sujeto a decisión futura.
+
+#### Relación con PROD
+
+* `master` continúa siendo **PROD v1.2.1**.
+* `master` **no incorpora por ahora el e-commerce académico**.
+* El desarrollo de v1.3 continúa en la rama `dev`.
+
+### v1.4 — Estabilización y migración
+
+Etapa futura. Una vez implementado el frontend del e-commerce, se realizará la estabilización de la arquitectura resultante.
+
+Esta etapa incluirá las pruebas necesarias para garantizar que las funcionalidades existentes continúen operativas.
+
+Si se decide reemplazar o migrar funcionalidades que actualmente dependen de Google Apps Script y Google Sheets, su alcance se definirá en su momento; por ahora esa migración **no está decidida**.
+
+### v1.5 — Auditoría técnica integral
+
+La auditoría originalmente prevista como v1.3 pasa a esta etapa.
+
+Incluirá:
+
+* SEO avanzado;
+* performance;
+* Core Web Vitals;
+* accesibilidad;
+* Lighthouse;
+* optimización de assets;
+* limpieza de CSS;
+* consolidación/refactor de código;
+* revisión técnica general de la arquitectura resultante.
+
+### Criterio para este cambio de orden
+
+No se considera conveniente realizar una auditoría profunda de la arquitectura actual antes de completar la nueva arquitectura.
+
+La incorporación de una API en PHP y una base de datos puede producir modificaciones importantes en el frontend, backend, modelo de datos y flujo de la aplicación. Por lo tanto, la auditoría integral se realizará sobre la arquitectura **ya evolucionada y estabilizada**, evitando optimizar anticipadamente componentes que posteriormente podrían ser reemplazados.
+
+### Estado actual
+
+**Última etapa cerrada:** v1.2.1
+**PROD (master):** v1.2.1 — no incorpora el e-commerce académico
+**Etapa en curso:** v1.3 — E-commerce e infraestructura (rama `dev`)
+**Próximo trabajo:** implementar el frontend del e-commerce en `dev`
+**Auditoría técnica integral:** postergada a v1.5
+**v2.x:** evolución futura de la plataforma, a definir posteriormente.
+
+
 # Backend v1.0
 
 **Estado: COMPLETADO**
@@ -322,7 +395,7 @@ assets/
 
 - Commit: `ef6d7d8`
 - Mensaje: "Visor de fotos v1.2.1 - proteger paneo durante pinch"
-- Rama: `dev` (pendiente de merge a PROD)
+- Rama: `dev` — mergeada a `master`
 
 # Testing del visor
 
@@ -349,9 +422,9 @@ assets/
 
 Algunas fallas iniciales fueron identificadas como artefactos del entorno de prueba y no como bugs reales del visor.
 
-# v1.3 — Auditoría técnica integral
+# v1.5 — Auditoría técnica integral
 
-**Estado: PENDIENTE**
+**Estado: POSTERGADA**
 
 ## Objetivo
 
@@ -423,8 +496,8 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 
 ## Versión funcional actual
 
-- **DEV:** v1.2.1
-- **PROD:** v1.1
+- **DEV (rama `dev`):** v1.2.1
+- **PROD (rama `master` → GitHub Pages):** v1.2.1 — sin e-commerce académico
 
 ## Completado
 
@@ -437,11 +510,11 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 - [x] Visor avanzado v1.2
 - [x] Protección de paneo durante pinch v1.2.1
 - [x] Testing automatizado del visor
+- [x] Merge de v1.2.1 de DEV → PROD
+- [x] Publicación de v1.2.1 en producción
 
 ## Pendiente
 
-- [ ] Merge de v1.2.1 de DEV → PROD
-- [ ] Publicación de v1.2.1 en producción
 - [ ] Validación final de v1.2.1 en producción
 
 ## Git
@@ -451,7 +524,9 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 - `dd6c932` — Visor de fotos v1.2 - funcionalmente validado
 - `ef6d7d8` — Visor de fotos v1.2.1 - proteger paneo durante pinch
 
-> v1.2.1 todavía no fue mergeada a PROD: la rama master no contiene estos commits.
+> `ef6d7d8` (v1.2.1) está contenido en `master` (verificado con `git merge-base --is-ancestor ef6d7d8 master`).
+> `dev` y `master` solo difieren en `scripts/api/apiConfig.js` (`ENVIRONMENT: "DEV"` vs `"PROD"`).
+> Último deploy de GitHub Pages: `c4e7d20` (master), 2026-08-08, estado `success` → https://incancelables.com.ar/.
 
 # Próxima prioridad
 
@@ -459,9 +534,8 @@ Orden recomendado:
 
 1. Finalizar y organizar la documentación técnica.
 2. Revisar la auditoría de calidad del visor.
-3. Hacer merge de v1.2.1 de DEV → PROD cuando decidamos publicar.
-4. Validar producción.
-5. Continuar con la planificación de v1.3 — Auditoría técnica integral.
+3. Validar la publicación de v1.2.1 en producción.
+4. Continuar con la implementación del frontend de v1.3 — E-commerce en la rama dev.
 
 # Historial de versiones
 
