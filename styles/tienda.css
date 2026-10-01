@@ -1,0 +1,193 @@
+/* ==========================
+   LAYOUT PRINCIPAL
+   ========================== */
+.layout {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows:
+        auto 1fr auto;
+    grid-template-areas:
+        "header"
+        "main"
+        "footer";
+}
+
+/* ==========================
+   MAIN
+   ========================== */
+.main {
+    grid-area: main;
+    background-color: var(--bg-alt);
+    color: var(--text);
+    display: grid;
+    gap: 2rem;
+    padding: 1rem;
+}
+
+/* ==========================
+   SECCIÓN TIENDA
+   ========================== */
+.tienda {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+}
+
+/* Título de la sección */
+.tienda h1 {
+    text-align: center;
+}
+
+/* Texto introductorio */
+.tienda-intro {
+    text-align: center;
+    padding: 0 1rem;
+    color: var(--text-secondary);
+}
+
+/* ==========================
+   ESTADOS (CARGA / ERROR / VACÍO)
+   ========================== */
+.catalogo-estado {
+
+    width: 100%;
+    max-width: 600px;
+
+    padding: 1.5rem 1rem;
+
+    border-radius: 12px;
+
+    background-color: var(--bg-dark);
+    color: var(--text);
+
+    text-align: center;
+
+}
+
+/* Estado de error */
+.catalogo-estado.error {
+
+    background: rgba(220, 53, 69, .15);
+    border: 1px solid #dc3545;
+    color: #ffb3bb;
+
+}
+
+/* Botón de reintento */
+.catalogo-estado .btn {
+
+    margin-top: 1rem;
+
+}
+
+/* ==========================
+   CATÁLOGO
+   ========================== */
+
+/* Mobile-first: una sola columna */
+.catalogo {
+
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    padding-bottom: 2rem;
+
+}
+
+/* Tarjeta de producto */
+.producto-card {
+
+    display: grid;
+    gap: .75rem;
+
+    background: var(--card);
+    color: var(--text-on-card);
+
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+
+    transition: transform .2s ease;
+
+}
+
+/* Título del producto */
+.producto-card h2 {
+
+    padding: 0;
+    text-align: left;
+    font-size: 1.3rem;
+
+}
+
+/* Descripción del producto */
+.producto-descripcion {
+
+    line-height: 1.5;
+
+}
+
+/* Precio del producto */
+.producto-precio {
+
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent);
+
+}
+
+/* Disponibilidad del producto */
+.producto-disponibilidad {
+
+    font-size: .95rem;
+    opacity: .85;
+
+}
+
+/* Producto sin disponibilidad */
+.producto-disponibilidad.agotado {
+
+    color: #dc3545;
+    font-weight: 600;
+    opacity: 1;
+
+}
+
+/* ==========================
+   TABLET
+   ========================== */
+@media (min-width: 768px) {
+
+    /* Tarjetas en dos columnas */
+    .catalogo {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Animación al pasar el mouse */
+    .producto-card:hover {
+        transform: translateY(-5px) scale(1.02);
+    }
+
+}
+
+/* ==========================
+   DESKTOP
+   ========================== */
+@media (min-width: 1024px) {
+
+    /* Tarjetas en tres columnas */
+    .catalogo {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+/* ==========================
+   DESKTOP GRANDE
+   ========================== */
+@media (min-width: 1440px) {}

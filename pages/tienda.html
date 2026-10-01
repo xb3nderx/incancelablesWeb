@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO -->
+    <meta name="description" content="Incancelables - Tienda">
+    <meta name="keywords" content="Musica, en vivo, online, rock, cancion, tienda, merch">
+    <meta name="robots" content="index, follow, tienda">
+
+    <!-- Insert your favicon here -->
+    <title>Incancelables - Tienda</title>
+    <link rel="icon" type="image/x-icon" href="../assets/irrobafav.svg">
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/tienda.css">
+</head>
+
+<body>
+    <div class="layout">
+        <!-- ====================================================== 
+                                HEADER 
+        ======================================================= -->
+        <header class="header">
+            <!-- Header reemplazado por components/header.html -->
+        </header>
+        <!-- ====================================================== 
+                                MAIN 
+        ======================================================= -->
+        <main class="main">
+            <!-- ====================================================== 
+                                    CATÁLOGO 
+        ======================================================= -->
+            <section class="tienda">
+                <!-- CABECERA DE LA TIENDA -->
+                <h1>Tienda</h1>
+                <p class="tienda-intro">Catálogo de productos oficiales de Incancelables.</p>
+                <!-- ESTADOS: CARGA / ERROR / CATÁLOGO VACÍO -->
+                <div id="catalogo-estado" class="catalogo-estado" hidden aria-live="polite"></div>
+                <!-- TARJETAS DE PRODUCTO -->
+                <div id="catalogo" class="catalogo">
+                    <!-- generado dinámicamente por tienda.js desde la API REST -->
+                </div>
+            </section>
+        </main>
+        <!-- ====================================================== 
+                                FOOTER 
+        ======================================================= -->
+        <footer class="footer">
+            <!-- footer reemplazado por components/footer.html -->
+        </footer>
+        <!-- SCRIPTS -->
+        <script src="../scripts/components.js"></script>
+        <script src="../scripts/main.js"></script>
+        <script src="../scripts/api/apiConfig.js"></script>
+        <script src="../scripts/analytics.js"></script>
+        <script src="../scripts/api/tiendaConfig.js"></script>
+        <script src="../scripts/api/tiendaClient.js"></script>
+        <script type="module" src="../scripts/tienda.js"></script>
+    </div>
+</body>
+
+</html>
