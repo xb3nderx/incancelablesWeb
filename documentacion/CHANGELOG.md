@@ -508,6 +508,57 @@ Estado:
 
 BACKUP Y RECUPERACIÓN — COMPLETADO
 
+# 2026-10-01
+
+## Bloque 2 — Carrito frontend
+
+Se implementa el Bloque 2 (carrito) del frontend de la Tienda en la rama `dev`, dentro de la etapa v1.3 — E-commerce (proyecto académico).
+
+Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PROD.
+
+### Parte 1 — Agregado al carrito
+
+- Nuevo módulo `scripts/carrito.js` con estado y persistencia en `sessionStorage` (clave `incancelables_carrito`).
+- Agregado de productos desde las tarjetas del catálogo.
+- Badge de unidades en el botón del carrito de la cabecera.
+- Sincronización del carrito con el catálogo de la API (nombre, precio y disponibilidad).
+- Disponibilidad mostrada: `disponibilidad API − cantidad en carrito`, aplicada sólo a nivel de presentación.
+- Estados de tarjeta: "Sin stock", "Máximo agregado" y "Agregar al carrito".
+- Aviso breve de feedback al agregar un producto.
+
+### Parte 2 — Drawer del carrito
+
+- Drawer responsive: mobile a pantalla completa y desktop como panel lateral desde la derecha.
+- Lista con nombre, precio unitario, controles − / +, subtotal y "Eliminar".
+- Totales de unidades y monto con botón "Continuar compra", sin backend ni checkout (aviso "Checkout disponible próximamente.").
+- Cantidades persistentes ante recarga de la página.
+- Cierres mediante ×, clic fuera y Escape.
+- Scroll del body bloqueado, foco contenido dentro del panel y devolución del foco al botón del carrito.
+- Carrito vacío: "Tu carrito está vacío" con el pie oculto.
+- Sin botón "Vaciar carrito".
+- Las acciones +, − y Eliminar actualizan storage, badge, subtotales y disponibilidad sin cerrar el drawer.
+
+### Corrección de layout del drawer
+
+- Problema detectado: con productos en el carrito, la cabecera dejaba de verse como sección independiente y el `×` quedaba desplazado.
+- Causa: `global.css` define `footer { grid-area: footer }` mediante selector de elemento; el pie del drawer heredaba un área inexistente en el panel y el grid del drawer pasaba de 1 columna × 3 filas a 2 columnas × 5 filas.
+- Corrección en `styles/tienda.css`: `grid-area: auto` sobre `.carrito-cabecera`, `.carrito-lista` y `.carrito-pie`, más neutralización del `color` y la alineación heredados en el pie.
+- El drawer mantiene siempre tres zonas independientes: cabecera (título + ×), lista con scroll propio y pie con totales + "Continuar compra".
+
+### Validación
+
+- 76/76 pruebas PASS: 38 unitarias de `carrito.js` y 38 de integración UI (catálogo, badge, drawer y estructura de las tres zonas).
+- Verificación visual del drawer en mobile y desktop con 0, 1 y varios productos.
+
+### Archivos
+
+- Nuevo: `scripts/carrito.js`
+- Modificados: `scripts/tienda.js`, `pages/tienda.html`, `styles/tienda.css`
+
+Estado:
+
+BLOQUE 2 — CARRITO FRONTEND: COMPLETADO
+
 ## Galerías históricas — evolución
 
 Continúa el desarrollo de la versión 1.1 correspondiente a las galerías fotográficas de shows históricos.

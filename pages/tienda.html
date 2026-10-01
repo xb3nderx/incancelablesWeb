@@ -32,9 +32,25 @@
                                     CATÁLOGO 
         ======================================================= -->
             <section class="tienda">
-                <!-- CABECERA DE LA TIENDA -->
-                <h1>Tienda</h1>
+                <!-- CABECERA DE LA TIENDA + ACCESO AL CARRITO -->
+                <div class="tienda-cabecera">
+                    <h1>Tienda</h1>
+                    <button id="btn-carrito" class="btn-carrito" type="button"
+                        aria-label="Carrito, 0 unidades" aria-expanded="false"
+                        aria-controls="carrito-drawer">
+                        <svg class="carrito-icono" viewBox="0 0 24 24" width="22" height="22" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <circle cx="9" cy="20" r="1.5"></circle>
+                            <circle cx="18" cy="20" r="1.5"></circle>
+                            <path d="M2 3h3l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h7.6a1.5 1.5 0 0 0 1.5-1.2L21 7H6"></path>
+                        </svg>
+                        <span id="carrito-badge" class="carrito-badge vacio">0</span>
+                    </button>
+                </div>
                 <p class="tienda-intro">Catálogo de productos oficiales de Incancelables.</p>
+                <!-- AVISO BREVE (AGREGADO / LÍMITE / SIN STOCK) -->
+                <div id="tienda-aviso" class="tienda-aviso" role="status" aria-live="polite" hidden></div>
                 <!-- ESTADOS: CARGA / ERROR / CATÁLOGO VACÍO -->
                 <div id="catalogo-estado" class="catalogo-estado" hidden aria-live="polite"></div>
                 <!-- TARJETAS DE PRODUCTO -->
@@ -49,6 +65,40 @@
         <footer class="footer">
             <!-- footer reemplazado por components/footer.html -->
         </footer>
+        <!-- ====================================================== 
+                                DRAWER DEL CARRITO 
+        ======================================================= -->
+        <div id="carrito-drawer" class="carrito-drawer" hidden>
+            <!-- FONDO / CLIC FUERA -->
+            <div class="carrito-fondo"></div>
+            <!-- PANEL LATERAL -->
+            <aside id="carrito-panel" class="carrito-panel" role="dialog"
+                aria-modal="true" aria-labelledby="carrito-titulo">
+
+                <header class="carrito-cabecera">
+                    <h2 id="carrito-titulo">Tu carrito</h2>
+                    <button id="carrito-cerrar" class="carrito-cerrar" type="button"
+                        aria-label="Cerrar carrito">×</button>
+                </header>
+
+                <!-- ÍTEMS -->
+                <div id="carrito-lista" class="carrito-lista" aria-live="polite">
+                    <!-- generado dinámicamente por tienda.js -->
+                </div>
+
+                <!-- TOTALES + CONTINUAR (oculto si el carrito está vacío) -->
+                <footer id="carrito-pie" class="carrito-pie" hidden>
+                    <p class="carrito-totales">
+                        <span id="carrito-unidades"></span>
+                        <span id="carrito-total" class="carrito-total"></span>
+                    </p>
+                    <button id="carrito-continuar" class="btn carrito-continuar" type="button">
+                        Continuar compra
+                    </button>
+                </footer>
+
+            </aside>
+        </div>
         <!-- SCRIPTS -->
         <script src="../scripts/components.js"></script>
         <script src="../scripts/main.js"></script>

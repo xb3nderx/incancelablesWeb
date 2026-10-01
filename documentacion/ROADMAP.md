@@ -18,7 +18,7 @@ Esta etapa surge a partir de un trabajo académico sobre e-commerce y se utiliza
 
 * **Diseño técnico y funcional:** definido.
 * **Backend MVP (PHP + MariaDB):** implementado.
-* **Frontend del e-commerce:** próximo trabajo de la etapa, a implementar en la rama `dev`.
+* **Frontend del e-commerce:** en desarrollo en la rama `dev`. Bloque 2 (carrito) completado.
 * **Entorno académico:** no habrá ventas ni cobros reales.
 
 #### Arquitectura y alcance
@@ -68,7 +68,7 @@ La incorporación de una API en PHP y una base de datos puede producir modificac
 **Última etapa cerrada:** v1.2.1
 **PROD (master):** v1.2.1 — no incorpora el e-commerce académico
 **Etapa en curso:** v1.3 — E-commerce e infraestructura (rama `dev`)
-**Próximo trabajo:** implementar el frontend del e-commerce en `dev`
+**Próximo trabajo:** continuar el frontend del e-commerce en `dev` — Bloque 2 (carrito) completado; siguiente: checkout e integración con el flujo definido del e-commerce
 **Auditoría técnica integral:** postergada a v1.5
 **v2.x:** evolución futura de la plataforma, a definir posteriormente.
 
@@ -422,6 +422,64 @@ assets/
 
 Algunas fallas iniciales fueron identificadas como artefactos del entorno de prueba y no como bugs reales del visor.
 
+# v1.3 — Frontend e-commerce (rama `dev`)
+
+**Estado: EN DESARROLLO**
+
+## Alcance implementado hasta ahora
+
+- [x] Página de Tienda (`pages/tienda.html`)
+- [x] Catálogo de productos consumido desde la API
+- [x] Bloque 2 — Carrito frontend
+
+## Bloque 2 — Carrito frontend
+
+**Estado: COMPLETADO**
+
+### Parte 1 — Agregado al carrito
+
+- [x] Módulo de estado y persistencia (`scripts/carrito.js`, `sessionStorage`)
+- [x] Agregar producto desde la tarjeta del catálogo
+- [x] Badge de unidades en el botón del carrito de la cabecera
+- [x] Sincronización del carrito con el catálogo de la API (nombre, precio y disponibilidad)
+- [x] Disponibilidad mostrada: `disponibilidad API − cantidad en carrito`, sólo a nivel de presentación
+- [x] Estados de tarjeta: "Sin stock", "Máximo agregado" y "Agregar al carrito"
+- [x] Aviso breve de feedback al agregar un producto
+
+### Parte 2 — Drawer del carrito
+
+- [x] Drawer responsive: mobile a pantalla completa y desktop como panel lateral
+- [x] Ítems con nombre, precio unitario, controles − / +, subtotal y "Eliminar"
+- [x] Totales de unidades y monto con botón "Continuar compra", sin backend ni checkout
+- [x] Cantidades persistentes ante recarga de la página
+- [x] Cierres mediante ×, clic fuera y Escape
+- [x] Scroll del body bloqueado, foco contenido dentro del panel y devolución al botón del carrito
+- [x] Carrito vacío: "Tu carrito está vacío" y pie oculto
+- [x] Sin botón "Vaciar carrito"
+
+### Corrección de layout del drawer
+
+- [x] Tres zonas independientes: cabecera (título + ×), lista con scroll propio y pie con totales
+- [x] Anulado el `grid-area` heredado del selector global `footer { grid-area: footer }`
+- [x] Verificado con 0, 1 y varios productos en mobile y desktop
+
+### Validación
+
+- [x] 76/76 pruebas PASS: 38 unitarias de `carrito.js` y 38 de integración UI
+- [x] Sin cambios en el backend ni en `scripts/api/apiConfig.js`
+
+### Archivos
+
+- [x] `scripts/carrito.js` (nuevo)
+- [x] `scripts/tienda.js`
+- [x] `pages/tienda.html`
+- [x] `styles/tienda.css`
+
+### Pendiente de la etapa
+
+- [ ] Checkout: integración del frontend con el flujo definido del e-commerce
+- [ ] Gestión de pedidos
+
 # v1.5 — Auditoría técnica integral
 
 **Estado: POSTERGADA**
@@ -496,7 +554,7 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 
 ## Versión funcional actual
 
-- **DEV (rama `dev`):** v1.2.1
+- **DEV (rama `dev`):** v1.2.1 + v1.3 en desarrollo (frontend e-commerce)
 - **PROD (rama `master` → GitHub Pages):** v1.2.1 — sin e-commerce académico
 
 ## Completado
@@ -512,10 +570,12 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 - [x] Testing automatizado del visor
 - [x] Merge de v1.2.1 de DEV → PROD
 - [x] Publicación de v1.2.1 en producción
+- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda y Bloque 2 (carrito)
 
 ## Pendiente
 
 - [ ] Validación final de v1.2.1 en producción
+- [ ] Frontend e-commerce v1.3 — checkout: integración del frontend con el flujo definido del e-commerce
 
 ## Git
 

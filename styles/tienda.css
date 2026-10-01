@@ -191,3 +191,610 @@
    DESKTOP GRANDE
    ========================== */
 @media (min-width: 1440px) {}
+
+/* ==========================
+   CABECERA DE LA TIENDA + CARRITO
+   ========================== */
+
+/* Fila: título centrado + acceso al carrito */
+.tienda-cabecera {
+
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+}
+
+/* El título ocupa el resto de la fila para seguir centrado */
+.tienda-cabecera h1 {
+
+    flex: 1;
+    text-align: center;
+
+}
+
+/* Botón de acceso al carrito */
+.btn-carrito {
+
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: var(--card);
+    color: var(--text-on-card);
+
+    cursor: pointer;
+
+    transition: transform .2s ease;
+
+}
+
+.btn-carrito:hover {
+
+    transform: scale(1.06);
+
+}
+
+.btn-carrito:active {
+
+    transform: scale(.96);
+
+}
+
+.btn-carrito:focus-visible {
+
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+
+}
+
+/* Icono del carrito */
+.carrito-icono {
+
+    width: 22px;
+    height: 22px;
+
+}
+
+/* Badge con el total de unidades */
+.carrito-badge {
+
+    position: absolute;
+    top: -7px;
+    right: -7px;
+
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    background: var(--accent);
+    color: #fff;
+
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1;
+
+}
+
+/* Badge sin unidades */
+.carrito-badge.vacio {
+
+    background: var(--border);
+    color: var(--text);
+
+}
+
+/* ==========================
+   AVISO BREVE (FEEDBACK)
+   ========================== */
+.tienda-aviso {
+
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+
+    /* Por encima del drawer del carrito (z-index 1200) */
+    z-index: 1300;
+
+    max-width: min(92vw, 460px);
+
+    padding: .75rem 1.1rem;
+
+    border: 1px solid var(--border);
+    border-radius: 999px;
+
+    background: var(--bg-dark);
+    color: var(--text);
+    box-shadow: var(--shadow);
+
+    text-align: center;
+    font-size: .95rem;
+    line-height: 1.35;
+
+    animation: aviso-entrada .25s ease;
+
+}
+
+.tienda-aviso[hidden] {
+
+    display: none;
+
+}
+
+@keyframes aviso-entrada {
+
+    from {
+        opacity: 0;
+        transform: translate(-50%, 12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+}
+
+/* ==========================
+   AGREGAR AL CARRITO
+   ========================== */
+
+/* Botón de compra dentro de la tarjeta */
+.producto-agregar {
+
+    width: 100%;
+
+    border: none;
+
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+/* Evita el zoom agresivo del .btn global dentro de la tarjeta */
+.producto-agregar:hover {
+
+    transform: scale(1.03);
+
+}
+
+/* Disponibilidad 0: "Sin stock" */
+.producto-agregar:disabled {
+
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-on-card);
+
+    opacity: .7;
+    cursor: not-allowed;
+
+}
+
+.producto-agregar:disabled:hover,
+.producto-agregar:disabled:active {
+
+    transform: none;
+
+}
+
+/* ==========================
+   DRAWER DEL CARRITO
+   ========================== */
+
+/* Fondo bloqueado mientras el drawer está abierto */
+body.carrito-abierto {
+
+    overflow: hidden;
+
+}
+
+/* Contenedor fijo a pantalla completa */
+.carrito-drawer {
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 1200;
+
+}
+
+.carrito-drawer[hidden] {
+
+    display: none;
+
+}
+
+/* Fondo / clic fuera */
+.carrito-fondo {
+
+    position: absolute;
+    inset: 0;
+
+    background: var(--overlay);
+
+    animation: carrito-fondo-entrada .2s ease both;
+
+}
+
+/* Panel: mobile-first => prácticamente a pantalla completa */
+.carrito-panel {
+
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+
+    background: var(--bg-alt);
+    color: var(--text);
+
+    box-shadow: var(--shadow);
+
+    animation: carrito-panel-movil .28s ease both;
+
+}
+
+/* Tres zonas propias: sin áreas heredadas de selectores globales
+   (p. ej. `footer { grid-area: footer }` rompería el grid del panel) */
+.carrito-cabecera,
+.carrito-lista,
+.carrito-pie {
+
+    grid-area: auto;
+
+}
+
+/* Cabecera: título a la izquierda, cierre arriba a la derecha */
+.carrito-cabecera {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+
+    padding: 1rem;
+    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+
+    background: var(--bg-dark);
+    border-bottom: 1px solid var(--border);
+
+}
+
+/* El título ocupa el resto de la fila para anclar el × al extremo */
+.carrito-cabecera h2 {
+
+    flex: 1;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    text-align: left;
+    font-size: 1.25rem;
+
+}
+
+/* Cierre (×): esquina superior derecha, separado del contenido */
+.carrito-cerrar {
+
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--bg-alt);
+    color: var(--text);
+
+    font-size: 1.6rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition: color .2s ease, border-color .2s ease;
+
+}
+
+.carrito-cerrar:hover {
+
+    color: var(--accent);
+    border-color: var(--accent);
+
+}
+
+.carrito-cerrar:focus-visible {
+
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+
+}
+
+/* Listado de ítems */
+.carrito-lista {
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+
+    padding: 1rem;
+
+}
+
+/* Carrito vacío */
+.carrito-vacio {
+
+    padding: 2.5rem 1rem;
+
+    text-align: center;
+    font-size: 1.05rem;
+
+    color: var(--text-secondary);
+
+}
+
+/* Ítem del carrito */
+.carrito-item {
+
+    display: grid;
+    gap: .7rem;
+
+    padding: 1rem;
+    border-radius: .85rem;
+
+    background: var(--card);
+    color: var(--text-on-card);
+
+    box-shadow: var(--shadow);
+
+}
+
+/* Nombre + precio unitario */
+.carrito-item-datos {
+
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+}
+
+.carrito-item-nombre {
+
+    margin: 0;
+    padding: 0;
+
+    text-align: left;
+    font-size: 1.05rem;
+
+}
+
+.carrito-item-precio {
+
+    font-size: .9rem;
+    opacity: .85;
+
+}
+
+/* Fila de controles */
+.carrito-item-controles {
+
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+
+}
+
+/* Controles − y + */
+.carrito-control {
+
+    width: 38px;
+    height: 38px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--bg);
+    color: var(--text);
+
+    font-size: 1.25rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+}
+
+.carrito-control:hover:not(:disabled) {
+
+    border-color: var(--accent);
+    color: var(--accent);
+
+}
+
+.carrito-control:disabled {
+
+    opacity: .4;
+    cursor: not-allowed;
+
+}
+
+/* Cantidad actual */
+.carrito-item-cantidad {
+
+    min-width: 2ch;
+
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+
+}
+
+/* Acción Eliminar */
+.carrito-eliminar {
+
+    margin-left: auto;
+
+    padding: .45rem .7rem;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+
+    background: none;
+    color: #dc3545;
+
+    font-size: .9rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+.carrito-eliminar:hover {
+
+    border-color: #dc3545;
+
+}
+
+/* Subtotal del ítem */
+.carrito-item-subtotal {
+
+    font-size: 1rem;
+    font-weight: 700;
+
+    color: var(--accent);
+
+}
+
+/* Pie: totales + continuar */
+.carrito-pie {
+
+    display: grid;
+    gap: .75rem;
+
+    color: var(--text);
+    text-align: left;
+
+    padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+
+    background: var(--bg-dark);
+    border-top: 1px solid var(--border);
+
+}
+
+.carrito-pie[hidden] {
+
+    display: none;
+
+}
+
+.carrito-totales {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    margin: 0;
+
+    font-size: 1rem;
+    font-weight: 700;
+
+}
+
+.carrito-total {
+
+    color: var(--accent);
+
+}
+
+.carrito-continuar {
+
+    width: 100%;
+    text-align: center;
+
+}
+
+.carrito-continuar:hover {
+
+    transform: scale(1.02);
+
+}
+
+/* Foco visible dentro del drawer */
+.carrito-panel button:focus-visible {
+
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+
+}
+
+@keyframes carrito-fondo-entrada {
+
+    from { opacity: 0; }
+    to { opacity: 1; }
+
+}
+
+@keyframes carrito-panel-movil {
+
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+
+}
+
+@keyframes carrito-panel-lateral {
+
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+
+}
+
+/* ==========================
+   DRAWER — TABLET / DESKTOP
+   ========================== */
+@media (min-width: 768px) {
+
+    /* Panel lateral desde la derecha */
+    .carrito-panel {
+
+        inset: 0 0 0 auto;
+
+        width: min(430px, 92vw);
+
+        border-left: 1px solid var(--border);
+
+        animation-name: carrito-panel-lateral;
+
+    }
+
+}
+
