@@ -86,6 +86,56 @@
                     <!-- generado dinámicamente por tienda.js -->
                 </div>
 
+                <!-- DATOS DEL COMPRADOR (Bloque 3 · paso 2) -->
+                <!-- Zona hermana de la lista: sólo una de las dos está
+                     visible a la vez, así que ambas ocupan la fila 1fr
+                     del grid del panel sin tocar grid-template-rows. -->
+                <form id="checkout-datos" class="checkout-datos" hidden
+                    aria-labelledby="checkout-titulo" autocomplete="on">
+
+                    <h3 id="checkout-titulo" class="checkout-titulo">Tus datos</h3>
+
+                    <p class="checkout-intro">
+                        Completá tus datos para continuar con la compra.
+                    </p>
+
+                    <div class="checkout-campo">
+                        <label for="checkout-nombre">Nombre</label>
+                        <input id="checkout-nombre" name="nombre" type="text"
+                            autocomplete="given-name" maxlength="100" required>
+                    </div>
+
+                    <div class="checkout-campo">
+                        <label for="checkout-apellido">Apellido</label>
+                        <input id="checkout-apellido" name="apellido" type="text"
+                            autocomplete="family-name" maxlength="100" required>
+                    </div>
+
+                    <div class="checkout-campo">
+                        <label for="checkout-email">Email</label>
+                        <input id="checkout-email" name="email" type="email"
+                            autocomplete="email" inputmode="email" required>
+                    </div>
+
+                    <!-- Estado del pedido: éxito, error o neutral.
+                         Es un <div> (y no un <p>) para poder contener el
+                         listado de motivos de una corrección, de modo que
+                         el detalle se anuncie junto con el mensaje. -->
+                    <div id="checkout-estado" class="checkout-estado" role="status"
+                        aria-live="polite" tabindex="-1" hidden></div>
+
+                    <div class="checkout-acciones">
+                        <button id="checkout-enviar" class="btn checkout-enviar"
+                            type="submit">
+                            Realizar pedido
+                        </button>
+                        <button id="checkout-volver" class="checkout-volver" type="button">
+                            Volver al carrito
+                        </button>
+                    </div>
+
+                </form>
+
                 <!-- TOTALES + CONTINUAR (oculto si el carrito está vacío) -->
                 <footer id="carrito-pie" class="carrito-pie" hidden>
                     <p class="carrito-totales">

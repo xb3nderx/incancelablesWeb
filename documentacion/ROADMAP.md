@@ -18,7 +18,7 @@ Esta etapa surge a partir de un trabajo académico sobre e-commerce y se utiliza
 
 * **Diseño técnico y funcional:** definido.
 * **Backend MVP (PHP + MariaDB):** implementado.
-* **Frontend del e-commerce:** en desarrollo en la rama `dev`. Bloque 2 (carrito) completado.
+* **Frontend del e-commerce:** en desarrollo en la rama `dev`. Bloque 2 (carrito) y Bloque 3 (checkout) completados.
 * **Entorno académico:** no habrá ventas ni cobros reales.
 
 #### Arquitectura y alcance
@@ -68,7 +68,7 @@ La incorporación de una API en PHP y una base de datos puede producir modificac
 **Última etapa cerrada:** v1.2.1
 **PROD (master):** v1.2.1 — no incorpora el e-commerce académico
 **Etapa en curso:** v1.3 — E-commerce e infraestructura (rama `dev`)
-**Próximo trabajo:** continuar el frontend del e-commerce en `dev` — Bloque 2 (carrito) completado; siguiente: checkout e integración con el flujo definido del e-commerce
+**Próximo trabajo:** continuar el frontend del e-commerce en `dev` — Bloques 2 (carrito) y 3 (checkout) completados; siguiente: gestión de pedidos
 **Auditoría técnica integral:** postergada a v1.5
 **v2.x:** evolución futura de la plataforma, a definir posteriormente.
 
@@ -431,6 +431,7 @@ Algunas fallas iniciales fueron identificadas como artefactos del entorno de pru
 - [x] Página de Tienda (`pages/tienda.html`)
 - [x] Catálogo de productos consumido desde la API
 - [x] Bloque 2 — Carrito frontend
+- [x] Bloque 3 — Checkout frontend
 
 ## Bloque 2 — Carrito frontend
 
@@ -475,9 +476,61 @@ Algunas fallas iniciales fueron identificadas como artefactos del entorno de pru
 - [x] `pages/tienda.html`
 - [x] `styles/tienda.css`
 
+## Bloque 3 — Checkout frontend
+
+**Estado: COMPLETADO**
+
+### Formulario guest checkout
+
+- [x] Formulario "Tus datos" con nombre, apellido y email (sin registro ni login)
+- [x] Integración con `POST /api/pedidos` enviando email, nombre, apellido e items
+- [x] Creación exitosa del Pedido: se conservan `pedido.id` y `pedido.estado` en el estado del frontend
+- [x] Mensaje de éxito que indica verificar el correo electrónico para continuar
+- [x] En éxito: campos inhabilitados y botón de envío oculto
+
+### Respuestas del backend
+
+- [x] Errores técnicos/estructurales (400, 404, 500, timeout, sin conexión): se muestra el mensaje y se conserva lo tipeado
+- [x] `200 / resultado "correccion"`: aviso de que el Pedido no se creó y detalle por producto de los motivos comerciales (`motivos[]`)
+- [x] `carrito_corregido` aplicado como **reemplazo** del carrito (ausentes eliminados, `[]` deja el carrito vacío)
+- [x] Catálogo refrescado con `GET /api/productos` después de aplicar la corrección
+- [x] Disponibilidad visible: `disponibilidad backend − cantidad cargada en carrito` (regla existente, sin cambios)
+- [x] Carrito nuevamente editable con sus operaciones normales (+, − y eliminar)
+- [x] Reintento explícito con el carrito vigente (botón "Reintentar compra")
+- [x] Ciclo corrección → reintento repetible hasta obtener `creado`
+- [x] Carrito intacto después de una creación exitosa
+
+### Accesibilidad, responsive y scroll
+
+- [x] Foco dirigido al mensaje de estado en cada respuesta (enviando, éxito, corrección y error)
+- [x] Formulario y detalle de motivos verificados en mobile y desktop, sin overflow horizontal y con scroll del panel operativo
+
+### Fuera de este bloque
+
+- [ ] Validación del token/email
+- [ ] Reenvío de verificación
+- [ ] Pago
+- [ ] Cancelación de Pedido
+- [ ] Finalización completa del flujo de compra
+
+### Validación
+
+- [x] 430/430 PASS / 0 fallos: 147 pruebas unitarias/UI y 283 verificaciones de navegador
+- [x] `node --check` OK para `scripts/carrito.js` y `scripts/tienda.js`
+- [x] Sin cambios en el backend ni en `scripts/api/apiConfig.js`
+
+### Archivos
+
+- [x] `scripts/tienda.js`
+- [x] `scripts/carrito.js`
+- [x] `scripts/api/tiendaClient.js`
+- [x] `pages/tienda.html`
+- [x] `styles/tienda.css`
+
+> Cambios en el working tree de `dev`, todavía sin commit.
+
 ### Pendiente de la etapa
 
-- [ ] Checkout: integración del frontend con el flujo definido del e-commerce
 - [ ] Gestión de pedidos
 
 # v1.5 — Auditoría técnica integral
@@ -570,12 +623,12 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 - [x] Testing automatizado del visor
 - [x] Merge de v1.2.1 de DEV → PROD
 - [x] Publicación de v1.2.1 en producción
-- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda y Bloque 2 (carrito)
+- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda, Bloque 2 (carrito) y Bloque 3 (checkout)
 
 ## Pendiente
 
 - [ ] Validación final de v1.2.1 en producción
-- [ ] Frontend e-commerce v1.3 — checkout: integración del frontend con el flujo definido del e-commerce
+- [ ] Frontend e-commerce v1.3 — gestión de pedidos
 
 ## Git
 

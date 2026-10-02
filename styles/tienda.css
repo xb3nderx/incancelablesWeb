@@ -547,6 +547,15 @@ body.carrito-abierto {
 
 }
 
+/* El display:grid de la zona vence al [hidden] del navegador:
+   sin este reset la lista seguiría ocupando la fila 1fr del panel
+   cuando se muestra el formulario del checkout. */
+.carrito-lista[hidden] {
+
+    display: none;
+
+}
+
 /* Carrito vacío */
 .carrito-vacio {
 
@@ -749,8 +758,238 @@ body.carrito-abierto {
 
 }
 
+/* En el paso del checkout la acción ya no corresponde a esa zona */
+.carrito-continuar[hidden] {
+
+    display: none;
+
+}
+
+/* ==========================
+   CHECKOUT — DATOS DEL COMPRADOR
+   ========================== */
+
+/* Zona hermana de .carrito-lista dentro del panel: sólo una de las dos
+   está visible a la vez, así que ambas ocupan la fila 1fr del grid sin
+   cambiar grid-template-rows (3 filas: cabecera / zona / pie). */
+.checkout-datos {
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+
+    padding: 1rem;
+    padding-top: 1.25rem;
+
+    color: var(--text);
+    text-align: left;
+
+}
+
+.checkout-datos[hidden] {
+
+    display: none;
+
+}
+
+.checkout-titulo {
+
+    margin: 0;
+    padding: 0;
+
+    text-align: left;
+    font-size: 1.15rem;
+
+}
+
+.checkout-intro {
+
+    margin: 0;
+
+    font-size: .95rem;
+
+    color: var(--text-secondary);
+
+}
+
+/* Cada campo: label visible + input debajo */
+.checkout-campo {
+
+    display: grid;
+    gap: .45rem;
+
+}
+
+.checkout-campo label {
+
+    font-size: .95rem;
+    font-weight: 600;
+
+}
+
+.checkout-campo input {
+
+    width: 100%;
+    padding: .85rem 1rem;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--bg);
+    color: var(--text);
+
+    font-size: 1rem;
+    font-family: inherit;
+
+    transition: border-color .2s ease;
+
+}
+
+.checkout-campo input:hover {
+
+    border-color: var(--accent);
+
+}
+
+.checkout-acciones {
+
+    display: grid;
+    gap: .75rem;
+
+    margin-top: .25rem;
+
+}
+
+/* Acción secundaria: mismo ancho que "Continuar compra" */
+.checkout-volver {
+
+    width: 100%;
+    padding: .8rem 1.5rem;
+
+    border: 1px solid var(--border);
+    border-radius: 5px;
+
+    background: var(--bg-alt);
+    color: var(--text);
+
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    font-family: inherit;
+
+    cursor: pointer;
+
+    transition: color .2s ease, border-color .2s ease;
+
+}
+
+.checkout-volver:hover {
+
+    color: var(--accent);
+    border-color: var(--accent);
+
+}
+
+/* Acción principal: mismo ancho que "Continuar compra" */
+.checkout-enviar {
+
+    width: 100%;
+    text-align: center;
+
+}
+
+.checkout-enviar[hidden] {
+
+    display: none;
+
+}
+
+.checkout-enviar:disabled {
+
+    opacity: .65;
+    cursor: not-allowed;
+    transform: none;
+
+}
+
+.checkout-campo input:disabled {
+
+    opacity: .7;
+    cursor: not-allowed;
+
+}
+
+/* Estado del pedido dentro del flujo de checkout */
+.checkout-estado {
+
+    margin: 0;
+
+    padding: .85rem 1rem;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--bg-dark);
+    color: var(--text);
+
+    font-size: .95rem;
+    line-height: 1.45;
+
+}
+
+.checkout-estado[hidden] {
+
+    display: none;
+
+}
+
+.checkout-estado.exito {
+
+    background: rgba(216, 131, 15, .15);
+    border-color: var(--accent);
+
+}
+
+.checkout-estado.error {
+
+    background: rgba(220, 53, 69, .15);
+    border-color: #dc3545;
+    color: #ffb3bb;
+
+}
+
+/* Detalle de motivos[] dentro del mensaje de corrección: un ítem por
+   entrada, para que dos motivos del mismo producto no se fusionen. */
+.checkout-motivos {
+
+    margin: .65rem 0 0;
+    padding-left: 1.3rem;
+
+    display: grid;
+    gap: .4rem;
+
+    overflow-wrap: anywhere;
+
+}
+
+.checkout-motivos li {
+
+    line-height: 1.45;
+
+}
+
+.checkout-motivos li::marker {
+
+    color: var(--accent);
+
+}
+
 /* Foco visible dentro del drawer */
-.carrito-panel button:focus-visible {
+.carrito-panel button:focus-visible,
+.carrito-panel input:focus-visible {
 
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;

@@ -484,3 +484,75 @@ export function sincronizarConCatalogo(productos) {
     return resultado;
 
 }
+
+// /////////////////////////////////////////////////////////////////////////////
+// CORRECCIÓN RECIBIDA DEL BACKEND (carrito_corregido)
+// /////////////////////////////////////////////////////////////////////////////
+
+// Reemplaza el carrito guardado por el propuesto en carrito_corregido
+// (POST /api/pedidos, 200 / resultado "correccion").
+//
+// La corrección manda:
+// - un producto ausente de la propuesta NO se conserva;
+// - carrito_corregido: [] deja el carrito vacío;
+// - cantidad y precio_unitario se toman tal cual.
+//
+// nombre y disponibilidad se conservan del carrito anterior cuando el
+// producto ya estaba; los datos vigentes los refresca la sincronización
+// con el catálogo (GET /api/productos) que sigue a la corrección.
+//
+// Devuelve:
+// { ok: true,  items }                     propuesta aplicada
+// { ok: false, motivo: "invalido", items } propuesta ausente o no-array
+//                                          (el carrito no se toca)
+
+export function aplicarCorreccion(corregido) {
+
+    if (!Array.isArray(corregido)) {
+
+        return {
+            ok: false,
+            motivo: "invalido",
+            items: obtenerCarrito()
+        };
+
+    }
+
+    const anterior = obtenerCarrito();
+
+    const items = [];
+
+    corregido.forEach(propuesta => {
+
+        if (propuesta === null || typeof propuesta !== "object") return;
+
+        const id = obtenerIdProducto(propuesta);
+
+        if (id === null) return;
+
+        const cantidad = aNumero(propuesta.cantidad, 0);
+
+        if (cantidad <= 0) return;
+
+        const previo = anterior.find(
+            item => claveId(item.producto_id) === claveId(id)
+        );
+
+        items.push({
+            producto_id: id,
+            nombre: previo?.nombre ?? "",
+            precio_unitario: aNumero(
+                propuesta.precio_unitario,
+                previo?.precio_unitario ?? 0
+            ),
+            cantidad,
+            disponibilidad: aNumero(previo?.disponibilidad, 0)
+        });
+
+    });
+
+    guardarCarrito(items);
+
+    return { ok: true, items };
+
+}

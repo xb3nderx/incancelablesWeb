@@ -508,6 +508,58 @@ Estado:
 
 BACKUP Y RECUPERACIÓN — COMPLETADO
 
+# 2026-10-02
+
+## Bloque 3 — Checkout frontend
+
+Se implementa el Bloque 3 (checkout) del frontend de la Tienda en la rama `dev`, dentro de la etapa v1.3 — E-commerce (proyecto académico).
+
+Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PROD. Los cambios quedan en el working tree de `dev`, todavía sin commit.
+
+### Formulario guest checkout
+
+- Formulario "Tus datos" con nombre, apellido y email, sin registro ni login.
+- Integración con `POST /api/pedidos` enviando email, nombre, apellido e items.
+- Creación exitosa del Pedido: se conservan `pedido.id` y `pedido.estado` en el estado del frontend (disponibles mediante `obtenerPedidoCreado()`).
+- Mensaje de éxito que indica verificar el correo electrónico para continuar.
+- En éxito se inhabilitan los campos y se oculta el botón de envío.
+
+### Respuestas del backend
+
+- Errores técnicos/estructurales (400, 404, 500, timeout, sin conexión): se muestra el mensaje devuelto y se conserva lo tipeado para reintentar.
+- `200 / resultado "correccion"`: se informa que el Pedido todavía no se creó y se detalla, producto por producto, el motivo comercial (`motivos[]`).
+- `carrito_corregido` se aplica como **reemplazo** del carrito y no como una fusión: los productos ausentes de la propuesta se eliminan, `[]` deja el carrito vacío y cantidad y precio unitario se toman tal cual.
+- El catálogo se refresca con `GET /api/productos` después de aplicar la corrección; la disponibilidad visible sigue la regla existente `disponibilidad backend − cantidad cargada en carrito`.
+- El carrito vuelve a ser editable con sus operaciones normales (+, − y eliminar).
+- El botón de envío pasa a "Reintentar compra": el reintento se dispara con el carrito vigente y el ciclo corrección → reintento puede repetirse hasta obtener `creado`.
+- Después de una creación exitosa el carrito queda intacto.
+
+### Accesibilidad, responsive y scroll
+
+- El foco se dirige al mensaje de estado en cada respuesta (enviando, éxito, corrección y error).
+- Formulario y detalle de motivos verificados en mobile y desktop, sin overflow horizontal y con scroll del panel operativo.
+
+### Fuera de este bloque
+
+- Validación del token/email.
+- Reenvío de verificación.
+- Pago.
+- Cancelación de Pedido.
+- Finalización completa del flujo de compra.
+
+### Validación
+
+- 430/430 PASS / 0 fallos: 147 pruebas unitarias/UI (73 de `tienda.js`, 43 de `carrito.js`, 31 de `tiendaClient.js`) y 283 verificaciones de navegador (134 motivos, 58 envío, 48 layout, 28 scroll, 15 teclado).
+- `node --check` OK para `scripts/carrito.js` y `scripts/tienda.js`.
+
+### Archivos
+
+- Modificados: `scripts/tienda.js`, `scripts/carrito.js`, `scripts/api/tiendaClient.js`, `pages/tienda.html`, `styles/tienda.css`
+
+Estado:
+
+BLOQUE 3 — CHECKOUT FRONTEND: COMPLETADO
+
 # 2026-10-01
 
 ## Bloque 2 — Carrito frontend
