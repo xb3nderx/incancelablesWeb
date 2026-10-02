@@ -510,17 +510,19 @@ BACKUP Y RECUPERACIÓN — COMPLETADO
 
 # 2026-10-02
 
-## Bloque 3 — Checkout frontend
+## Bloque 3 — Inicio de checkout frontend
 
-Se implementa el Bloque 3 (checkout) del frontend de la Tienda en la rama `dev`, dentro de la etapa v1.3 — E-commerce (proyecto académico).
+Se implementa el Bloque 3 (inicio de checkout) del frontend de la Tienda en la rama `dev`, dentro de la etapa v1.3 — E-commerce (proyecto académico).
 
-Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PROD. Los cambios quedan en el working tree de `dev`, todavía sin commit.
+Este bloque cubre el **inicio** del checkout: formulario guest, `POST /api/pedidos`, creación del Pedido en `PEND_VERIF`, correcciones comerciales y reintento de creación. **No** representa el checkout completo hasta `PAGADO`: el flujo continúa con la verificación de email (Bloque 4) y el pago (Bloque 5).
+
+Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PROD. Commit `24f8cf8` (`feat: implementar checkout frontend`) en `dev`.
 
 ### Formulario guest checkout
 
 - Formulario "Tus datos" con nombre, apellido y email, sin registro ni login.
 - Integración con `POST /api/pedidos` enviando email, nombre, apellido e items.
-- Creación exitosa del Pedido: se conservan `pedido.id` y `pedido.estado` en el estado del frontend (disponibles mediante `obtenerPedidoCreado()`).
+- Creación exitosa del Pedido en `PEND_VERIF`: se conservan `pedido.id` y `pedido.estado` en el estado del frontend (disponibles mediante `obtenerPedidoCreado()`).
 - Mensaje de éxito que indica verificar el correo electrónico para continuar.
 - En éxito se inhabilitan los campos y se oculta el botón de envío.
 
@@ -547,6 +549,8 @@ Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PR
 - Cancelación de Pedido.
 - Finalización completa del flujo de compra.
 
+Estos puntos continúan el mismo flujo de compra y quedan registrados en el ROADMAP como Bloque 4 — Verificación de email frontend, Bloque 5 — Pago frontend y finalización/confirmación del flujo de compra.
+
 ### Validación
 
 - 430/430 PASS / 0 fallos: 147 pruebas unitarias/UI (73 de `tienda.js`, 43 de `carrito.js`, 31 de `tiendaClient.js`) y 283 verificaciones de navegador (134 motivos, 58 envío, 48 layout, 28 scroll, 15 teclado).
@@ -558,7 +562,7 @@ Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PR
 
 Estado:
 
-BLOQUE 3 — CHECKOUT FRONTEND: COMPLETADO
+BLOQUE 3 — INICIO DE CHECKOUT FRONTEND: COMPLETADO
 
 # 2026-10-01
 

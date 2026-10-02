@@ -18,7 +18,7 @@ Esta etapa surge a partir de un trabajo académico sobre e-commerce y se utiliza
 
 * **Diseño técnico y funcional:** definido.
 * **Backend MVP (PHP + MariaDB):** implementado.
-* **Frontend del e-commerce:** en desarrollo en la rama `dev`. Bloque 2 (carrito) y Bloque 3 (checkout) completados.
+* **Frontend del e-commerce:** en desarrollo en la rama `dev`. Bloque 2 (carrito) y Bloque 3 (inicio de checkout) completados.
 * **Entorno académico:** no habrá ventas ni cobros reales.
 
 #### Arquitectura y alcance
@@ -68,7 +68,7 @@ La incorporación de una API en PHP y una base de datos puede producir modificac
 **Última etapa cerrada:** v1.2.1
 **PROD (master):** v1.2.1 — no incorpora el e-commerce académico
 **Etapa en curso:** v1.3 — E-commerce e infraestructura (rama `dev`)
-**Próximo trabajo:** continuar el frontend del e-commerce en `dev` — Bloques 2 (carrito) y 3 (checkout) completados; siguiente: gestión de pedidos
+**Próximo trabajo:** continuar el frontend del e-commerce en `dev` — Bloques 2 (carrito) y 3 (inicio de checkout) completados; siguiente: **Bloque 4 — Verificación de email frontend**
 **Auditoría técnica integral:** postergada a v1.5
 **v2.x:** evolución futura de la plataforma, a definir posteriormente.
 
@@ -431,7 +431,7 @@ Algunas fallas iniciales fueron identificadas como artefactos del entorno de pru
 - [x] Página de Tienda (`pages/tienda.html`)
 - [x] Catálogo de productos consumido desde la API
 - [x] Bloque 2 — Carrito frontend
-- [x] Bloque 3 — Checkout frontend
+- [x] Bloque 3 — Inicio de checkout frontend
 
 ## Bloque 2 — Carrito frontend
 
@@ -476,15 +476,17 @@ Algunas fallas iniciales fueron identificadas como artefactos del entorno de pru
 - [x] `pages/tienda.html`
 - [x] `styles/tienda.css`
 
-## Bloque 3 — Checkout frontend
+## Bloque 3 — Inicio de checkout frontend
 
 **Estado: COMPLETADO**
+
+Cubre el **inicio** del checkout: formulario guest, integración con `POST /api/pedidos`, creación del Pedido en `PEND_VERIF` y manejo de las correcciones comerciales de esa creación. **No** representa el checkout completo hasta `PAGADO`: la verificación de email y el pago continúan en los Bloques 4 y 5 (ver más abajo).
 
 ### Formulario guest checkout
 
 - [x] Formulario "Tus datos" con nombre, apellido y email (sin registro ni login)
 - [x] Integración con `POST /api/pedidos` enviando email, nombre, apellido e items
-- [x] Creación exitosa del Pedido: se conservan `pedido.id` y `pedido.estado` en el estado del frontend
+- [x] Creación exitosa del Pedido en `PEND_VERIF`: se conservan `pedido.id` y `pedido.estado` en el estado del frontend
 - [x] Mensaje de éxito que indica verificar el correo electrónico para continuar
 - [x] En éxito: campos inhabilitados y botón de envío oculto
 
@@ -527,11 +529,38 @@ Algunas fallas iniciales fueron identificadas como artefactos del entorno de pru
 - [x] `pages/tienda.html`
 - [x] `styles/tienda.css`
 
-> Cambios en el working tree de `dev`, todavía sin commit.
+> Commit `24f8cf8` (`feat: implementar checkout frontend`) en `dev`.
 
 ### Pendiente de la etapa
 
-- [ ] Gestión de pedidos
+- [ ] **Bloque 4 — Verificación de email frontend** (próximo bloque)
+- [ ] Bloque 5 — Pago frontend
+- [ ] Finalización/confirmación del flujo de compra
+
+## Bloque 4 — Verificación de email frontend
+
+**Estado: PENDIENTE — próximo bloque concreto**
+
+Continuación directa del flujo iniciado en el Bloque 3: el Pedido queda en `PEND_VERIF` hasta que el email sea verificado, y sólo al pasar a `PEND_PAGO` puede iniciarse el pago.
+
+**Punto previo a la implementación:** en DEV el email real **no se envía** (sin MTA: el enlace de verificación queda registrado en el `error_log` de Apache y el reenvío responde `502 error_envio_email`). El canal de prueba debe definirse **antes** de implementar y probar este bloque.
+
+### Alcance previsto
+
+- [ ] Persistencia/recuperación del `pedido.id` necesario para continuar el flujo (hoy el estado del Pedido no sobrevive a una recarga de la página)
+- [ ] Landing de checkout con token
+- [ ] `POST /api/email-verificaciones/validar`
+- [ ] Estados del token: confirmado, inválido y expirado
+- [ ] Reenvío mediante `POST /api/email-verificaciones/reenvio`
+- [ ] Cooldown y respuestas correspondientes
+
+> Sin decisiones de UI tomadas todavía: el alcance se documenta sólo a nivel de capacidades y contratos.
+
+## Bloque 5 — Pago frontend
+
+**Estado: PENDIENTE — posterior a la verificación de email**
+
+Denominación registrada; su checklist se definirá al momento de abordarlo, junto con la finalización/confirmación del flujo de compra.
 
 # v1.5 — Auditoría técnica integral
 
@@ -623,12 +652,12 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 - [x] Testing automatizado del visor
 - [x] Merge de v1.2.1 de DEV → PROD
 - [x] Publicación de v1.2.1 en producción
-- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda, Bloque 2 (carrito) y Bloque 3 (checkout)
+- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda, Bloque 2 (carrito) y Bloque 3 (inicio de checkout)
 
 ## Pendiente
 
 - [ ] Validación final de v1.2.1 en producción
-- [ ] Frontend e-commerce v1.3 — gestión de pedidos
+- [ ] Frontend e-commerce v1.3 — Bloque 4 (verificación de email), Bloque 5 (pago) y finalización del flujo de compra
 
 ## Git
 
