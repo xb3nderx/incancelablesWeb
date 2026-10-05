@@ -121,6 +121,38 @@ function mostrarEstado(
             break;
 
 
+        // --------------------------------
+        // CHECKOUT (E-COMMERCE)
+        // --------------------------------
+
+        case "checkout_confirmado":
+
+            document.title =
+                "Email verificado";
+
+            titulo.textContent =
+                "Email verificado";
+
+            mensaje.textContent =
+                "Tu dirección de email fue verificada correctamente.";
+
+            break;
+
+
+        case "checkout_confirmado_con_pedido":
+
+            document.title =
+                "Email verificado";
+
+            titulo.textContent =
+                "Email verificado";
+
+            mensaje.textContent =
+                "Tu dirección de email fue verificada correctamente. Tu pedido quedó habilitado para continuar con el proceso de compra.";
+
+            break;
+
+
         case "desuscripto":
 
             document.title =
@@ -372,6 +404,129 @@ else if (
 
             }
         );
+
+}
+
+
+// =====================================
+// FLUJO CHECKOUT (E-COMMERCE)
+// =====================================
+
+else if (
+    flow === "checkout"
+) {
+
+    // Sin token no hay nada que validar:
+    // se muestra el error sin consultar al backend.
+    if (!token) {
+
+        mostrarEstado(
+            "token_invalido"
+        );
+
+    }
+    else {
+
+        // Ocultar botón mientras
+        // se procesa la verificación.
+        btnVolver.style.display =
+            "none";
+
+        document.title =
+            "Verificando email";
+
+        titulo.textContent =
+            "Verificando email";
+
+        mensaje.textContent =
+            "Estamos validando tu dirección de email.";
+
+        // Consultar al backend e-commerce
+        // utilizando el token recibido.
+        validarTokenCheckout(
+            token
+        )
+
+            // Actualizar interfaz
+            // según la respuesta real.
+            .then(
+                respuesta => {
+
+                    const datos =
+                        respuesta.ok
+                            ? respuesta.data
+                            : null;
+
+                    // --------------------------------
+                    // RESULTADO CONFIRMADO
+                    // --------------------------------
+                    // Con pedidos o sin ellos, un
+                    // resultado "confirmado" siempre
+                    // es un éxito.
+
+                    if (
+                        datos &&
+                        datos.resultado === "confirmado"
+                    ) {
+
+                        const pedidos =
+                            Array.isArray(datos.pedidos)
+                                ? datos.pedidos
+                                : [];
+
+                        mostrarEstado(
+                            pedidos.length > 0
+                                ? "checkout_confirmado_con_pedido"
+                                : "checkout_confirmado"
+                        );
+
+                        return;
+
+                    }
+
+                    // --------------------------------
+                    // ERRORES REALES DEL BACKEND
+                    // --------------------------------
+
+                    if (
+                        respuesta.codigo === "token_invalido" ||
+                        respuesta.codigo === "token_expirado"
+                    ) {
+
+                        mostrarEstado(
+                            respuesta.codigo
+                        );
+
+                        return;
+
+                    }
+
+                    // Resto de errores de validación,
+                    // técnicos o de conexión.
+                    mostrarEstado(
+                        "error"
+                    );
+
+                }
+            )
+
+            // Error inesperado
+            // o de red.
+            .catch(
+                error => {
+
+                    console.error(
+                        error
+                    );
+
+                    mostrarEstado(
+                        "error"
+                    );
+
+                }
+            );
+
+    }
 
 }
 
