@@ -508,6 +508,52 @@ Estado:
 
 BACKUP Y RECUPERACIÓN — COMPLETADO
 
+# 2026-10-06
+
+## Bloque 5 — Pago frontend
+
+Se implementa el Bloque 5 (pago) del frontend de la Tienda en la rama `dev`, dentro de la etapa v1.3 — E-commerce (proyecto académico), cerrando el flujo `Email verificado → Continuar al pago → APROBADO/RECHAZADO → resultado`.
+
+Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PROD. Trabajo realizado en el working tree, sin commit.
+
+### Cliente de pago
+
+- Nueva función `iniciarPago(pedidoId, items, simulacion)` en `scripts/api/tiendaClient.js`: `POST /api/pedidos/{id}/pago` con `{accion: "iniciar_pago", proveedor_id: "DUMMY", items: [{producto_id, cantidad, precio_unitario}], simulacion: "APROBADO" | "RECHAZADO"}`, headers `Accept`/`Content-Type` JSON y timeout con `AbortSignal.timeout(TIENDA_API.TIMEOUT)`.
+- Envelope uniforme `{ok, message, data, codigo}`: `ok: true` sólo para 200 con `resultado` ∈ `aprobado | rechazado | correccion` (no implica compra completada); `{"error"}` del backend ⇒ `codigo` crudo; timeout, sin conexión o configuración ausente ⇒ `data: null` con un `message` pensado para mostrarsele al usuario.
+- Sin `pedidoId` no se arma la ruta: se devuelve error sin hacer `fetch`.
+
+### Página de resultado
+
+- `scripts/resultado.js` pasa a módulo (`<script type="module" src="../scripts/resultado.js">` en `pages/resultado.html`) e importa de `carrito.js` los helpers nuevos `obtenerItemsParaPago()` y `vaciarCarrito()`.
+- `mostrarEstado(status, detalle)` acepta un segundo parámetro opcional para informar importe, referencia o intentos; las llamadas existentes del newsletter (un solo argumento) quedan intactas.
+- Tras verificar el email, si la respuesta incluye un Pedido en `PEND_PAGO` se conserva su `id` y se muestra el botón **Continuar al pago**.
+
+### Resultados del pago
+
+- `aprobado` + `pedido.estado = PAGADO`: estado **Pago aprobado** con importe y referencia del proveedor, y único punto del flujo que ejecuta `vaciarCarrito()`.
+- `aprobado` + `PAGADO_STOCK_NO_AFECTADO`: estado **Pago en revisión**; el carrito se conserva.
+- `rechazado`: estado **Pago rechazado** con `Intento N de M` y botón **Reintentar pago** sólo si el Pedido sigue en `PEND_PAGO` y no se agotaron los intentos.
+- `correccion`: se reutiliza `aplicarCorreccion(carrito_corregido)` (reemplazo del carrito, implementado en el Bloque 3) y se ofrece **Reintentar pago**; nunca se informa como aprobado.
+- Errores reales con estado propio: `pedido_vencido`, `maximo_intentos_alcanzado`, `pago_ya_aprobado`, `pedido_inexistente` / `pedido_no_activo` / `pedido_no_pendiente_de_pago`. El resto cae en **No pudimos procesar el pago** mostrando el `message` del envelope: el código crudo del backend nunca se expone al usuario.
+- Carrito vacío al pagar ⇒ estado **Tu carrito está vacío** sin realizar el request. La bandera `pagoEnCurso` descarta activaciones repetidas del botón (doble envío).
+
+### Fuera de este bloque
+
+- `EN_PROCESO`, cancelación de Pedido y finalización/confirmación posterior al pago.
+
+### Validación
+
+- 212/212 PASS / 0 fallos: 49 pruebas de `carrito.js` (43 previas + 6 nuevas de `obtenerItemsParaPago()` y `vaciarCarrito()`), 48 de `tiendaClient.js` (31 previas + 17 nuevas de `iniciarPago()`), 12 de creación de Pedido, 30 escenarios de `resultado.js` (13 de regresión del flujo newsletter/verificación + 17 de pago) y 73 de UI de `tienda.js`.
+- `node --check` OK para `scripts/resultado.js`, `scripts/carrito.js` y `scripts/api/tiendaClient.js`.
+
+### Archivos
+
+- Modificados: `scripts/resultado.js`, `scripts/carrito.js`, `scripts/api/tiendaClient.js`, `pages/resultado.html`
+
+Estado:
+
+BLOQUE 5 — PAGO FRONTEND: IMPLEMENTADO
+
 # 2026-10-02
 
 ## Bloque 3 — Inicio de checkout frontend

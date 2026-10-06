@@ -533,13 +533,13 @@ Cubre el **inicio** del checkout: formulario guest, integración con `POST /api/
 
 ### Pendiente de la etapa
 
-- [ ] **Bloque 4 — Verificación de email frontend** (próximo bloque)
-- [ ] Bloque 5 — Pago frontend
+- [x] **Bloque 4 — Verificación de email frontend** (implementado en `636ff06`)
+- [x] **Bloque 5 — Pago frontend** (implementado, ver sección propia)
 - [ ] Finalización/confirmación del flujo de compra
 
 ## Bloque 4 — Verificación de email frontend
 
-**Estado: PENDIENTE — próximo bloque concreto**
+**Estado: IMPLEMENTADO en `636ff06` (validación del token); reenvío y cooldown todavía pendientes**
 
 Continuación directa del flujo iniciado en el Bloque 3: el Pedido queda en `PEND_VERIF` hasta que el email sea verificado, y sólo al pasar a `PEND_PAGO` puede iniciarse el pago.
 
@@ -558,9 +558,40 @@ Continuación directa del flujo iniciado en el Bloque 3: el Pedido queda en `PEN
 
 ## Bloque 5 — Pago frontend
 
-**Estado: PENDIENTE — posterior a la verificación de email**
+**Estado: IMPLEMENTADO (trabajo sin commitear en `dev`)**
 
-Denominación registrada; su checklist se definirá al momento de abordarlo, junto con la finalización/confirmación del flujo de compra.
+Cierre del flujo de compra iniciado en el Bloque 3: desde la verificación del email hasta el resultado del pago, reutilizando la infraestructura existente (`scripts/api/tiendaClient.js`, `scripts/carrito.js`) y la página `pages/resultado.html`.
+
+Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PROD.
+
+### Alcance implementado
+
+- [x] `iniciarPago(pedidoId, items, simulacion)` en `tiendaClient.js`: `POST /api/pedidos/{id}/pago` con `{accion: "iniciar_pago", proveedor_id: "DUMMY", items, simulacion}`, timeout con `AbortSignal.timeout` y envelope `{ok, message, data, codigo}`.
+- [x] `resultado.js` convertido en módulo (`type="module"`) e importa de `carrito.js` los helpers nuevos `obtenerItemsParaPago()` y `vaciarCarrito()`.
+- [x] Estado `Email verificado` + botón **Continuar al pago** cuando la verificación devuelve un Pedido en `PEND_PAGO` (se conserva `pedido.id` para el request).
+- [x] `simulacion: "APROBADO"` ⇒ `resultado: "aprobado"` ⇒ estado **Pago aprobado** con importe y referencia del proveedor.
+- [x] Compra confirmada **sólo** con `aprobado` + `pedido.estado === "PAGADO"`: es el único caso que ejecuta `vaciarCarrito()`.
+- [x] `aprobado` + `PAGADO_STOCK_NO_AFECTADO` ⇒ estado **Pago en revisión**, carrito conservado.
+- [x] `resultado: "rechazado"` ⇒ estado **Pago rechazado** con intentos (`Intento N de M`) y botón **Reintentar pago** sólo si el Pedido sigue en `PEND_PAGO` y no se agotaron los intentos.
+- [x] `resultado: "correccion"` ⇒ se aplica `aplicarCorreccion(carrito_corregido)` (reutilización del Bloque 3) y se ofrece **Reintentar pago**; nunca se informa como aprobado.
+- [x] Errores reales del backend mapeados a estados propios: `pedido_vencido`, `maximo_intentos_alcanzado`, `pago_ya_aprobado`, `pedido_inexistente` / `pedido_no_activo` / `pedido_no_pendiente_de_pago`.
+- [x] Fallos de transporte (timeout, sin conexión, configuración ausente, cuerpo fuera de contrato) ⇒ estado **No pudimos procesar el pago** con el `message` del envelope; los códigos crudos nunca se muestran al usuario.
+- [x] Carrito vacío al pagar ⇒ **Tu carrito está vacío**, sin request al backend.
+- [x] Blindaje de doble envío: `pagoEnCurso` descarta activaciones repetidas del botón.
+- [x] Fuera de alcance: `EN_PROCESO`, cancelación de Pedido y finalización/confirmación posterior al pago.
+
+### Validación
+
+- 212/212 PASS / 0 fallos: 49 pruebas de `carrito.js`, 48 de `tiendaClient.js`, 12 de creación de Pedido (`test_checkout.js`), 30 escenarios de `resultado.js` (13 de regresión del flujo newsletter/verificación + 17 de pago) y 73 de UI de `tienda.js`.
+- `node --check` OK para `scripts/resultado.js`, `scripts/carrito.js` y `scripts/api/tiendaClient.js`.
+
+### Archivos
+
+- Modificados: `scripts/resultado.js`, `scripts/carrito.js`, `scripts/api/tiendaClient.js`, `pages/resultado.html`
+
+Estado:
+
+BLOQUE 5 — PAGO FRONTEND: IMPLEMENTADO
 
 # v1.5 — Auditoría técnica integral
 
@@ -652,12 +683,12 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 - [x] Testing automatizado del visor
 - [x] Merge de v1.2.1 de DEV → PROD
 - [x] Publicación de v1.2.1 en producción
-- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda, Bloque 2 (carrito) y Bloque 3 (inicio de checkout)
+- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda, Bloque 2 (carrito), Bloque 3 (inicio de checkout), Bloque 4 (verificación de email) y Bloque 5 (pago)
 
 ## Pendiente
 
 - [ ] Validación final de v1.2.1 en producción
-- [ ] Frontend e-commerce v1.3 — Bloque 4 (verificación de email), Bloque 5 (pago) y finalización del flujo de compra
+- [ ] Frontend e-commerce v1.3 — finalización/confirmación del flujo de compra
 
 ## Git
 

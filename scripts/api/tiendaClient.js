@@ -8,8 +8,9 @@
 // desde el Bloque 3, creación del Pedido
 // (POST /pedidos). Desde el Bloque 4, validación del token
 // de verificación de email del checkout
-// (POST /email-verificaciones/validar). Sin reenvío de email
-// ni pagos.
+// (POST /email-verificaciones/validar) y, desde el Bloque 5,
+// inicio del pago del Pedido (POST /pedidos/{id}/pago).
+// Sin reenvío de email.
 //
 // Misma forma de respuesta que forms.js:
 // { ok, message, data }
@@ -435,6 +436,259 @@ async function validarTokenCheckout(token) {
 
         // --------------------------------------------------
         // 2xx con un cuerpo que no corresponde al contrato
+        // --------------------------------------------------
+
+        return {
+
+            ok: false,
+
+            message: "Respuesta inesperada de la API",
+
+            data: cuerpo,
+
+            codigo: null
+
+        };
+
+    }
+    catch (error) {
+
+        // Timeout del AbortSignal: el backend no respondió
+        // dentro de TIENDA_API.TIMEOUT.
+        if (
+            error &&
+            (error.name === "TimeoutError" || error.name === "AbortError")
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: "La tienda tardó en responder. Intentá nuevamente.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        return {
+
+            ok: false,
+
+            message: "No fue posible conectar con la tienda. Intentá nuevamente.",
+
+            data: null,
+
+            codigo: null
+
+        };
+
+    }
+
+}
+
+// =======================================================
+// INICIAR PAGO — POST /pedidos/{id}/pago (Bloque 5 · MVP)
+// =======================================================
+//
+// Contrato real auditado del backend:
+//
+//   POST ${TIENDA_API.URL}/pedidos/{id}/pago
+//   headers: Accept + Content-Type application/json
+//   body: {
+//     accion: "iniciar_pago",
+//     proveedor_id: "DUMMY",
+//     items: [ { producto_id, cantidad, precio_unitario } ],
+//     simulacion: "APROBADO" | "RECHAZADO"   (opcional)
+//   }
+//
+//   200 { resultado: "aprobado",  pago, validacion, pedido }
+//   200 { resultado: "rechazado", pedido, intentos,
+//         maximo_intentos, pago, validacion }
+//   200 { resultado: "correccion", carrito_corregido,
+//         motivos, disponibilidad, catalogo, ... }
+//   400 / 404 / 409 / 500 { error }
+//        ("pedido_vencido" | "pedido_no_activo" |
+//         "pedido_no_pendiente_de_pago" | "pago_ya_aprobado" |
+//         "maximo_intentos_alcanzado" | "pedido_inexistente" |
+//         errores de request/proveedor)
+//
+// Envelope { ok, message, data, codigo }:
+//
+//   ok: true  => 200 y data.resultado vale "aprobado",
+//                "rechazado" o "correccion". NO significa
+//                compra completada: eso sólo se cumple con
+//                data.resultado === "aprobado" &&
+//                data.pedido.estado === "PAGADO".
+//   ok: false => el backend respondió con error, la
+//                respuesta no corresponde al contrato o
+//                falló la conexión.
+//   codigo     => código crudo del backend cuando existe
+//                (p. ej. "pedido_vencido"); null si no hay
+//                código identificable (timeout, sin
+//                conexión, etc.).
+//   data       => cuerpo JSON crudo, o null si no hubo
+//                cuerpo.
+//
+// El simulador MVP sólo admite "APROBADO" y "RECHAZADO";
+// "EN_PROCESO" queda fuera del alcance.
+
+async function iniciarPago(pedidoId, items, simulacion) {
+
+    try {
+
+        // Sin configuración (por ejemplo, si ENVIRONMENT
+        // apunta a un PROD que todavía no existe).
+        if (!TIENDA_API.URL) {
+
+            return {
+
+                ok: false,
+
+                message: "La API de la tienda no está configurada en este entorno.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        // Sin identificador de Pedido no se arma la ruta:
+        // se evita un request inválido al backend.
+        if (
+            pedidoId === null ||
+            pedidoId === undefined ||
+            pedidoId === ""
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: "No pudimos identificar el pedido a pagar.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        const cuerpoRequest = {
+
+            accion: "iniciar_pago",
+
+            proveedor_id: "DUMMY",
+
+            items: Array.isArray(items) ? items : []
+
+        };
+
+        if (
+            typeof simulacion === "string" &&
+            simulacion !== ""
+        ) {
+
+            cuerpoRequest.simulacion = simulacion;
+
+        }
+
+        const response = await fetch(
+            `${TIENDA_API.URL}/pedidos/${pedidoId}/pago`,
+            {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(cuerpoRequest),
+                signal: AbortSignal.timeout(TIENDA_API.TIMEOUT)
+            }
+        );
+
+        const cuerpo = await response.json().catch(() => null);
+
+        // --------------------------------------------------
+        // 200 - salida válida del simulador de pago
+        // --------------------------------------------------
+
+        if (
+            response.ok &&
+            cuerpo &&
+            typeof cuerpo === "object" &&
+            (
+                cuerpo.resultado === "aprobado" ||
+                cuerpo.resultado === "rechazado" ||
+                cuerpo.resultado === "correccion"
+            )
+        ) {
+
+            return {
+
+                ok: true,
+
+                message: "",
+
+                data: cuerpo,
+
+                codigo: null
+
+            };
+
+        }
+
+        // --------------------------------------------------
+        // Errores del backend: 400 / 404 / 409 / 500 { error }
+        // --------------------------------------------------
+
+        if (
+            cuerpo &&
+            typeof cuerpo.error === "string" &&
+            cuerpo.error !== ""
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: cuerpo.error,
+
+                data: cuerpo,
+
+                codigo: cuerpo.error
+
+            };
+
+        }
+
+        // --------------------------------------------------
+        // HTTP error sin cuerpo JSON (p. ej. un 502 en HTML)
+        // --------------------------------------------------
+
+        if (!response.ok) {
+
+            return {
+
+                ok: false,
+
+                message: `HTTP ${response.status}`,
+
+                data: cuerpo,
+
+                codigo: null
+
+            };
+
+        }
+
+        // --------------------------------------------------
+        // 200 con un cuerpo que no corresponde al contrato
         // --------------------------------------------------
 
         return {
