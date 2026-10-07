@@ -508,6 +508,66 @@ Estado:
 
 BACKUP Y RECUPERACIÓN — COMPLETADO
 
+# 2026-10-07
+
+## Bloque 6 — continuación de la compra en el drawer (post-verificación)
+
+Se retira la sección provisional **Tu compra** (`#compra`) y todo el flujo posterior a la verificación del email pasa a vivir en el **drawer del carrito** que ya existe en `pages/tienda.html`: recuperación del Pedido por token, edición de items, reemplazo del Pedido, pago, correcciones y reintentos comparten el mismo panel, el mismo carrito y el mismo CTA.
+
+Sin cambios en el backend (cerrado en `1f3d37a`) ni en `scripts/api/apiConfig.js`. No se despliega a PROD. Trabajo realizado en el working tree, sin commit.
+
+### Flujo
+
+`resultado.html` (verificación) → **Continuar compra** → `tienda.html?token=TOKEN` → `POST /api/email-verificaciones/pedidos` → drawer con el Pedido sembrado (estado `#carrito-estado` + CTA **Pagar**) → edición libre de items → si cambiaron, `POST /api/email-verificaciones/pedidos/reemplazo` → `POST /api/pedidos/{id}/pago` → confirmación, rechazo o corrección dentro del mismo drawer.
+
+### Cliente (`scripts/api/tiendaClient.js`)
+
+- Nueva función `reemplazarPedido(token, items)`: `POST ${TIENDA_API.URL}/email-verificaciones/pedidos/reemplazo` con `{token, items}`, headers JSON, timeout con `AbortSignal.timeout(TIENDA_API.TIMEOUT)` y envelope uniforme `{ok, message, data, codigo}`.
+- `200` + `resultado: "reemplazado"` (hay Pedido nuevo) y `200` + `resultado: "correccion"` (transacción deshecha, Pedido activo intacto) son salidas válidas; `{"error"}` ⇒ `codigo` crudo (`token_invalido`, `token_expirado`, `verificacion_pendiente`, `pedido_no_activo`, `varios_pedidos_activos`, `pedido_vencido`, `carrito_vacio`, `accion_invalida`); `502` sin cuerpo JSON ⇒ `HTTP 502`; timeout/sin conexión ⇒ `data: null` con mensaje apto para el usuario.
+- Sin token o sin `items[]` no se arma la ruta: se devuelve error sin hacer `fetch`.
+
+### Página de resultado (`scripts/resultado.js`)
+
+- En `mostrarContinuarCompra()` se oculta **Volver a Incancelables** (`btnVolver.style.display = "none"`): el estado `checkout_confirmado` sólo ofrece continuar en la tienda. Los demás estados de la página (newsletter y errores) conservan el botón, porque `mostrarEstado()` lo restaura.
+
+### Tienda — HTML y CSS (`pages/tienda.html`, `styles/tienda.css`)
+
+- Eliminada la sección `#compra` completa. Nuevo `#carrito-estado` dentro del panel, entre la cabecera y la lista, con `role="status"`, `aria-live="polite"` y `tabindex="-1"`; **sin `hidden`**: se colapsa con `#carrito-estado:empty` (un `display:none` lo sacaría del flujo del grid y desplazaría lista y pie).
+- `.carrito-panel` pasa a 4 filas `auto auto 1fr auto` (cabecera / estado / zona central / pie): la lista y el `form#checkout-datos` siguen compartiendo la fila `1fr`, que se activa cuando la lista queda `display: none`.
+- `#carrito-estado` suma `grid-area: auto` (mismo reset que las otras zonas contra los selectores globales) y entra al bloque de foco visible del drawer.
+
+### Tienda — lógica (`scripts/tienda.js`)
+
+- `mostrarEstadoCarrito(texto, tipo, {enfocar})` reemplaza a la interfaz retirada: concentra carga, recuperación, pago, corrección, rechazo y confirmación en `#carrito-estado` (clases `checkout-estado`, `.exito`, `.error`).
+- Recuperación al abrir la página: `abrirCarrito()` con lista y pie ocultos y estado **Estamos recuperando tu compra...**; éxito ⇒ **Tu pedido está listo para pagar.**; fallo ⇒ `falloDeRecuperacion()` devuelve el carrito local intacto, sale del modo verificación y muestra el error con foco.
+- El CTA del pie (`#carrito-continuar`) alterna **Pagar** / **Continuar compra** según `modoPostVerificacionActivo()` (`tokenVerificacion && pedidoContinuar`), con un único enganche `manejarClicContinuar()` que decide entre `procesarPago()` y `mostrarCheckout()`.
+- El Pedido recuperado **reemplaza** (nunca fusiona) el carrito local y fija `pedidoContinuar = {id, estado, items}`; `cargarCatalogo()` sólo sincroniza nombre, precio y disponibilidad (ya no pinta resúmenes ajenos).
+- `procesarPago()`: si los items coinciden con el snapshot (`itemsIgualesAlSnapshot()`, tripletas `producto_id|cantidad|precio_unitario` normalizadas e insensibles al orden) paga directo el Pedido activo; si cambiaron, primero `reemplazarPedido()` y después paga el Pedido nuevo. Las cadenas A → B → C son válidas; como un pago aprobado retira el modo, sólo continúan tras un rechazo.
+- `resultado: "correccion"` del reemplazo ⇒ `mostrarCorreccionDeReemplazo()`: aplica `carrito_corregido` + catálogo, **no** paga, **no** toca el snapshot y el siguiente **Pagar** vuelve a comparar.
+- Corrección durante el pago ⇒ `mostrarCorreccionDePago()` aplica el carrito pero **no** sobrescribe `pedidoContinuar.items`, de modo que el siguiente **Pagar** materializa el reemplazo.
+- Rechazo: aviso con `Intento N de M` y "volver a intentarlo con **Pagar**" dentro de `#carrito-estado` (sin botón aparte); se sale del modo si el Pedido ya no está en `PEND_PAGO`.
+- `PAGADO` ⇒ `vaciarCarrito()` + badge + render + `cargarCatalogo()` + salida del modo y estado de confirmación; `PAGADO_STOCK_NO_AFECTADO` ⇒ mensaje neutro con el carrito conservado.
+- Errores: los códigos identificables (`MENSAJES_DE_VERIFICACION` y `ESTADOS_DE_ERROR_DE_PAGO`, con `varios_pedidos_activos` agregado) retiran el modo; los fallos de transporte lo conservan. El código crudo del backend nunca se muestra.
+- `sessionStorage` y la clave `incancelables_carrito` no cambian: el token sólo vive en memoria.
+
+### Eliminado
+
+- Sección `#compra` de `pages/tienda.html`, bloque `.compra*` de `styles/tienda.css` y sus helpers de `scripts/tienda.js` (`mostrarEstadoCompra`, `pintarResumenCompra`, `agregarAccionCompra` y el enganche de `#compra-pagar`).
+
+### Validación
+
+- 254/254 PASS / 0 fallos: 47 pruebas de `carrito.js`, 77 de `tiendaClient.js` (63 previas + 14 nuevas de `reemplazarPedido()`), 12 de creación de Pedido (`test_checkout.js`), 13 escenarios de `resultado.js`, 73 de UI de `tienda.js` y 32 de recuperación/reemplazo/pago en `tiendaPago.test.mjs`.
+- `node --check` OK para `scripts/resultado.js`, `scripts/carrito.js`, `scripts/tienda.js` y `scripts/api/tiendaClient.js`.
+- Sin cambios en el backend ni en `scripts/api/apiConfig.js`.
+
+### Archivos
+
+- Modificados: `scripts/resultado.js`, `scripts/tienda.js`, `scripts/api/tiendaClient.js`, `pages/tienda.html`, `styles/tienda.css`
+
+Estado:
+
+CONTINUACIÓN DE LA COMPRA EN EL DRAWER — IMPLEMENTADO
+
 # 2026-10-06
 
 ## Bloque 5 — continuación de la compra y pago desde la tienda

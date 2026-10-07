@@ -138,6 +138,13 @@ function mostrarContinuarCompra() {
         "checkout_confirmado"
     );
 
+    // Este estado sólo ofrece continuar la compra
+    // en la tienda: "Volver a Incancelables" queda
+    // oculto (mostrarEstado() lo restaura para el
+    // resto de los estados de esta página).
+    btnVolver.style.display =
+        "none";
+
     acciones.appendChild(
         crearEnlace(
             "Continuar compra",

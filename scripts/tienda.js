@@ -18,7 +18,13 @@
 // El drawer del carrito también presenta el checkout:
 // formulario de datos del comprador y envío del pedido
 // mediante crearPedido() (Bloque 3).
-// Pendiente: verificación y reenvío de email, pago y cancelación.
+// Con ?token= (post-verificación) el mismo drawer sostiene
+// la continuación de la compra y el pago (Bloque 5): el
+// Pedido recuperado reemplaza el carrito local, el CTA del
+// pie pasa a [Pagar] y todos los mensajes (recuperación,
+// pago, corrección, rechazo, confirmación) salen en
+// #carrito-estado, dentro del drawer.
+// Pendiente: reenvío de email y cancelación.
 // /////////////////////////////////////////////////////////////////////////////
 
 import {
@@ -100,27 +106,10 @@ const checkoutEnviar =
 const checkoutEstado =
     document.querySelector("#checkout-estado");
 
-// Zona de continuación de compra (tienda.html?token=... · Bloque 5)
-const compraSeccion =
-    document.querySelector("#compra");
-
-const compraEstado =
-    document.querySelector("#compra-estado");
-
-const compraResumen =
-    document.querySelector("#compra-resumen");
-
-const compraItems =
-    document.querySelector("#compra-items");
-
-const compraTotal =
-    document.querySelector("#compra-total");
-
-const compraPagar =
-    document.querySelector("#compra-pagar");
-
-const compraAcciones =
-    document.querySelector("#compra-acciones");
+// Estado del flujo de compra dentro del mismo drawer (recuperación del
+// Pedido, procesamiento del pago, corrección, rechazo o confirmación).
+const carritoEstado =
+    document.querySelector("#carrito-estado");
 
 // Catálogo cargado en memoria (para resolver el clic por índice)
 let catalogoActual = [];
@@ -767,12 +756,13 @@ function textoDeMotivo(entrada) {
 
 }
 
-// Agrega el detalle bajo el mensaje general. Va dentro de #checkout-estado
-// (role="status") para que el lector de pantalla anuncie mensaje y lista
-// juntos; el foco sigue cayendo en el propio estado.
-function mostrarDetalleDeMotivos(motivos) {
+// Agrega el detalle bajo el mensaje general. Va dentro de un contenedor
+// role="status" para que el lector de pantalla anuncie mensaje y lista
+// juntos (#checkout-estado en el formulario, #carrito-estado en el resto
+// del flujo de compra dentro del drawer).
+function mostrarDetalleDeMotivos(motivos, destino = checkoutEstado) {
 
-    if (!checkoutEstado) return;
+    if (!destino) return;
 
     const textos = (Array.isArray(motivos) ? motivos : [])
 
@@ -796,7 +786,7 @@ function mostrarDetalleDeMotivos(motivos) {
 
     });
 
-    checkoutEstado.appendChild(lista);
+    destino.appendChild(lista);
 
 }
 
@@ -1025,31 +1015,37 @@ async function manejarEnvioPedido(evento) {
 }
 
 // ---------------------------------------------------------------------------
-// CONTINUACIÓN DE COMPRA (tienda.html?token=... · Bloque 5)
+// CONTINUACIÓN DE COMPRA Y PAGO (tienda.html?token=... · Bloque 5)
 // ---------------------------------------------------------------------------
 //
 // Después de que resultado.html verifica el email, la compra continúa
-// ACÁ con la fuente de verdad del backend:
+// ACÁ, dentro del drawer del carrito:
 //
 //   POST /email-verificaciones/pedidos  ->  Pedido PEND_PAGO + items[]
 //
-// - El resumen y el request de pago se arman con esos items[]: el carrito
-//   de sessionStorage NO se lee para continuar esta compra (sólo se vacía,
-//   como hasta ahora, cuando el Pedido queda PAGADO).
-// - Nombre del producto y disponibilidad salen del catálogo existente;
-//   cantidad, precio unitario, subtotal y total salen del Pedido.
-// - La orquestación del pago es la del Bloque 5 (iniciarPago(),
-//   APROBADO, RECHAZADO, reintentos, CORRECCION, PAGADO_STOCK_NO_AFECTADO
-//   y errores), movida desde resultado.js a esta página.
+// - El Pedido REEMPLAZA el carrito local (aplicarCorreccion, nunca una
+//   fusión): a partir de ahí sessionStorage guarda la representación
+//   editable del Pedido en el drawer.
+// - El drawer es el mismo de siempre (lista, + / − / eliminar, totales,
+//   foco y cierre). Con Pedido activo el CTA del pie dice [Pagar]; sin
+//   él, [Continuar compra] como hasta ahora.
+// - Al pagar se comparan los items actuales del carrito con el snapshot
+//   del Pedido (tripleta producto/cantidad/precio, orden insensible):
+//   sin cambios se paga el Pedido existente; con cambios se reemplaza
+//   (o se aplica la corrección comercial) y recién ahí se paga.
+// - Todos los mensajes (recuperación, pago, corrección, rechazo,
+//   confirmación) salen en #carrito-estado, dentro del drawer.
 
 // Token de verificación: vive sólo en memoria, nunca en storage.
 let tokenVerificacion = null;
 
 // Pedido que se está continuando: { id, estado, items[] }.
-// Única fuente de items para pagar.
+// items[] es el snapshot persistido del Pedido activo: decide si el
+// carrito cambió, no es la fuente de items a pagar.
 let pedidoContinuar = null;
 
-// Evita doble envío mientras iniciarPago() está en curso.
+// Evita doble envío mientras reemplazarPedido() / iniciarPago() están
+// en curso.
 let pagoEnCurso = false;
 
 // El simulador MVP sólo admite APROBADO y RECHAZADO.
@@ -1084,7 +1080,10 @@ const ESTADOS_DE_ERROR_DE_PAGO = {
 
     pedido_no_activo: "Este pedido no está disponible para pagar.",
 
-    pedido_no_pendiente_de_pago: "Este pedido no está disponible para pagar."
+    pedido_no_pendiente_de_pago: "Este pedido no está disponible para pagar.",
+
+    varios_pedidos_activos:
+        "Hay varios pedidos activos con esta verificación. Escribinos para continuar."
 
 };
 
@@ -1095,7 +1094,7 @@ const MENSAJE_DE_COMPRA_FALLIDA =
     "No pudimos recuperar tu compra. Intentá nuevamente.";
 
 // ---------------------------------------------------------------------------
-// PRESENTACIÓN DE LA SECCIÓN DE COMPRA
+// LECTURA DEL TOKEN Y ESTADO DENTRO DEL DRAWER
 // ---------------------------------------------------------------------------
 
 function leerTokenDeUrl() {
@@ -1115,113 +1114,82 @@ function leerTokenDeUrl() {
 
 }
 
-// Escribe el estado, decide si el resumen queda a la vista y limpia las
-// acciones dinámicas (los botones de reintento se agregan después).
-function mostrarEstadoCompra(texto, tipo = "", opciones = {}) {
+// Escribe el mensaje en #carrito-estado, la zona de estado del propio
+// drawer (siempre visible con el drawer abierto). El tipo pinta
+// .exito / .error; con texto vacío la zona colapsa por CSS. Nunca usa
+// [hidden]: el nodo debe permanecer en el flujo del grid del panel.
+function mostrarEstadoCarrito(texto, tipo = "", opciones = {}) {
 
-    if (compraEstado) {
+    if (!carritoEstado) return;
 
-        compraEstado.className =
-            `compra-estado ${tipo}`.trim();
+    carritoEstado.className = `checkout-estado ${tipo}`.trim();
 
-        // Se muestra primero y se escribe después: así aria-live anuncia.
-        compraEstado.hidden = texto === "";
+    // Se muestra primero y se escribe después: así aria-live anuncia.
+    carritoEstado.textContent = texto;
 
-        compraEstado.textContent = texto;
-
-    }
-
-    if (compraResumen) {
-
-        compraResumen.hidden = opciones.resumen !== true;
-
-    }
-
-    if (compraAcciones) compraAcciones.innerHTML = "";
-
-    if (opciones.enfocar) compraEstado?.focus();
+    if (opciones.enfocar) carritoEstado.focus();
 
 }
 
-function agregarAccionCompra(texto, id, alPulsar) {
+// Normaliza items al formato del snapshot del Pedido.
+function snapshotDeItems(items) {
 
-    if (!compraAcciones) return null;
+    return items.map(item => ({
 
-    const boton = document.createElement("button");
+        producto_id: item.producto_id,
 
-    boton.type = "button";
+        cantidad: aNumero(item.cantidad),
 
-    boton.textContent = texto;
+        precio_unitario: aNumero(item.precio_unitario)
 
-    boton.id = id;
-
-    boton.className = "btn";
-
-    boton.addEventListener("click", alPulsar);
-
-    compraAcciones.appendChild(boton);
-
-    return boton;
+    }));
 
 }
 
-// Resumen de lo que se va a pagar: producto, cantidad, precio unitario,
-// subtotal por producto y total. Todo desde pedidoContinuar.items.
-function pintarResumenCompra() {
+// Con Pedido activo el CTA del drawer es [Pagar]; sin él vuelve a ser
+// [Continuar compra] (modo normal / pre-checkout).
+function modoPostVerificacionActivo() {
 
-    if (!compraItems || !compraTotal) return;
+    return Boolean(tokenVerificacion && pedidoContinuar);
 
-    const items =
-        Array.isArray(pedidoContinuar?.items)
-            ? pedidoContinuar.items
-            : [];
+}
 
-    compraItems.innerHTML = items
+function actualizarCtaDelDrawer() {
 
-        .map(item => {
+    if (botonContinuarCompra) {
 
-            const cantidad = aNumero(item.cantidad);
+        botonContinuarCompra.textContent =
+            modoPostVerificacionActivo() ? "Pagar" : "Continuar compra";
 
-            const unitario = aNumero(item.precio_unitario);
+    }
 
-            const subtotal = cantidad * unitario;
+}
 
-            return `
+// El clic del CTA decide según el modo: pre-checkout abre el formulario
+// de datos del comprador; con Pedido activo dispara el pago.
+function manejarClicContinuar() {
 
-                <tr>
+    if (modoPostVerificacionActivo()) {
 
-                    <td class="compra-item-nombre">
-                        ${identificacionDeProducto(item.producto_id)}
-                    </td>
+        procesarPago();
 
-                    <td class="compra-item-cantidad">
-                        ${cantidad}
-                    </td>
+        return;
 
-                    <td class="compra-item-precio">
-                        ${formatoPrecio.format(unitario)}
-                    </td>
+    }
 
-                    <td class="compra-item-subtotal">
-                        ${formatoPrecio.format(subtotal)}
-                    </td>
+    mostrarCheckout();
 
-                </tr>
+}
 
-            `;
+// Sale del modo post-verificación (Pedido pagado, recuperación fallida
+// o error terminal): el drawer vuelve a ser el de siempre.
+function salirDelModoVerificacion() {
 
-        })
-        .join("");
+    tokenVerificacion = null;
 
-    const total = items.reduce(
-        (acumulado, item) =>
-            acumulado +
-            aNumero(item.cantidad) * aNumero(item.precio_unitario),
-        0
-    );
+    pedidoContinuar = null;
 
-    compraTotal.textContent =
-        formatoPrecio.format(total);
+    actualizarCtaDelDrawer();
 
 }
 
@@ -1254,6 +1222,40 @@ function mensajeDePagoFallido(respuesta) {
 
 }
 
+// Errores del reemplazo: los códigos de verificación tienen mensaje
+// propio; el resto (pago, transporte o desconocidos) cae en la
+// traducción genérica del pago. El código crudo nunca se muestra.
+function mensajeDeErrorDeReemplazo(respuesta) {
+
+    const mensaje =
+        MENSAJES_DE_VERIFICACION[respuesta?.codigo];
+
+    if (mensaje) return mensaje;
+
+    return mensajeDePagoFallido(respuesta);
+
+}
+
+// Código identificable que deja el Pedido sin posibilidad de reintento
+// (o la verificación sin continuidad): se vuelve al modo normal de la
+// tienda sin inventar recuperaciones.
+function esErrorTerminalDeCompra(codigo) {
+
+    if (typeof codigo !== "string" || codigo === "") return false;
+
+    return (
+        Object.prototype.hasOwnProperty.call(
+            MENSAJES_DE_VERIFICACION,
+            codigo
+        ) ||
+        Object.prototype.hasOwnProperty.call(
+            ESTADOS_DE_ERROR_DE_PAGO,
+            codigo
+        )
+    );
+
+}
+
 // ---------------------------------------------------------------------------
 // RECUPERACIÓN DEL PEDIDO VERIFICADO
 // ---------------------------------------------------------------------------
@@ -1262,23 +1264,24 @@ async function iniciarContinuacionDeCompra() {
 
     if (!tokenVerificacion) return;
 
-    if (compraSeccion) compraSeccion.hidden = false;
+    // El drawer abre apenas arranca la recuperación: el mensaje de carga
+    // se ve dentro de él. La lista local queda oculta hasta saber si el
+    // Pedido la reemplaza (el carrito previo nunca se muestra como si
+    // fuera el Pedido).
+    abrirCarrito();
 
-    mostrarEstadoCompra(
-        "Estamos recuperando tu compra...",
-        ""
-    );
+    if (listaCarrito) listaCarrito.hidden = true;
+
+    if (pieCarrito) pieCarrito.hidden = true;
+
+    mostrarEstadoCarrito("Estamos recuperando tu compra...", "");
 
     const respuesta =
         await obtenerPedidosVerificados(tokenVerificacion);
 
     if (!respuesta?.ok) {
 
-        mostrarEstadoCompra(
-            mensajeDeErrorDeVerificacion(respuesta),
-            "error",
-            { enfocar: true }
-        );
+        falloDeRecuperacion(mensajeDeErrorDeVerificacion(respuesta));
 
         return;
 
@@ -1301,39 +1304,67 @@ async function iniciarContinuacionDeCompra() {
 
     if (!pedido || items.length === 0) {
 
-        mostrarEstadoCompra(
-            "No hay compras pendientes de pago.",
-            "",
-            { enfocar: true }
-        );
+        falloDeRecuperacion("No hay compras pendientes de pago.");
 
         return;
 
     }
 
-    // Los items del Pedido pasan a ser la fuente de verdad:
-    // se normalizan una única vez y no se toca el carrito.
+    // Snapshot normalizado del Pedido: lo que se compara contra el
+    // carrito al pagar.
+    const snapshot = snapshotDeItems(items);
+
+    // El carrito local se REEMPLAZA por el Pedido: nunca se fusiona.
+    // A partir de acá sessionStorage es la representación editable del
+    // Pedido dentro del drawer.
+    const aplicacion = aplicarCorreccion(snapshot);
+
+    if (!aplicacion.ok) {
+
+        falloDeRecuperacion(MENSAJE_DE_COMPRA_FALLIDA);
+
+        return;
+
+    }
+
     pedidoContinuar = {
 
         id: pedido.id ?? null,
 
         estado: pedido.estado ?? null,
 
-        items: items.map(item => ({
-
-            producto_id: item.producto_id,
-
-            cantidad: aNumero(item.cantidad),
-
-            precio_unitario: aNumero(item.precio_unitario)
-
-        }))
+        items: snapshot
 
     };
 
-    pintarResumenCompra();
+    // El catálogo completa nombre, precio y disponibilidad de la
+    // representación recién sembrada y actualiza el badge.
+    await cargarCatalogo();
 
-    mostrarEstadoCompra("", "", { resumen: true });
+    actualizarBadgeCarrito();
+
+    if (listaCarrito) listaCarrito.hidden = false;
+
+    renderCarrito();
+
+    actualizarCtaDelDrawer();
+
+    mostrarEstadoCarrito("Tu pedido está listo para pagar.", "");
+
+}
+
+// La recuperación no encontró un Pedido utilizable: se restaura la vista
+// normal del drawer con el carrito local intacto (no se reemplazó nada)
+// y el modo post-verificación queda desactivado.
+function falloDeRecuperacion(mensaje) {
+
+    if (listaCarrito) listaCarrito.hidden = false;
+
+    renderCarrito();
+
+    salirDelModoVerificacion();
+
+    mostrarEstadoCarrito(mensaje, "error", { enfocar: true });
 
 }
 
@@ -1386,48 +1417,180 @@ function textoCompraAprobada(datos) {
 
 }
 
+// ---------------------------------------------------------------------------
+// COMPARACIÓN DEL CARRITO CONTRA EL SNAPSHOT DEL PEDIDO
+// ---------------------------------------------------------------------------
+
+// Clave comparable de un item: tripleta producto / cantidad / precio con
+// tipos normalizados ("2" y 2, 1000 y "1000" valen lo mismo) para que
+// una diferencia de formato no dispare un reemplazo innecesario.
+function claveDeItemDePago(item) {
+
+    return [
+        String(item?.producto_id ?? ""),
+        aNumero(item?.cantidad),
+        aNumero(item?.precio_unitario)
+    ].join("|");
+
+}
+
+// Independiente del orden: sólo importa qué tripletas hay, no su
+// posición dentro de cada lista.
+function itemsIgualesAlSnapshot(actual, snapshot) {
+
+    if (!Array.isArray(actual) || !Array.isArray(snapshot)) return false;
+
+    if (actual.length !== snapshot.length) return false;
+
+    const clavesActuales =
+        actual.map(claveDeItemDePago).sort();
+
+    const clavesSnapshot =
+        snapshot.map(claveDeItemDePago).sort();
+
+    return clavesActuales.every(
+        (clave, indice) => clave === clavesSnapshot[indice]
+    );
+
+}
+
 async function procesarPago() {
 
-    if (pagoEnCurso || !pedidoContinuar) return;
+    if (pagoEnCurso || !modoPostVerificacionActivo()) return;
 
-    const items = pedidoContinuar.items;
+    // Items actuales del carrito visual: lo que el usuario ve y editó.
+    const items = construirItemsPedido();
 
-    // Sin items no hay request posible (p. ej. una corrección que
-    // dejó el Pedido sin productos).
-    if (!items || items.length === 0) {
+    // Sin items no hay request posible (p. ej. una corrección o una
+    // eliminación que dejó el carrito sin productos).
+    if (items.length === 0) {
 
-        mostrarEstadoCompra(
-            "No hay productos en tu pedido para pagar. " +
-            "Volvé a la tienda para agregar antes de pagar.",
+        mostrarEstadoCarrito(
+            "Tu carrito está vacío. Agregá productos para continuar " +
+            "con la compra.",
             "error",
-            { resumen: false, enfocar: true }
+            { enfocar: true }
         );
 
         return;
+
     }
 
     pagoEnCurso = true;
 
-    mostrarEstadoCompra(
-        "Estamos procesando tu pago. No cierres esta ventana.",
-        "",
-        { resumen: false }
-    );
+    // El lock se libera SIEMPRE: el finally cubre también una
+    // excepción inesperada del tramo protegido (p. ej. al refrescar
+    // el catálogo dentro de una corrección), de modo que [Pagar]
+    // nunca queda bloqueado hasta recargar la página.
+    let respuesta = null;
 
-    const respuesta =
-        await iniciarPago(
+    try {
+
+        mostrarEstadoCarrito(
+            "Estamos procesando tu pago. No cierres esta ventana.",
+            ""
+        );
+
+        // ---------------------------------------------------------
+        // CARRITO MODIFICADO: primero se reemplaza el Pedido.
+        // ---------------------------------------------------------
+
+        if (!itemsIgualesAlSnapshot(items, pedidoContinuar.items)) {
+
+            const reemplazo =
+                await reemplazarPedido(tokenVerificacion, items);
+
+            if (!reemplazo?.ok) {
+
+                mostrarEstadoCarrito(
+                    mensajeDeErrorDeReemplazo(reemplazo),
+                    "error",
+                    { enfocar: true }
+                );
+
+                if (esErrorTerminalDeCompra(reemplazo?.codigo)) {
+
+                    salirDelModoVerificacion();
+
+                }
+
+                return;
+
+            }
+
+            const datos = reemplazo.data;
+
+            // -----------------------------------------------------
+            // corrección comercial: NO se creó un Pedido nuevo, así
+            // que no hay nada que pagar. El Pedido activo sigue
+            // siendo el anterior y el carrito queda como lo propuso
+            // el backend: el siguiente [Pagar] vuelve a comparar e
+            // intentar el reemplazo.
+            // -----------------------------------------------------
+
+            if (datos.resultado === "correccion") {
+
+                await mostrarCorreccionDeReemplazo(datos);
+
+                return;
+
+            }
+
+            // -----------------------------------------------------
+            // reemplazado: A -> B (y B -> C -> D... son válidos).
+            // El snapshot pasa a ser el del Pedido nuevo y enseguida
+            // se paga con los mismos items.
+            // -----------------------------------------------------
+
+            const pedidoNuevo = datos.pedido ?? {};
+
+            if (
+                pedidoNuevo.id === null ||
+                pedidoNuevo.id === undefined
+            ) {
+
+                // Respuesta fuera de contrato: no se toca el Pedido
+                // activo y el usuario puede volver a intentar.
+                mostrarEstadoCarrito(
+                    MENSAJE_DE_PAGO_FALLIDO,
+                    "error",
+                    { enfocar: true }
+                );
+
+                return;
+
+            }
+
+            pedidoContinuar = {
+
+                id: pedidoNuevo.id,
+
+                estado: pedidoNuevo.estado ?? null,
+
+                items
+
+            };
+
+        }
+
+        respuesta = await iniciarPago(
             pedidoContinuar.id,
             items,
             SIMULACION_PAGO
         );
 
-    pagoEnCurso = false;
+    }
+    finally {
+
+        pagoEnCurso = false;
+
+    }
 
     await manejarRespuestaPago(respuesta);
 
 }
 
-// Traduce la respuesta real del backend a un estado de la página.
+// Traduce la respuesta real del backend a un estado del drawer.
 // Único punto que decide si la compra está confirmada.
 async function manejarRespuestaPago(respuesta) {
 
@@ -1437,11 +1600,19 @@ async function manejarRespuestaPago(respuesta) {
 
     if (!respuesta?.ok) {
 
-        mostrarEstadoCompra(
+        mostrarEstadoCarrito(
             mensajeDePagoFallido(respuesta),
             "error",
-            { resumen: true, enfocar: true }
+            { enfocar: true }
         );
+
+        // Código identificable: sobre ese Pedido ya no hay reintento
+        // posible, se vuelve al modo normal de la tienda.
+        if (esErrorTerminalDeCompra(respuesta?.codigo)) {
+
+            salirDelModoVerificacion();
+
+        }
 
         return;
 
@@ -1470,10 +1641,14 @@ async function manejarRespuestaPago(respuesta) {
             // vaciarse hay que refrescarla contra la API.
             await cargarCatalogo();
 
-            mostrarEstadoCompra(
+            // Se retira el modo post-verificación: no queda disponible
+            // otro [Pagar] sobre este Pedido ya pagado.
+            salirDelModoVerificacion();
+
+            mostrarEstadoCarrito(
                 textoCompraAprobada(datos),
                 "exito",
-                { resumen: false, enfocar: true }
+                { enfocar: true }
             );
 
             return;
@@ -1486,21 +1661,21 @@ async function manejarRespuestaPago(respuesta) {
             pedido.estado === "PAGADO_STOCK_NO_AFECTADO"
         ) {
 
-            mostrarEstadoCompra(
+            mostrarEstadoCarrito(
                 "El pago fue registrado, pero la compra " +
                 "requiere revisión.",
                 "",
-                { resumen: false, enfocar: true }
+                { enfocar: true }
             );
 
             return;
 
         }
 
-        mostrarEstadoCompra(
+        mostrarEstadoCarrito(
             MENSAJE_DE_PAGO_FALLIDO,
             "error",
-            { resumen: true, enfocar: true }
+            { enfocar: true }
         );
 
         return;
@@ -1531,16 +1706,17 @@ async function manejarRespuestaPago(respuesta) {
 
     }
 
-    mostrarEstadoCompra(
+    mostrarEstadoCarrito(
         MENSAJE_DE_PAGO_FALLIDO,
         "error",
-        { resumen: true, enfocar: true }
+        { enfocar: true }
     );
 
 }
 
-// Pago rechazado. Ofrece reintento sólo si el Pedido sigue en
-// PEND_PAGO y quedan intentos.
+// Pago rechazado. El Pedido activo y el carrito se conservan: si sigue
+// en PEND_PAGO, el CTA [Pagar] del drawer permite otro intento (no hay
+// botón de reintento aparte).
 function mostrarRechazado(datos) {
 
     const pedido = datos.pedido ?? {};
@@ -1574,31 +1750,31 @@ function mostrarRechazado(datos) {
     if (reintentoDisponible) {
 
         detalle +=
-            " Podés volver a intentarlo.";
+            " Podés volver a intentarlo con [Pagar].";
 
     }
 
-    mostrarEstadoCompra(
+    mostrarEstadoCarrito(
         detalle,
         "error",
-        { resumen: true, enfocar: true }
+        { enfocar: true }
     );
 
-    if (reintentoDisponible) {
+    // Sin Pedido pendiente de pago no hay reintento posible:
+    // se vuelve al modo normal de la tienda.
+    if (pedido.estado && pedido.estado !== "PEND_PAGO") {
 
-        agregarAccionCompra(
-            "Reintentar pago",
-            "btnReintentarPago",
-            procesarPago
-        );
+        salirDelModoVerificacion();
 
     }
 
 }
 
-// El backend pidió corregir antes de pagar. La corrección se aplica
-// al carrito de la tienda con la infraestructura existente y sus
-// items pasan a ser los del Pedido para el reintento.
+// El backend pidió corregir antes de pagar. La corrección se aplica al
+// carrito de la tienda y al catálogo, pero el Pedido activo NO se toca
+// ni se modifica el snapshot: como el carrito pasó a diferir de él, el
+// siguiente [Pagar] dispara el reemplazo y recién ahí se reintenta el
+// pago (comportamiento esperado).
 async function mostrarCorreccionDePago(datos) {
 
     const aplicacion =
@@ -1608,42 +1784,61 @@ async function mostrarCorreccionDePago(datos) {
     // devolvería la misma corrección.
     if (!aplicacion?.ok) {
 
-        mostrarEstadoCompra(
+        mostrarEstadoCarrito(
             MENSAJE_DE_PAGO_FALLIDO,
             "error",
-            { resumen: true, enfocar: true }
+            { enfocar: true }
         );
 
         return;
 
     }
 
-    pedidoContinuar.items = (aplicacion.items ?? [])
-
-        .map(item => ({
-
-            producto_id: item.producto_id,
-
-            cantidad: aNumero(item.cantidad),
-
-            precio_unitario: aNumero(item.precio_unitario)
-
-        }));
-
-    pintarResumenCompra();
-
-    mostrarEstadoCompra(
+    mostrarEstadoCarrito(
         "El pago no se realizó: hubo cambios en tu carrito. " +
-        "Volvé a intentarlo con los productos actualizados.",
+        "Revisá los productos actualizados y volvé a intentar " +
+        "con [Pagar].",
         "",
-        { resumen: true, enfocar: true }
+        { enfocar: true }
     );
 
-    agregarAccionCompra(
-        "Reintentar pago",
-        "btnReintentarPago",
-        procesarPago
+    mostrarDetalleDeMotivos(datos.motivos, carritoEstado);
+
+}
+
+// El reemplazo devolvió una corrección comercial en lugar de
+// materializar el Pedido nuevo: se aplica al carrito y al catálogo,
+// pero el Pedido activo y el snapshot siguen siendo los anteriores y NO
+// se inicia ningún pago. El siguiente [Pagar] vuelve a comparar e
+// intentar.
+async function mostrarCorreccionDeReemplazo(datos) {
+
+    const aplicacion =
+        await aplicarCarritoCorregido(datos.carrito_corregido);
+
+    // Payload fuera de contrato: no se aplicó nada y un reintento
+    // devolvería la misma corrección.
+    if (!aplicacion?.ok) {
+
+        mostrarEstadoCarrito(
+            MENSAJE_DE_PAGO_FALLIDO,
+            "error",
+            { enfocar: true }
+        );
+
+        return;
+
+    }
+
+    mostrarEstadoCarrito(
+        "Tu carrito tuvo cambios y todavía no se generó un pedido " +
+        "nuevo. Revisá los productos actualizados y volvé a " +
+        "intentar con [Pagar].",
+        "",
+        { enfocar: true }
     );
+
+    mostrarDetalleDeMotivos(datos.motivos, carritoEstado);
 
 }
 
@@ -1657,10 +1852,6 @@ function initContinuacionDeCompra() {
 
     // Sin token la tienda funciona como siempre.
     if (!tokenVerificacion) return;
-
-    if (compraSeccion) compraSeccion.hidden = false;
-
-    compraPagar?.addEventListener("click", procesarPago);
 
     iniciarContinuacionDeCompra();
 
@@ -1959,10 +2150,6 @@ async function cargarCatalogo() {
 
     actualizarBadgeCarrito();
 
-    // Los nombres del resumen de compra se resuelven con el catálogo
-    // recién cargado (importa si el Pedido llegó antes o después).
-    if (pedidoContinuar) pintarResumenCompra();
-
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -2003,9 +2190,10 @@ function initCarrito() {
 
     listaCarrito?.addEventListener("click", manejarAccionCarrito);
 
-    // Checkout (Bloque 3): el clic presenta el formulario de datos
-    // del comprador dentro del mismo drawer.
-    botonContinuarCompra?.addEventListener("click", mostrarCheckout);
+    // CTA del pie del drawer: pre-checkout presenta el formulario de
+    // datos del comprador; con Pedido activo (modo post-verificación)
+    // dispara el pago.
+    botonContinuarCompra?.addEventListener("click", manejarClicContinuar);
 
     checkoutVolver?.addEventListener("click", volverAlCarrito);
 
@@ -2044,6 +2232,6 @@ initCarrito();
 
 cargarCatalogo();
 
-// Modo continuación (sólo si la URL trae ?token=): recupera el Pedido
-// y habilita [Pagar].
+// Modo continuación (sólo si la URL trae ?token=): recupera el Pedido,
+// reemplaza el carrito local y habilita [Pagar] en el drawer.
 initContinuacionDeCompra();

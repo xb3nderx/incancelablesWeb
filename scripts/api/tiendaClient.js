@@ -9,9 +9,10 @@
 // (POST /pedidos). Desde el Bloque 4, validación del token
 // de verificación de email del checkout
 // (POST /email-verificaciones/validar) y recuperación de los
-// Pedidos verificados (POST /email-verificaciones/pedidos)
-// y, desde el Bloque 5, inicio del pago del Pedido
-// (POST /pedidos/{id}/pago).
+// Pedidos verificados (POST /email-verificaciones/pedidos);
+// desde el Bloque 5, inicio del pago del Pedido
+// (POST /pedidos/{id}/pago) y reemplazo del Pedido activo
+// (POST /email-verificaciones/pedidos/reemplazo).
 // Sin reenvío de email.
 //
 // Misma forma de respuesta que forms.js:
@@ -666,6 +667,257 @@ async function obtenerPedidosVerificados(token) {
 
         // --------------------------------------------------
         // 2xx con un cuerpo que no corresponde al contrato
+        // --------------------------------------------------
+
+        return {
+
+            ok: false,
+
+            message: "Respuesta inesperada de la API",
+
+            data: cuerpo,
+
+            codigo: null
+
+        };
+
+    }
+    catch (error) {
+
+        // Timeout del AbortSignal: el backend no respondió
+        // dentro de TIENDA_API.TIMEOUT.
+        if (
+            error &&
+            (error.name === "TimeoutError" || error.name === "AbortError")
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: "La tienda tardó en responder. Intentá nuevamente.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        return {
+
+            ok: false,
+
+            message: "No fue posible conectar con la tienda. Intentá nuevamente.",
+
+            data: null,
+
+            codigo: null
+
+        };
+
+    }
+
+}
+
+// =======================================================
+// REEMPLAZAR PEDIDO — POST /email-verificaciones/pedidos/reemplazo
+// =======================================================
+//
+// Contrato real auditado del backend:
+//
+//   POST ${TIENDA_API.URL}/email-verificaciones/pedidos/reemplazo
+//   headers: Accept + Content-Type application/json
+//   body: {
+//     token,
+//     items: [ { producto_id, cantidad, precio_unitario } ]
+//   }
+//
+//   200 { resultado: "reemplazado",
+//         pedido_anterior: { id, estado: "NO_PAGADO" },
+//         pedido: { id, estado } }
+//        El Pedido anterior pasa a NO_PAGADO y el nuevo hereda el
+//        estado (PEND_PAGO). Los reemplazos encadenados
+//        A -> B -> C... son comportamiento válido.
+//   200 { resultado: "correccion", pedido: { id, estado },
+//         carrito_corregido, disponibilidad, motivos, catalogo }
+//        NO se crea un Pedido nuevo: hay que aplicar la corrección
+//        al carrito y volver a intentar.
+//   400 / 404 / 409 / 500 { error }
+//        ("token_invalido" | "token_expirado" |
+//         "verificacion_pendiente" | "pedido_no_activo" |
+//         "varios_pedidos_activos" | "pedido_inexistente" |
+//         "pedido_vencido" | "carrito_vacio" |
+//         errores de validación del body/token)
+//
+// Envelope { ok, message, data, codigo }:
+//
+//   ok: true  => 200 y data.resultado vale "reemplazado" o
+//                "correccion"; ambos son salidas válidas del
+//                endpoint, sólo "reemplazado" deja un Pedido nuevo.
+//   ok: false => el backend respondió con error, la respuesta no
+//                corresponde al contrato o falló la conexión.
+//   codigo     => código crudo del backend cuando existe; null si
+//                no hay código identificable.
+//   data       => cuerpo JSON crudo, o null si no hubo cuerpo.
+//
+// No aplica carrito_corregido ni inicia pagos: el llamador decide
+// (misma separación que crearPedido()).
+
+async function reemplazarPedido(token, items) {
+
+    try {
+
+        // Sin configuración (por ejemplo, si ENVIRONMENT
+        // apunta a un PROD que todavía no existe).
+        if (!TIENDA_API.URL) {
+
+            return {
+
+                ok: false,
+
+                message: "La API de la tienda no está configurada en este entorno.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        // Sin token no se arma la ruta: se evita un request
+        // inválido al backend.
+        if (
+            token === null ||
+            token === undefined ||
+            token === ""
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: "No pudimos identificar la verificación de tu email.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        // Sin items no hay Pedido que reemplazar.
+        if (
+            !Array.isArray(items) ||
+            items.length === 0
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: "Tu carrito está vacío.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        const response = await fetch(
+            `${TIENDA_API.URL}/email-verificaciones/pedidos/reemplazo`,
+            {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ token, items }),
+                signal: AbortSignal.timeout(TIENDA_API.TIMEOUT)
+            }
+        );
+
+        const cuerpo = await response.json().catch(() => null);
+
+        // --------------------------------------------------
+        // 200 - salida válida: Pedido reemplazado o corrección
+        // --------------------------------------------------
+
+        if (
+            response.ok &&
+            cuerpo &&
+            typeof cuerpo === "object" &&
+            (
+                cuerpo.resultado === "reemplazado" ||
+                cuerpo.resultado === "correccion"
+            )
+        ) {
+
+            return {
+
+                ok: true,
+
+                message: "",
+
+                data: cuerpo,
+
+                codigo: null
+
+            };
+
+        }
+
+        // --------------------------------------------------
+        // Errores del backend: 400 / 404 / 409 / 500 { error }
+        // --------------------------------------------------
+
+        if (
+            cuerpo &&
+            typeof cuerpo.error === "string" &&
+            cuerpo.error !== ""
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: cuerpo.error,
+
+                data: cuerpo,
+
+                codigo: cuerpo.error
+
+            };
+
+        }
+
+        // --------------------------------------------------
+        // HTTP error sin cuerpo JSON (p. ej. un 502 en HTML)
+        // --------------------------------------------------
+
+        if (!response.ok) {
+
+            return {
+
+                ok: false,
+
+                message: `HTTP ${response.status}`,
+
+                data: cuerpo,
+
+                codigo: null
+
+            };
+
+        }
+
+        // --------------------------------------------------
+        // 200 con un cuerpo que no corresponde al contrato
         // --------------------------------------------------
 
         return {

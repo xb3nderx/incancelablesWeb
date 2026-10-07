@@ -18,7 +18,7 @@ Esta etapa surge a partir de un trabajo académico sobre e-commerce y se utiliza
 
 * **Diseño técnico y funcional:** definido.
 * **Backend MVP (PHP + MariaDB):** implementado.
-* **Frontend del e-commerce:** en desarrollo en la rama `dev`. Bloque 2 (carrito) y Bloque 3 (inicio de checkout) completados.
+* **Frontend del e-commerce:** en desarrollo en la rama `dev`. Bloques 2 (carrito), 3 (inicio de checkout), 4 (verificación de email), 5 (pago) y 6 (continuación de la compra en el drawer) completados.
 * **Entorno académico:** no habrá ventas ni cobros reales.
 
 #### Arquitectura y alcance
@@ -68,7 +68,7 @@ La incorporación de una API en PHP y una base de datos puede producir modificac
 **Última etapa cerrada:** v1.2.1
 **PROD (master):** v1.2.1 — no incorpora el e-commerce académico
 **Etapa en curso:** v1.3 — E-commerce e infraestructura (rama `dev`)
-**Próximo trabajo:** continuar el frontend del e-commerce en `dev` — Bloques 2 (carrito) y 3 (inicio de checkout) completados; siguiente: **Bloque 4 — Verificación de email frontend**
+**Próximo trabajo:** continuar el frontend del e-commerce en `dev` — Bloques 2, 3, 4, 5 y 6 completados; siguiente: reenvío de verificación, cancelación de Pedido y estado `EN_PROCESO`
 **Auditoría técnica integral:** postergada a v1.5
 **v2.x:** evolución futura de la plataforma, a definir posteriormente.
 
@@ -535,7 +535,9 @@ Cubre el **inicio** del checkout: formulario guest, integración con `POST /api/
 
 - [x] **Bloque 4 — Verificación de email frontend** (implementado en `636ff06`)
 - [x] **Bloque 5 — Pago frontend** (implementado; la compra continúa y se paga en `tienda.html`, ver sección propia)
-- [ ] Finalización/confirmación del flujo de compra
+- [x] **Bloque 6 — Continuación de la compra en el drawer** (implementado sin commit; retira la sección provisional `#compra`, ver sección propia)
+- [x] Flujo de compra (verificación → pago → confirmación): cerrado en los Bloques 5 y 6
+- [ ] Pendientes posteriores del flujo de compra: reenvío de verificación, cancelación de Pedido y estado `EN_PROCESO`
 
 ## Bloque 4 — Verificación de email frontend
 
@@ -559,6 +561,8 @@ Continuación directa del flujo iniciado en el Bloque 3: el Pedido queda en `PEN
 ## Bloque 5 — Pago frontend
 
 **Estado: IMPLEMENTADO (trabajo sin commitear en `dev`); la compra continúa y se paga en `tienda.html`**
+
+> **Actualizado por el Bloque 6 (2026-10-07):** la sección hermana `#compra` descripta más abajo fue **retirada**. El resumen del Pedido, los estados del pago y el botón **Pagar** ahora viven en el drawer del carrito (ver sección propia).
 
 Cierre del flujo de compra iniciado en el Bloque 3. La verificación del email se informa en `pages/resultado.html` y la compra **continúa en `pages/tienda.html?token=...`**, donde el Pedido se recupera desde el backend y se paga con sus propios `items[]`.
 
@@ -598,6 +602,60 @@ Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PR
 Estado:
 
 BLOQUE 5 — PAGO FRONTEND: IMPLEMENTADO (pago desde `tienda.html`)
+
+## Bloque 6 — Continuación de la compra en el drawer (post-verificación)
+
+**Estado: IMPLEMENTADO (trabajo sin commitear en `dev`)**
+
+Retira la sección provisional **Tu compra** (`#compra`) e integra todo el flujo posterior a la verificación del email en el **drawer del carrito**: recuperación del Pedido por token, edición de items, reemplazo del Pedido, pago, correcciones y reintentos comparten el mismo panel, el mismo carrito y el mismo CTA.
+
+Sin cambios en el backend (cerrado en `1f3d37a`) ni en `scripts/api/apiConfig.js`. No se despliega a PROD.
+
+### Flujo
+
+`resultado.html` (verificación) → **Continuar compra** → `tienda.html?token=TOKEN` → `POST /api/email-verificaciones/pedidos` → drawer con el Pedido sembrado → edición libre de items → si cambiaron, `POST /api/email-verificaciones/pedidos/reemplazo` → `POST /api/pedidos/{id}/pago` → confirmación / rechazo / corrección dentro del mismo drawer.
+
+### Alcance implementado
+
+- [x] `reemplazarPedido(token, items)` en `scripts/api/tiendaClient.js`: `POST /email-verificaciones/pedidos/reemplazo` con `{token, items}`, timeout con `AbortSignal.timeout` y envelope `{ok, message, data, codigo}`; acepta `resultado: "reemplazado"` y `resultado: "correccion"`; identifica `token_invalido`, `token_expirado`, `verificacion_pendiente`, `pedido_no_activo`, `varios_pedidos_activos`, `pedido_vencido`, `carrito_vacio` y `accion_invalida`; sin token o sin `items[]` no arma la ruta.
+- [x] `#compra` eliminada de `pages/tienda.html` y bloque `.compra*` de `styles/tienda.css`; nuevos `#carrito-estado` dentro del panel (cabecera / estado / lista / formulario / pie) con `role="status"`, `aria-live="polite"` y `tabindex="-1"`.
+- [x] `.carrito-panel` en 4 filas `auto auto 1fr auto`; `#carrito-estado` colapsa con `:empty` (nunca con `display: none`, que lo sacaría del grid) y suma `grid-area: auto` junto con las demás zonas.
+- [x] El CTA `#carrito-continuar` alterna **Pagar** / **Continuar compra** según `modoPostVerificacionActivo()` (`tokenVerificacion && pedidoContinuar`), con un único enganche `manejarClicContinuar()`.
+- [x] Recuperación del Pedido al abrir la página: carga anunciada en `#carrito-estado` con lista y pie ocultos; éxito ⇒ **Tu pedido está listo para pagar.**; fallo ⇒ carrito local intacto, salida del modo verificación y error con foco.
+- [x] El Pedido **reemplaza** (nunca fusiona) el carrito local y fija `pedidoContinuar = {id, estado, items}`; el catálogo sólo sincroniza nombre, precio y disponibilidad.
+- [x] `procesarPago()` compara los items con el snapshot (`itemsIgualesAlSnapshot()`, tripletas `producto_id|cantidad|precio_unitario` normalizadas): sin cambios paga el Pedido activo; con cambios paga primero `reemplazarPedido()` y después el Pedido nuevo (A → B → C encadenados).
+- [x] Corrección del reemplazo ⇒ se aplica `carrito_corregido` + catálogo, no se paga y no se toca el snapshot; el siguiente **Pagar** vuelve a comparar.
+- [x] Corrección del pago ⇒ se aplica el carrito pero no se sobrescribe `pedidoContinuar.items`, de modo que el siguiente **Pagar** materializa el reemplazo.
+- [x] Rechazo con `Intento N de M` y "volver a intentarlo con **Pagar**" dentro de `#carrito-estado`; salida del modo sólo si el Pedido dejó de estar en `PEND_PAGO`.
+- [x] `PAGADO` ⇒ `vaciarCarrito()` + badge + render + refresco del catálogo + salida del modo y estado de confirmación; `PAGADO_STOCK_NO_AFECTADO` ⇒ mensaje neutro con el carrito conservado.
+- [x] Errores identificables (`MENSAJES_DE_VERIFICACION`, `ESTADOS_DE_ERROR_DE_PAGO`) retiran el modo; los fallos de transporte lo conservan; los códigos crudos del backend nunca se muestran.
+- [x] `sessionStorage` / `incancelables_carrito` sin cambios: el token sólo vive en memoria.
+- [x] `scripts/resultado.js`: **Volver a Incancelables** queda oculto en `mostrarContinuarCompra()`; los demás estados de la página conservan el botón.
+- [x] Sin `?token=` en la URL la tienda trabaja igual que siempre (catálogo + carrito + checkout).
+
+### Fuera de este bloque
+
+- Reenvío de verificación y cooldown.
+- Cancelación de Pedido y estado `EN_PROCESO`.
+- Backend y despliegue a PROD.
+
+### Validación
+
+- 254/254 PASS / 0 fallos: 47 pruebas de `carrito.js`, 77 de `tiendaClient.js` (63 previas + 14 nuevas de `reemplazarPedido()`), 12 de creación de Pedido (`test_checkout.js`), 13 escenarios de `resultado.js`, 73 de UI de `tienda.js` y 32 de recuperación/reemplazo/pago en `tiendaPago.test.mjs`.
+- `node --check` OK para `scripts/resultado.js`, `scripts/carrito.js`, `scripts/tienda.js` y `scripts/api/tiendaClient.js`.
+- Sin cambios en el backend ni en `scripts/api/apiConfig.js`.
+
+### Archivos
+
+- [x] `scripts/tienda.js`
+- [x] `scripts/api/tiendaClient.js`
+- [x] `scripts/resultado.js`
+- [x] `pages/tienda.html`
+- [x] `styles/tienda.css`
+
+Estado:
+
+BLOQUE 6 — CONTINUACIÓN DE LA COMPRA EN EL DRAWER: IMPLEMENTADO
 
 # v1.5 — Auditoría técnica integral
 
@@ -689,12 +747,12 @@ Desacoplar la verificación de email del sistema Newsletter para reutilizarla en
 - [x] Testing automatizado del visor
 - [x] Merge de v1.2.1 de DEV → PROD
 - [x] Publicación de v1.2.1 en producción
-- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda, Bloque 2 (carrito), Bloque 3 (inicio de checkout), Bloque 4 (verificación de email) y Bloque 5 (pago)
+- [x] Frontend e-commerce v1.3 en `dev`: catálogo de la Tienda, Bloque 2 (carrito), Bloque 3 (inicio de checkout), Bloque 4 (verificación de email), Bloque 5 (pago) y Bloque 6 (continuación de la compra en el drawer)
 
 ## Pendiente
 
 - [ ] Validación final de v1.2.1 en producción
-- [ ] Frontend e-commerce v1.3 — finalización/confirmación del flujo de compra
+- [ ] Frontend e-commerce v1.3 — pendientes posteriores del flujo de compra (reenvío de verificación, cancelación de Pedido y estado `EN_PROCESO`); el flujo de compra de los Bloques 5 y 6 está cerrado
 
 ## Git
 

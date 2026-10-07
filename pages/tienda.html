@@ -29,56 +29,6 @@
         ======================================================= -->
         <main class="main">
             <!-- ======================================================
-                                CONTINUACIÓN DE COMPRA
-                        (tienda.html?token=... · Bloque 5)
-            ======================================================= -->
-            <!-- Sección hermana del catálogo: sólo se muestra cuando la
-                 URL trae el token de verificación del checkout. El Pedido
-                 y sus items[] vienen del backend (nunca del carrito de
-                 sessionStorage) y son lo que se paga con [Pagar]. -->
-            <section id="compra" class="compra" hidden aria-labelledby="compra-titulo">
-                <h2 id="compra-titulo">Tu compra</h2>
-
-                <p id="compra-intro" class="compra-intro">
-                    Estos son los productos de tu pedido, listos para pagar.
-                </p>
-
-                <!-- ESTADOS: CARGA / ERROR / RESULTADO DEL PAGO -->
-                <div id="compra-estado" class="compra-estado" role="status" aria-live="polite"
-                    tabindex="-1" hidden></div>
-
-                <!-- RESUMEN: QUÉ SE VA A PAGAR -->
-                <div id="compra-resumen" class="compra-resumen" hidden>
-                    <table class="compra-tabla">
-                        <thead>
-                            <tr>
-                                <th scope="col">Producto</th>
-                                <th scope="col">Cantidad</th>
-                                <th scope="col">Precio unitario</th>
-                                <th scope="col">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="compra-items">
-                            <!-- generado dinámicamente por tienda.js -->
-                        </tbody>
-                    </table>
-
-                    <p class="compra-total">
-                        <span class="compra-total-etiqueta">Total</span>
-                        <span id="compra-total" class="compra-total-valor"></span>
-                    </p>
-
-                    <button id="compra-pagar" class="btn compra-pagar" type="button">
-                        Pagar
-                    </button>
-                </div>
-
-                <!-- ACCIONES DINÁMICAS DEL PAGO (REINTENTO) -->
-                <div id="compra-acciones" class="compra-acciones">
-                </div>
-            </section>
-
-            <!-- ======================================================
                                     CATÁLOGO
         ======================================================= -->
             <section class="tienda">
@@ -130,6 +80,14 @@
                     <button id="carrito-cerrar" class="carrito-cerrar" type="button"
                         aria-label="Cerrar carrito">×</button>
                 </header>
+
+                <!-- ESTADO DEL FLUJO DE COMPRA (recuperación del Pedido,
+                     procesamiento del pago, corrección, rechazo o
+                     confirmación). Siempre en el flujo del panel: vacío no
+                     ocupa lugar (nunca lleva [hidden], que lo sacaría de la
+                     fila del grid y desplazaría lista y pie). -->
+                <div id="carrito-estado" class="checkout-estado" role="status"
+                    aria-live="polite" tabindex="-1"></div>
 
                 <!-- ÍTEMS -->
                 <div id="carrito-lista" class="carrito-lista" aria-live="polite">

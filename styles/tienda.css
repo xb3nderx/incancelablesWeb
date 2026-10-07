@@ -445,7 +445,7 @@ body.carrito-abierto {
     inset: 0;
 
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
 
     background: var(--bg-alt);
     color: var(--text);
@@ -530,6 +530,26 @@ body.carrito-abierto {
 
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
+
+}
+
+/* Estado del flujo de compra dentro del drawer (recuperación, pago,
+   corrección, rechazo, confirmación). Ocupa la fila 2 del panel: para que
+   un texto vacío no desplace lista y pie, se colapsa por :empty en lugar
+   de [hidden] (display:none lo sacaría del flujo del grid). Reutiliza las
+   reglas de .checkout-estado (tipografía, .exito y .error). */
+#carrito-estado {
+
+    grid-area: auto;
+
+}
+
+#carrito-estado:empty {
+
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
 
 }
 
@@ -771,7 +791,7 @@ body.carrito-abierto {
 
 /* Zona hermana de .carrito-lista dentro del panel: sólo una de las dos
    está visible a la vez, así que ambas ocupan la fila 1fr del grid sin
-   cambiar grid-template-rows (3 filas: cabecera / zona / pie). */
+   cambiar grid-template-rows (4 filas: cabecera / estado / zona / pie). */
 .checkout-datos {
 
     overflow-y: auto;
@@ -989,7 +1009,8 @@ body.carrito-abierto {
 
 /* Foco visible dentro del drawer */
 .carrito-panel button:focus-visible,
-.carrito-panel input:focus-visible {
+.carrito-panel input:focus-visible,
+#carrito-estado:focus-visible {
 
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
@@ -1036,200 +1057,3 @@ body.carrito-abierto {
     }
 
 }
-
-/* ==========================
-   CONTINUACIÓN DE COMPRA
-   (tienda.html?token=)
-   ========================== */
-
-/* Zona hermana del catálogo: qué se va a pagar y con qué resultado. */
-.compra {
-
-    width: 100%;
-    max-width: 700px;
-
-    margin: 0 auto;
-
-    display: grid;
-    gap: 1rem;
-
-    background: var(--card);
-    color: var(--text-on-card);
-
-    padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: var(--shadow);
-
-    text-align: left;
-
-}
-
-.compra[hidden] {
-
-    display: none;
-
-}
-
-.compra h2 {
-
-    margin: 0;
-    padding: 0;
-
-    text-align: left;
-    font-size: 1.3rem;
-
-}
-
-.compra-intro {
-
-    margin: 0;
-
-    font-size: .95rem;
-
-    color: var(--text-secondary);
-
-}
-
-/* Estado (carga, error o resultado del pago) */
-.compra-estado {
-
-    margin: 0;
-
-    padding: .85rem 1rem;
-
-    border: 1px solid var(--border);
-    border-radius: 10px;
-
-    background: var(--bg-dark);
-    color: var(--text);
-
-    font-size: .95rem;
-    line-height: 1.45;
-
-}
-
-.compra-estado[hidden] {
-
-    display: none;
-
-}
-
-.compra-estado.exito {
-
-    background: rgba(216, 131, 15, .15);
-    border-color: var(--accent);
-
-}
-
-.compra-estado.error {
-
-    background: rgba(220, 53, 69, .15);
-    border-color: #dc3545;
-    color: #ffb3bb;
-
-}
-
-/* Resumen: tabla de items + total + pagar */
-.compra-resumen {
-
-    display: grid;
-    gap: 1rem;
-
-}
-
-.compra-resumen[hidden] {
-
-    display: none;
-
-}
-
-.compra-tabla {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    font-size: .95rem;
-
-}
-
-.compra-tabla th,
-.compra-tabla td {
-
-    padding: .6rem .4rem;
-
-    border-bottom: 1px solid var(--border);
-
-    text-align: left;
-    overflow-wrap: anywhere;
-
-}
-
-.compra-tabla th:nth-child(2),
-.compra-tabla td:nth-child(2) {
-
-    text-align: center;
-    white-space: nowrap;
-
-}
-
-.compra-tabla th:last-child,
-.compra-tabla td:last-child {
-
-    text-align: right;
-    white-space: nowrap;
-
-}
-
-.compra-tabla thead th {
-
-    font-size: .85rem;
-    text-transform: uppercase;
-    letter-spacing: .03em;
-    opacity: .8;
-
-}
-
-.compra-total {
-
-    margin: 0;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
-
-    font-size: 1.15rem;
-    font-weight: 700;
-
-}
-
-.compra-pagar {
-
-    width: 100%;
-
-}
-
-/* Acciones dinámicas (reintento del pago) */
-.compra-acciones {
-
-    display: grid;
-    gap: .75rem;
-
-}
-
-.compra-acciones:empty {
-
-    display: none;
-
-}
-
-/* Foco visible dentro de la zona de compra */
-.compra-estado:focus-visible,
-.compra button:focus-visible {
-
-    outline: 3px solid var(--focus-ring);
-    outline-offset: 2px;
-
-}
-
