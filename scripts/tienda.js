@@ -31,9 +31,12 @@ import {
     agregarProducto,
     aplicarCorreccion,
     aumentarCantidad,
+    definirCompromisoDelPedido,
     disminuirCantidad,
     eliminarProducto,
+    limpiarCompromisoDelPedido,
     obtenerCarrito,
+    obtenerDisponibilidadBase,
     obtenerDisponibilidadMostrada,
     obtenerTotales,
     obtenerTotalUnidades,
@@ -202,7 +205,7 @@ function actualizarBadgeCarrito() {
 // /////////////////////////////////////////////////////////////////////////////
 
 // Tras cada intento se vuelve a renderizar la tarjeta:
-// la disponibilidad mostrada (API - cantidad en carrito) y el
+// la disponibilidad mostrada (base - cantidad en carrito) y el
 // estado del botón se recalculan desde sessionStorage.
 
 function refrescarCatalogo(indiceFoco = null) {
@@ -222,6 +225,15 @@ function refrescarCatalogo(indiceFoco = null) {
 }
 
 function manejarAgregar(producto, indice) {
+
+    // Primer producto de una compra NUEVA: el carrito estaba vacío y
+    // no hay Pedido recuperado en curso, así que cualquier mensaje
+    // anterior (p. ej. la confirmación de la compra ya pagada) no
+    // pertenece a esta compra y se retira. En un flujo activo el
+    // mensaje se conserva.
+    const esPrimeroDeCompraNueva =
+        obtenerTotalUnidades() === 0 &&
+        !modoPostVerificacionActivo();
 
     const resultado = agregarProducto(producto);
 
@@ -252,6 +264,14 @@ function manejarAgregar(producto, indice) {
         }
 
         return;
+
+    }
+
+    // El producto entró al carrito: si abría una compra nueva, el
+    // resultado de la compra anterior ya no corresponde a la vista.
+    if (esPrimeroDeCompraNueva) {
+
+        mostrarEstadoCarrito("");
 
     }
 
@@ -867,7 +887,7 @@ function construirItemsPedido() {
 // Después sólo se refresca la presentación con la infraestructura
 // existente: badge, lista/totales del drawer y catálogo (GET
 // /api/productos + sincronizarConCatalogo), que es lo que sostiene la
-// disponibilidad mostrada = disponibilidad_API - cantidad_en_carrito.
+// disponibilidad mostrada = disponibilidad_base - cantidad_en_carrito.
 
 async function aplicarCarritoCorregido(corregido) {
 
@@ -1182,12 +1202,15 @@ function manejarClicContinuar() {
 }
 
 // Sale del modo post-verificación (Pedido pagado, recuperación fallida
-// o error terminal): el drawer vuelve a ser el de siempre.
+// o error terminal): el drawer vuelve a ser el de siempre y la base de
+// disponibilidad vuelve a ser la de la API (sin compromiso activo).
 function salirDelModoVerificacion() {
 
     tokenVerificacion = null;
 
     pedidoContinuar = null;
+
+    limpiarCompromisoDelPedido();
 
     actualizarCtaDelDrawer();
 
@@ -1336,6 +1359,12 @@ async function iniciarContinuacionDeCompra() {
         items: snapshot
 
     };
+
+    // El Pedido recuperado es comprometedor: su disponibilidad ya
+    // viene descontada en la API. El compromiso se registra ANTES de
+    // cargar el catálogo para que la sincronización guarde la base
+    // efectiva y la presentación no descuente esas unidades dos veces.
+    definirCompromisoDelPedido(snapshot);
 
     // El catálogo completa nombre, precio y disponibilidad de la
     // representación recién sembrada y actualiza el badge.
@@ -1571,6 +1600,10 @@ async function procesarPago() {
 
             };
 
+            // El nuevo Pedido (B) reemplaza al anterior: el compromiso
+            // de stock pasa a ser el de sus propios items.
+            definirCompromisoDelPedido(items);
+
         }
 
         respuesta = await iniciarPago(
@@ -1637,13 +1670,15 @@ async function manejarRespuestaPago(respuesta) {
 
             renderCarrito();
 
+            // Se retira el modo post-verificación (y su compromiso de
+            // stock): no queda disponible otro [Pagar] sobre este
+            // Pedido ya pagado. Va ANTES de refrescar el catálogo para
+            // que la disponibilidad vuelva a salir cruda de la API.
+            salirDelModoVerificacion();
+
             // La disponibilidad mostrada depende del carrito: al
             // vaciarse hay que refrescarla contra la API.
             await cargarCatalogo();
-
-            // Se retira el modo post-verificación: no queda disponible
-            // otro [Pagar] sobre este Pedido ya pagado.
-            salirDelModoVerificacion();
 
             mostrarEstadoCarrito(
                 textoCompraAprobada(datos),
@@ -1656,10 +1691,14 @@ async function manejarRespuestaPago(respuesta) {
         }
 
         // Pago registrado pero stock no afectado: no es una compra
-        // normalmente confirmada y el carrito se conserva.
+        // normalmente confirmada y el carrito se conserva. El Pedido
+        // NO es comprometedor (el stock no se descontó): la base de
+        // presentación vuelve a ser la de la API.
         if (
             pedido.estado === "PAGADO_STOCK_NO_AFECTADO"
         ) {
+
+            limpiarCompromisoDelPedido();
 
             mostrarEstadoCarrito(
                 "El pago fue registrado, pero la compra " +
@@ -1965,9 +2004,13 @@ function ocultarEstado() {
 
 // Lo que se muestra es lo que al usuario le falta agregar a SU carrito:
 //
-// disponibilidad_mostrada = disponibilidad_API - cantidad_en_carrito
+// disponibilidad_mostrada = disponibilidad_base - cantidad_en_carrito
 //
-// Ejemplo: API = 10, carrito = 3 => "Disponibilidad: 7".
+// disponibilidad_base = disponibilidad_API + las unidades del Pedido
+// recuperado (modo post-verificación): esas unidades la API ya las
+// descontó. Con compromiso vacío la base es igual a la API.
+//
+// Ejemplo pre-Pedido: API = 10, carrito = 3 => "Disponibilidad: 7".
 //
 // Es solo presentación: no se toca la disponibilidad base del ítem,
 // ni la de la API, ni el stock. El valor se recalcula en cada render
@@ -1976,7 +2019,7 @@ function ocultarEstado() {
 
 function obtenerEstadoProducto(producto) {
 
-    const base = Number(producto.disponibilidad);
+    const base = obtenerDisponibilidadBase(producto);
 
     const sinStock = !(base > 0);
 

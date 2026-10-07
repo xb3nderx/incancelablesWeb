@@ -10,7 +10,10 @@
 // - agregar unidades desde el catálogo (1 por clic);
 // - límite de unidades según la disponibilidad informativa;
 // - total de unidades y total monetario;
-// - disponibilidad mostrada = disponibilidad_API - cantidad en carrito;
+// - disponibilidad mostrada = disponibilidad_base - cantidad en carrito;
+//   (pre-Pedido, base = disponibilidad_API; con el Pedido recuperado
+//   activo la base agrega las unidades de ese Pedido, que la API ya
+//   descontó — ver el bloque COMPROMISO DEL PEDIDO RECUPERADO);
 // - editar cantidades (+ / -) y eliminar ítems desde el drawer;
 // - sincronización de nombre, precio y disponibilidad contra la API.
 //
@@ -142,14 +145,109 @@ export function obtenerTotales() {
 }
 
 // /////////////////////////////////////////////////////////////////////////////
+// COMPROMISO DEL PEDIDO RECUPERADO (MODO POST-VERIFICACIÓN)
+// /////////////////////////////////////////////////////////////////////////////
+
+// Mapa producto_id -> unidades comprometidas por EL MISMO Pedido que el
+// carrito acaba de recuperar (continuación con ?token=).
+//
+// Ese Pedido es comprometedor (PEND_VERIF / PEND_PAGO /
+// PROCESANDO_PAGO), así que su disponibilidad YA está descontada en
+// GET /api/productos. Restarla además en la presentación la descuenta
+// dos veces (bug de doble descuento post-verificación).
+//
+// Mientras el modo está activo:
+//
+//   disponibilidad_base = disponibilidad_API + compromiso_del_Pedido
+//
+// Con compromiso vacío la base es exactamente la disponibilidad de la
+// API: el cálculo pre-Pedido no cambia.
+//
+// El máximo alcanzable (API + compromiso) coincide con lo que valida
+// el backend en el reemplazo A->B: validarCarrito($recibidos,
+// $pedidoId) excluye al Pedido reemplazado, que ya no compromete.
+
+let compromisoDelPedido = new Map();
+
+// Define o REEMPLAZA el compromiso activo (snapshot del Pedido).
+// Array no válido => compromiso vacío.
+
+export function definirCompromisoDelPedido(items) {
+
+    compromisoDelPedido = new Map();
+
+    if (!Array.isArray(items)) return;
+
+    items.forEach(item => {
+
+        const id = obtenerIdProducto(item);
+
+        if (id === null) return;
+
+        const cantidad = aNumero(item?.cantidad, 0);
+
+        if (cantidad <= 0) return;
+
+        const clave = claveId(id);
+
+        compromisoDelPedido.set(
+            clave,
+            (compromisoDelPedido.get(clave) ?? 0) + cantidad
+        );
+
+    });
+
+}
+
+// El modo post-verificación terminó: la base vuelve a ser la API.
+
+export function limpiarCompromisoDelPedido() {
+
+    compromisoDelPedido = new Map();
+
+}
+
+function cantidadComprometida(productoId) {
+
+    if (
+        productoId === null ||
+        productoId === undefined ||
+        productoId === ""
+    ) return 0;
+
+    return aNumero(
+        compromisoDelPedido.get(claveId(productoId)),
+        0
+    );
+
+}
+
+// Base efectiva de presentación (sólo lectura).
+//
+// respaldo: valor a usar cuando la API no trae disponibilidad; NO se
+// le suma el compromiso (ese valor ya podría incluirlo).
+
+export function obtenerDisponibilidadBase(producto, respaldo = 0) {
+
+    const cruda = aNumero(producto?.disponibilidad, NaN);
+
+    const base = Number.isNaN(cruda)
+        ? aNumero(respaldo, 0)
+        : cruda;
+
+    return base + cantidadComprometida(obtenerIdProducto(producto));
+
+}
+
+// /////////////////////////////////////////////////////////////////////////////
 // DISPONIBILIDAD MOSTRADA (SOLO PRESENTACIÓN)
 // /////////////////////////////////////////////////////////////////////////////
 
 // Unidades que todavía puede agregar el usuario a SU carrito:
 //
-// disponibilidad_mostrada = disponibilidad_API - cantidad_en_carrito
+// disponibilidad_mostrada = disponibilidad_base - cantidad_en_carrito
 //
-// Ejemplo: API = 10, carrito = 3 => se muestran 7.
+// Ejemplo pre-Pedido: API = 10, carrito = 3 => se muestran 7.
 //
 // No modifica la disponibilidad base del ítem ni la de la API:
 // es un cálculo de lectura sobre sessionStorage, por lo que
@@ -176,7 +274,7 @@ export function obtenerCantidadDeProducto(productoId) {
 
 export function obtenerDisponibilidadMostrada(producto) {
 
-    const base = aNumero(producto?.disponibilidad, 0);
+    const base = obtenerDisponibilidadBase(producto);
 
     const enCarrito = obtenerCantidadDeProducto(
         obtenerIdProducto(producto)
@@ -208,7 +306,7 @@ export function agregarProducto(producto) {
     }
 
     const disponibilidad =
-        aNumero(producto.disponibilidad, 0);
+        obtenerDisponibilidadBase(producto);
 
     if (disponibilidad <= 0) {
 
@@ -450,8 +548,11 @@ export function sincronizarConCatalogo(productos) {
             item.precio_unitario
         );
 
-        const disponibilidad = aNumero(
-            producto.disponibilidad,
+        // Base efectiva: API + compromiso del Pedido recuperado.
+        // Sin dato de API se conserva la base ya conocida del ítem
+        // (nunca se le vuelve a sumar el compromiso).
+        const disponibilidad = obtenerDisponibilidadBase(
+            producto,
             item.disponibilidad
         );
 
