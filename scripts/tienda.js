@@ -31,7 +31,8 @@ import {
     obtenerDisponibilidadMostrada,
     obtenerTotales,
     obtenerTotalUnidades,
-    sincronizarConCatalogo
+    sincronizarConCatalogo,
+    vaciarCarrito
 } from "./carrito.js";
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -98,6 +99,28 @@ const checkoutEnviar =
 
 const checkoutEstado =
     document.querySelector("#checkout-estado");
+
+// Zona de continuación de compra (tienda.html?token=... · Bloque 5)
+const compraSeccion =
+    document.querySelector("#compra");
+
+const compraEstado =
+    document.querySelector("#compra-estado");
+
+const compraResumen =
+    document.querySelector("#compra-resumen");
+
+const compraItems =
+    document.querySelector("#compra-items");
+
+const compraTotal =
+    document.querySelector("#compra-total");
+
+const compraPagar =
+    document.querySelector("#compra-pagar");
+
+const compraAcciones =
+    document.querySelector("#compra-acciones");
 
 // Catálogo cargado en memoria (para resolver el clic por índice)
 let catalogoActual = [];
@@ -873,6 +896,10 @@ async function aplicarCarritoCorregido(corregido) {
 
     }
 
+    // Lo usa también la corrección del pago (Bloque 5): devuelve
+    // { ok, items } para que el llamador sepa si pudo aplicarla.
+    return aplicacion;
+
 }
 
 async function manejarEnvioPedido(evento) {
@@ -994,6 +1021,648 @@ async function manejarEnvioPedido(evento) {
     );
 
     checkoutEstado?.focus();
+
+}
+
+// ---------------------------------------------------------------------------
+// CONTINUACIÓN DE COMPRA (tienda.html?token=... · Bloque 5)
+// ---------------------------------------------------------------------------
+//
+// Después de que resultado.html verifica el email, la compra continúa
+// ACÁ con la fuente de verdad del backend:
+//
+//   POST /email-verificaciones/pedidos  ->  Pedido PEND_PAGO + items[]
+//
+// - El resumen y el request de pago se arman con esos items[]: el carrito
+//   de sessionStorage NO se lee para continuar esta compra (sólo se vacía,
+//   como hasta ahora, cuando el Pedido queda PAGADO).
+// - Nombre del producto y disponibilidad salen del catálogo existente;
+//   cantidad, precio unitario, subtotal y total salen del Pedido.
+// - La orquestación del pago es la del Bloque 5 (iniciarPago(),
+//   APROBADO, RECHAZADO, reintentos, CORRECCION, PAGADO_STOCK_NO_AFECTADO
+//   y errores), movida desde resultado.js a esta página.
+
+// Token de verificación: vive sólo en memoria, nunca en storage.
+let tokenVerificacion = null;
+
+// Pedido que se está continuando: { id, estado, items[] }.
+// Única fuente de items para pagar.
+let pedidoContinuar = null;
+
+// Evita doble envío mientras iniciarPago() está en curso.
+let pagoEnCurso = false;
+
+// El simulador MVP sólo admite APROBADO y RECHAZADO.
+const SIMULACION_PAGO = "APROBADO";
+
+// Errores del endpoint de pedidos => mensaje para el usuario.
+// El código crudo del backend nunca se muestra.
+const MENSAJES_DE_VERIFICACION = {
+
+    token_invalido: "El enlace utilizado no es válido o ya fue utilizado.",
+
+    token_expirado: "El enlace de confirmación ha expirado.",
+
+    verificacion_pendiente:
+        "Tu email todavía no está verificado: revisá tu correo para continuar."
+
+};
+
+// Errores del endpoint de pago => mensaje para el usuario.
+const ESTADOS_DE_ERROR_DE_PAGO = {
+
+    pedido_vencido:
+        "Este pedido ya no está disponible para pagar porque venció.",
+
+    maximo_intentos_alcanzado:
+        "Se alcanzó el máximo de intentos de pago de este pedido.",
+
+    pago_ya_aprobado:
+        "El pago de este pedido ya fue aprobado anteriormente.",
+
+    pedido_inexistente: "Este pedido no está disponible para pagar.",
+
+    pedido_no_activo: "Este pedido no está disponible para pagar.",
+
+    pedido_no_pendiente_de_pago: "Este pedido no está disponible para pagar."
+
+};
+
+const MENSAJE_DE_PAGO_FALLIDO =
+    "Ocurrió un error al procesar tu pago. Intentá nuevamente.";
+
+const MENSAJE_DE_COMPRA_FALLIDA =
+    "No pudimos recuperar tu compra. Intentá nuevamente.";
+
+// ---------------------------------------------------------------------------
+// PRESENTACIÓN DE LA SECCIÓN DE COMPRA
+// ---------------------------------------------------------------------------
+
+function leerTokenDeUrl() {
+
+    const parametros =
+        new URLSearchParams(window.location.search);
+
+    const token =
+        parametros.get("token");
+
+    return (
+        typeof token === "string" &&
+        token !== ""
+    )
+        ? token
+        : null;
+
+}
+
+// Escribe el estado, decide si el resumen queda a la vista y limpia las
+// acciones dinámicas (los botones de reintento se agregan después).
+function mostrarEstadoCompra(texto, tipo = "", opciones = {}) {
+
+    if (compraEstado) {
+
+        compraEstado.className =
+            `compra-estado ${tipo}`.trim();
+
+        // Se muestra primero y se escribe después: así aria-live anuncia.
+        compraEstado.hidden = texto === "";
+
+        compraEstado.textContent = texto;
+
+    }
+
+    if (compraResumen) {
+
+        compraResumen.hidden = opciones.resumen !== true;
+
+    }
+
+    if (compraAcciones) compraAcciones.innerHTML = "";
+
+    if (opciones.enfocar) compraEstado?.focus();
+
+}
+
+function agregarAccionCompra(texto, id, alPulsar) {
+
+    if (!compraAcciones) return null;
+
+    const boton = document.createElement("button");
+
+    boton.type = "button";
+
+    boton.textContent = texto;
+
+    boton.id = id;
+
+    boton.className = "btn";
+
+    boton.addEventListener("click", alPulsar);
+
+    compraAcciones.appendChild(boton);
+
+    return boton;
+
+}
+
+// Resumen de lo que se va a pagar: producto, cantidad, precio unitario,
+// subtotal por producto y total. Todo desde pedidoContinuar.items.
+function pintarResumenCompra() {
+
+    if (!compraItems || !compraTotal) return;
+
+    const items =
+        Array.isArray(pedidoContinuar?.items)
+            ? pedidoContinuar.items
+            : [];
+
+    compraItems.innerHTML = items
+
+        .map(item => {
+
+            const cantidad = aNumero(item.cantidad);
+
+            const unitario = aNumero(item.precio_unitario);
+
+            const subtotal = cantidad * unitario;
+
+            return `
+
+                <tr>
+
+                    <td class="compra-item-nombre">
+                        ${identificacionDeProducto(item.producto_id)}
+                    </td>
+
+                    <td class="compra-item-cantidad">
+                        ${cantidad}
+                    </td>
+
+                    <td class="compra-item-precio">
+                        ${formatoPrecio.format(unitario)}
+                    </td>
+
+                    <td class="compra-item-subtotal">
+                        ${formatoPrecio.format(subtotal)}
+                    </td>
+
+                </tr>
+
+            `;
+
+        })
+        .join("");
+
+    const total = items.reduce(
+        (acumulado, item) =>
+            acumulado +
+            aNumero(item.cantidad) * aNumero(item.precio_unitario),
+        0
+    );
+
+    compraTotal.textContent =
+        formatoPrecio.format(total);
+
+}
+
+function mensajeDeErrorDeVerificacion(respuesta) {
+
+    const mensaje =
+        MENSAJES_DE_VERIFICACION[respuesta?.codigo];
+
+    if (mensaje) return mensaje;
+
+    // Código nuevo o fuera de contrato: tampoco se expone.
+    return respuesta?.data === null
+        ? (respuesta?.message || MENSAJE_DE_COMPRA_FALLIDA)
+        : MENSAJE_DE_COMPRA_FALLIDA;
+
+}
+
+function mensajeDePagoFallido(respuesta) {
+
+    const mensaje =
+        ESTADOS_DE_ERROR_DE_PAGO[respuesta?.codigo];
+
+    if (mensaje) return mensaje;
+
+    // Fallo de transporte (timeout, sin conexión, configuración):
+    // ese message ya está pensado para el usuario.
+    return respuesta?.data === null
+        ? (respuesta?.message || MENSAJE_DE_PAGO_FALLIDO)
+        : MENSAJE_DE_PAGO_FALLIDO;
+
+}
+
+// ---------------------------------------------------------------------------
+// RECUPERACIÓN DEL PEDIDO VERIFICADO
+// ---------------------------------------------------------------------------
+
+async function iniciarContinuacionDeCompra() {
+
+    if (!tokenVerificacion) return;
+
+    if (compraSeccion) compraSeccion.hidden = false;
+
+    mostrarEstadoCompra(
+        "Estamos recuperando tu compra...",
+        ""
+    );
+
+    const respuesta =
+        await obtenerPedidosVerificados(tokenVerificacion);
+
+    if (!respuesta?.ok) {
+
+        mostrarEstadoCompra(
+            mensajeDeErrorDeVerificacion(respuesta),
+            "error",
+            { enfocar: true }
+        );
+
+        return;
+
+    }
+
+    const pedidos =
+        Array.isArray(respuesta.data?.pedidos)
+            ? respuesta.data.pedidos
+            : [];
+
+    const pedido =
+        pedidos.find(
+            pedido =>
+                pedido &&
+                pedido.estado === "PEND_PAGO"
+        ) ?? null;
+
+    const items =
+        Array.isArray(pedido?.items) ? pedido.items : [];
+
+    if (!pedido || items.length === 0) {
+
+        mostrarEstadoCompra(
+            "No hay compras pendientes de pago.",
+            "",
+            { enfocar: true }
+        );
+
+        return;
+
+    }
+
+    // Los items del Pedido pasan a ser la fuente de verdad:
+    // se normalizan una única vez y no se toca el carrito.
+    pedidoContinuar = {
+
+        id: pedido.id ?? null,
+
+        estado: pedido.estado ?? null,
+
+        items: items.map(item => ({
+
+            producto_id: item.producto_id,
+
+            cantidad: aNumero(item.cantidad),
+
+            precio_unitario: aNumero(item.precio_unitario)
+
+        }))
+
+    };
+
+    pintarResumenCompra();
+
+    mostrarEstadoCompra("", "", { resumen: true });
+
+}
+
+// ---------------------------------------------------------------------------
+// PAGO — MISMA ORQUESTACIÓN QUE EL BLOQUE 5
+// ---------------------------------------------------------------------------
+
+/**
+ * Texto final de una compra aprobada: incluye importe
+ * y referencia del pago cuando el backend los envía.
+ *
+ * @param {object} datos
+ * @returns {string}
+ */
+function textoCompraAprobada(datos) {
+
+    const partes = [
+        "Tu compra fue confirmada correctamente."
+    ];
+
+    const importe =
+        Number(datos?.pago?.importe);
+
+    if (
+        Number.isFinite(importe) &&
+        importe > 0
+    ) {
+
+        partes.push(
+            `Importe: ${formatoPrecio.format(importe)}.`
+        );
+
+    }
+
+    const referencia =
+        datos?.validacion?.referencia_proveedor;
+
+    if (
+        typeof referencia === "string" &&
+        referencia !== ""
+    ) {
+
+        partes.push(
+            `Referencia: ${referencia}.`
+        );
+
+    }
+
+    return partes.join(" ");
+
+}
+
+async function procesarPago() {
+
+    if (pagoEnCurso || !pedidoContinuar) return;
+
+    const items = pedidoContinuar.items;
+
+    // Sin items no hay request posible (p. ej. una corrección que
+    // dejó el Pedido sin productos).
+    if (!items || items.length === 0) {
+
+        mostrarEstadoCompra(
+            "No hay productos en tu pedido para pagar. " +
+            "Volvé a la tienda para agregar antes de pagar.",
+            "error",
+            { resumen: false, enfocar: true }
+        );
+
+        return;
+    }
+
+    pagoEnCurso = true;
+
+    mostrarEstadoCompra(
+        "Estamos procesando tu pago. No cierres esta ventana.",
+        "",
+        { resumen: false }
+    );
+
+    const respuesta =
+        await iniciarPago(
+            pedidoContinuar.id,
+            items,
+            SIMULACION_PAGO
+        );
+
+    pagoEnCurso = false;
+
+    await manejarRespuestaPago(respuesta);
+
+}
+
+// Traduce la respuesta real del backend a un estado de la página.
+// Único punto que decide si la compra está confirmada.
+async function manejarRespuestaPago(respuesta) {
+
+    // --------------------------------
+    // ERRORES REALES / FALLOS DE RED
+    // --------------------------------
+
+    if (!respuesta?.ok) {
+
+        mostrarEstadoCompra(
+            mensajeDePagoFallido(respuesta),
+            "error",
+            { resumen: true, enfocar: true }
+        );
+
+        return;
+
+    }
+
+    const datos = respuesta.data;
+
+    const pedido = datos.pedido ?? {};
+
+    // --------------------------------
+    // APROBADO
+    // --------------------------------
+
+    if (datos.resultado === "aprobado") {
+
+        // Único caso de compra confirmada: vacía el carrito.
+        if (pedido.estado === "PAGADO") {
+
+            vaciarCarrito();
+
+            actualizarBadgeCarrito();
+
+            renderCarrito();
+
+            // La disponibilidad mostrada depende del carrito: al
+            // vaciarse hay que refrescarla contra la API.
+            await cargarCatalogo();
+
+            mostrarEstadoCompra(
+                textoCompraAprobada(datos),
+                "exito",
+                { resumen: false, enfocar: true }
+            );
+
+            return;
+
+        }
+
+        // Pago registrado pero stock no afectado: no es una compra
+        // normalmente confirmada y el carrito se conserva.
+        if (
+            pedido.estado === "PAGADO_STOCK_NO_AFECTADO"
+        ) {
+
+            mostrarEstadoCompra(
+                "El pago fue registrado, pero la compra " +
+                "requiere revisión.",
+                "",
+                { resumen: false, enfocar: true }
+            );
+
+            return;
+
+        }
+
+        mostrarEstadoCompra(
+            MENSAJE_DE_PAGO_FALLIDO,
+            "error",
+            { resumen: true, enfocar: true }
+        );
+
+        return;
+
+    }
+
+    // --------------------------------
+    // RECHAZADO
+    // --------------------------------
+
+    if (datos.resultado === "rechazado") {
+
+        mostrarRechazado(datos);
+
+        return;
+
+    }
+
+    // --------------------------------
+    // CORRECCIÓN: el pago NO se realizó
+    // --------------------------------
+
+    if (datos.resultado === "correccion") {
+
+        await mostrarCorreccionDePago(datos);
+
+        return;
+
+    }
+
+    mostrarEstadoCompra(
+        MENSAJE_DE_PAGO_FALLIDO,
+        "error",
+        { resumen: true, enfocar: true }
+    );
+
+}
+
+// Pago rechazado. Ofrece reintento sólo si el Pedido sigue en
+// PEND_PAGO y quedan intentos.
+function mostrarRechazado(datos) {
+
+    const pedido = datos.pedido ?? {};
+
+    const intentos = datos.intentos;
+
+    const maximo = datos.maximo_intentos;
+
+    const intentosAgotados =
+        typeof intentos === "number" &&
+        typeof maximo === "number" &&
+        intentos >= maximo;
+
+    const reintentoDisponible =
+        pedido.estado === "PEND_PAGO" &&
+        !intentosAgotados;
+
+    let detalle =
+        "Tu pago fue rechazado.";
+
+    if (
+        typeof intentos === "number" &&
+        typeof maximo === "number"
+    ) {
+
+        detalle +=
+            ` Intento ${intentos} de ${maximo}.`;
+
+    }
+
+    if (reintentoDisponible) {
+
+        detalle +=
+            " Podés volver a intentarlo.";
+
+    }
+
+    mostrarEstadoCompra(
+        detalle,
+        "error",
+        { resumen: true, enfocar: true }
+    );
+
+    if (reintentoDisponible) {
+
+        agregarAccionCompra(
+            "Reintentar pago",
+            "btnReintentarPago",
+            procesarPago
+        );
+
+    }
+
+}
+
+// El backend pidió corregir antes de pagar. La corrección se aplica
+// al carrito de la tienda con la infraestructura existente y sus
+// items pasan a ser los del Pedido para el reintento.
+async function mostrarCorreccionDePago(datos) {
+
+    const aplicacion =
+        await aplicarCarritoCorregido(datos.carrito_corregido);
+
+    // Payload fuera de contrato: no se aplicó nada y un reintento
+    // devolvería la misma corrección.
+    if (!aplicacion?.ok) {
+
+        mostrarEstadoCompra(
+            MENSAJE_DE_PAGO_FALLIDO,
+            "error",
+            { resumen: true, enfocar: true }
+        );
+
+        return;
+
+    }
+
+    pedidoContinuar.items = (aplicacion.items ?? [])
+
+        .map(item => ({
+
+            producto_id: item.producto_id,
+
+            cantidad: aNumero(item.cantidad),
+
+            precio_unitario: aNumero(item.precio_unitario)
+
+        }));
+
+    pintarResumenCompra();
+
+    mostrarEstadoCompra(
+        "El pago no se realizó: hubo cambios en tu carrito. " +
+        "Volvé a intentarlo con los productos actualizados.",
+        "",
+        { resumen: true, enfocar: true }
+    );
+
+    agregarAccionCompra(
+        "Reintentar pago",
+        "btnReintentarPago",
+        procesarPago
+    );
+
+}
+
+// ---------------------------------------------------------------------------
+// ARRANQUE DEL MODO CONTINUACIÓN (sólo con ?token= en la URL)
+// ---------------------------------------------------------------------------
+
+function initContinuacionDeCompra() {
+
+    tokenVerificacion = leerTokenDeUrl();
+
+    // Sin token la tienda funciona como siempre.
+    if (!tokenVerificacion) return;
+
+    if (compraSeccion) compraSeccion.hidden = false;
+
+    compraPagar?.addEventListener("click", procesarPago);
+
+    iniciarContinuacionDeCompra();
 
 }
 
@@ -1290,6 +1959,10 @@ async function cargarCatalogo() {
 
     actualizarBadgeCarrito();
 
+    // Los nombres del resumen de compra se resuelven con el catálogo
+    // recién cargado (importa si el Pedido llegó antes o después).
+    if (pedidoContinuar) pintarResumenCompra();
+
 }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -1370,3 +2043,7 @@ function initCarrito() {
 initCarrito();
 
 cargarCatalogo();
+
+// Modo continuación (sólo si la URL trae ?token=): recupera el Pedido
+// y habilita [Pagar].
+initContinuacionDeCompra();

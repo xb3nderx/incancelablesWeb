@@ -15,8 +15,10 @@
 // - sincronización de nombre, precio y disponibilidad contra la API.
 //
 // Fuera de alcance:
-// llamadas al backend. El carrito sólo aporta al checkout/pago el
-// snapshot de items y el vaciado cuando el Pedido queda PAGADO.
+// llamadas al backend. El carrito sólo aporta al checkout el snapshot
+// de items con que se CREA el Pedido y el vaciado cuando ese Pedido
+// queda PAGADO. Una vez creado el Pedido la compra continúa con los
+// items[] del backend: este storage no se vuelve a leer para pagar.
 // /////////////////////////////////////////////////////////////////////////////
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -559,34 +561,17 @@ export function aplicarCorreccion(corregido) {
 }
 
 // /////////////////////////////////////////////////////////////////////////////
-// PAGO (BLOQUE 5) — SNAPSHOT DE ITEMS Y VACIADO
+// VACIADO (BLOQUE 5)
 // /////////////////////////////////////////////////////////////////////////////
-
-// Snapshot del carrito sólo con los campos que espera el backend
-// (POST /api/pedidos y POST /api/pedidos/{id}/pago):
-// { producto_id, cantidad, precio_unitario }.
-//
-// Es la única fuente de items para pagar: no se guarda una segunda
-// copia del carrito.
-
-export function obtenerItemsParaPago() {
-
-    return obtenerCarrito().map(item => ({
-
-        producto_id: item.producto_id,
-
-        cantidad: item.cantidad,
-
-        precio_unitario: item.precio_unitario
-
-    }));
-
-}
 
 // Vaciado único del carrito. Se ejecuta cuando el pago queda
 // aprobado y el Pedido pasa a PAGADO: cualquier otro resultado
 // del pago (rechazado, corrección, revisión, error de red)
 // conserva el carrito intacto.
+//
+// El carrito NO es la fuente de items para pagar: una vez creado el
+// Pedido, los items[] que viajan a POST /api/pedidos/{id}/pago salen
+// del Pedido del backend (ver tienda.js).
 
 export function vaciarCarrito() {
 

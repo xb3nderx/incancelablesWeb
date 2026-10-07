@@ -534,7 +534,7 @@ Cubre el **inicio** del checkout: formulario guest, integración con `POST /api/
 ### Pendiente de la etapa
 
 - [x] **Bloque 4 — Verificación de email frontend** (implementado en `636ff06`)
-- [x] **Bloque 5 — Pago frontend** (implementado, ver sección propia)
+- [x] **Bloque 5 — Pago frontend** (implementado; la compra continúa y se paga en `tienda.html`, ver sección propia)
 - [ ] Finalización/confirmación del flujo de compra
 
 ## Bloque 4 — Verificación de email frontend
@@ -558,40 +558,46 @@ Continuación directa del flujo iniciado en el Bloque 3: el Pedido queda en `PEN
 
 ## Bloque 5 — Pago frontend
 
-**Estado: IMPLEMENTADO (trabajo sin commitear en `dev`)**
+**Estado: IMPLEMENTADO (trabajo sin commitear en `dev`); la compra continúa y se paga en `tienda.html`**
 
-Cierre del flujo de compra iniciado en el Bloque 3: desde la verificación del email hasta el resultado del pago, reutilizando la infraestructura existente (`scripts/api/tiendaClient.js`, `scripts/carrito.js`) y la página `pages/resultado.html`.
+Cierre del flujo de compra iniciado en el Bloque 3. La verificación del email se informa en `pages/resultado.html` y la compra **continúa en `pages/tienda.html?token=...`**, donde el Pedido se recupera desde el backend y se paga con sus propios `items[]`.
 
 Sin cambios en el backend ni en `scripts/api/apiConfig.js`. No se despliega a PROD.
 
+### Flujo
+
+`resultado.html` (verificación) → enlace **Continuar compra** → `tienda.html?token=TOKEN` → `POST /api/email-verificaciones/pedidos` → resumen de compra → **Pagar** → `POST /api/pedidos/{id}/pago`
+
 ### Alcance implementado
 
+- [x] `obtenerPedidosVerificados(token)` en `tiendaClient.js`: `POST /api/email-verificaciones/pedidos` con `{token}` (endpoint de sólo lectura), envelope `{ok, message, data, codigo}`; `token_invalido`, `token_expirado` y `verificacion_pendiente` quedan identificados en `codigo` y sin token no se arma la ruta.
 - [x] `iniciarPago(pedidoId, items, simulacion)` en `tiendaClient.js`: `POST /api/pedidos/{id}/pago` con `{accion: "iniciar_pago", proveedor_id: "DUMMY", items, simulacion}`, timeout con `AbortSignal.timeout` y envelope `{ok, message, data, codigo}`.
-- [x] `resultado.js` convertido en módulo (`type="module"`) e importa de `carrito.js` los helpers nuevos `obtenerItemsParaPago()` y `vaciarCarrito()`.
-- [x] Estado `Email verificado` + botón **Continuar al pago** cuando la verificación devuelve un Pedido en `PEND_PAGO` (se conserva `pedido.id` para el request).
-- [x] `simulacion: "APROBADO"` ⇒ `resultado: "aprobado"` ⇒ estado **Pago aprobado** con importe y referencia del proveedor.
-- [x] Compra confirmada **sólo** con `aprobado` + `pedido.estado === "PAGADO"`: es el único caso que ejecuta `vaciarCarrito()`.
-- [x] `aprobado` + `PAGADO_STOCK_NO_AFECTADO` ⇒ estado **Pago en revisión**, carrito conservado.
-- [x] `resultado: "rechazado"` ⇒ estado **Pago rechazado** con intentos (`Intento N de M`) y botón **Reintentar pago** sólo si el Pedido sigue en `PEND_PAGO` y no se agotaron los intentos.
-- [x] `resultado: "correccion"` ⇒ se aplica `aplicarCorreccion(carrito_corregido)` (reutilización del Bloque 3) y se ofrece **Reintentar pago**; nunca se informa como aprobado.
+- [x] `resultado.js` vuelve a script clásico: sólo informa la verificación y agrega el enlace **Continuar compra** a `tienda.html?token=...`. No recupera items, no ejecuta el pago y no muestra UI de pago/reintento/corrección; el token se propaga tal cual llegó en la URL y no se persiste en `localStorage`/`sessionStorage`.
+- [x] `pages/tienda.html` + `styles/tienda.css`: sección hermana `#compra` con estado anunciable (`role="status"`, `aria-live`, foco), resumen en tabla (Producto / Cantidad / Precio unitario / Subtotal), total y botón **Pagar**; oculta por defecto y visible sólo cuando la URL trae `?token=`.
+- [x] `tienda.js` recupera el Pedido con `obtenerPedidosVerificados(token)` (token sólo en memoria) y paga con `pedidoContinuar = {id, estado, items[]}`: **el carrito de `sessionStorage` no se lee para continuar la compra** (sólo se vacía, como hasta ahora, cuando el Pedido queda `PAGADO`).
+- [x] Nombres y disponibilidad del resumen salen del catálogo; cantidad, precio unitario, subtotal y total salen del Pedido.
+- [x] `simulacion: "APROBADO"` ⇒ `resultado: "aprobado"` ⇒ compra confirmada con importe y referencia del proveedor, y **único** caso que ejecuta `vaciarCarrito()`.
+- [x] `aprobado` + `PAGADO_STOCK_NO_AFECTADO` ⇒ **El pago fue registrado, pero la compra requiere revisión**, carrito conservado.
+- [x] `resultado: "rechazado"` ⇒ error con `Intento N de M` y botón **Reintentar pago** sólo si el Pedido sigue en `PEND_PAGO` y no se agotaron los intentos.
+- [x] `resultado: "correccion"` ⇒ se reutiliza `aplicarCorreccion(carrito_corregido)` (Bloque 3); los items corregidos pasan a ser los del Pedido para el reintento y el resumen se repinta; nunca se informa como aprobado.
 - [x] Errores reales del backend mapeados a estados propios: `pedido_vencido`, `maximo_intentos_alcanzado`, `pago_ya_aprobado`, `pedido_inexistente` / `pedido_no_activo` / `pedido_no_pendiente_de_pago`.
-- [x] Fallos de transporte (timeout, sin conexión, configuración ausente, cuerpo fuera de contrato) ⇒ estado **No pudimos procesar el pago** con el `message` del envelope; los códigos crudos nunca se muestran al usuario.
-- [x] Carrito vacío al pagar ⇒ **Tu carrito está vacío**, sin request al backend.
+- [x] Fallos de transporte (timeout, sin conexión, configuración ausente, cuerpo fuera de contrato) ⇒ mensaje del envelope; los códigos crudos del backend nunca se muestran al usuario.
+- [x] Sin Pedido `PEND_PAGO`, con Pedido sin items o sin `?token=` en la URL ⇒ la tienda sigue funcionando como siempre (catálogo + carrito) y no se llama al backend de pago.
 - [x] Blindaje de doble envío: `pagoEnCurso` descarta activaciones repetidas del botón.
 - [x] Fuera de alcance: `EN_PROCESO`, cancelación de Pedido y finalización/confirmación posterior al pago.
 
 ### Validación
 
-- 212/212 PASS / 0 fallos: 49 pruebas de `carrito.js`, 48 de `tiendaClient.js`, 12 de creación de Pedido (`test_checkout.js`), 30 escenarios de `resultado.js` (13 de regresión del flujo newsletter/verificación + 17 de pago) y 73 de UI de `tienda.js`.
-- `node --check` OK para `scripts/resultado.js`, `scripts/carrito.js` y `scripts/api/tiendaClient.js`.
+- 237/237 PASS / 0 fallos: 47 pruebas de `carrito.js`, 63 de `tiendaClient.js` (48 previas + 15 de `obtenerPedidosVerificados()`), 12 de creación de Pedido (`test_checkout.js`), 13 escenarios de `resultado.js` (los 17 de pago se mudaron a la tienda), 73 de UI de `tienda.js` y 29 nuevas de continuación/pago en `tiendaPago.test.mjs`.
+- `node --check` OK para `scripts/resultado.js`, `scripts/carrito.js`, `scripts/tienda.js` y `scripts/api/tiendaClient.js`.
 
 ### Archivos
 
-- Modificados: `scripts/resultado.js`, `scripts/carrito.js`, `scripts/api/tiendaClient.js`, `pages/resultado.html`
+- Modificados: `scripts/resultado.js`, `scripts/carrito.js`, `scripts/api/tiendaClient.js`, `scripts/tienda.js`, `pages/resultado.html`, `pages/tienda.html`, `styles/tienda.css`
 
 Estado:
 
-BLOQUE 5 — PAGO FRONTEND: IMPLEMENTADO
+BLOQUE 5 — PAGO FRONTEND: IMPLEMENTADO (pago desde `tienda.html`)
 
 # v1.5 — Auditoría técnica integral
 

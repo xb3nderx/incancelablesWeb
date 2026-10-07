@@ -8,8 +8,10 @@
 // desde el Bloque 3, creación del Pedido
 // (POST /pedidos). Desde el Bloque 4, validación del token
 // de verificación de email del checkout
-// (POST /email-verificaciones/validar) y, desde el Bloque 5,
-// inicio del pago del Pedido (POST /pedidos/{id}/pago).
+// (POST /email-verificaciones/validar) y recuperación de los
+// Pedidos verificados (POST /email-verificaciones/pedidos)
+// y, desde el Bloque 5, inicio del pago del Pedido
+// (POST /pedidos/{id}/pago).
 // Sin reenvío de email.
 //
 // Misma forma de respuesta que forms.js:
@@ -387,6 +389,234 @@ async function validarTokenCheckout(token) {
                 };
 
             }
+
+        }
+
+        // --------------------------------------------------
+        // Errores del backend: 400 y demás { error }
+        // --------------------------------------------------
+
+        if (
+            cuerpo &&
+            typeof cuerpo.error === "string" &&
+            cuerpo.error !== ""
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: cuerpo.error,
+
+                data: cuerpo,
+
+                codigo: cuerpo.error
+
+            };
+
+        }
+
+        // --------------------------------------------------
+        // HTTP error sin cuerpo JSON (p. ej. un 502 en HTML)
+        // --------------------------------------------------
+
+        if (!response.ok) {
+
+            return {
+
+                ok: false,
+
+                message: `HTTP ${response.status}`,
+
+                data: cuerpo,
+
+                codigo: null
+
+            };
+
+        }
+
+        // --------------------------------------------------
+        // 2xx con un cuerpo que no corresponde al contrato
+        // --------------------------------------------------
+
+        return {
+
+            ok: false,
+
+            message: "Respuesta inesperada de la API",
+
+            data: cuerpo,
+
+            codigo: null
+
+        };
+
+    }
+    catch (error) {
+
+        // Timeout del AbortSignal: el backend no respondió
+        // dentro de TIENDA_API.TIMEOUT.
+        if (
+            error &&
+            (error.name === "TimeoutError" || error.name === "AbortError")
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: "La tienda tardó en responder. Intentá nuevamente.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        return {
+
+            ok: false,
+
+            message: "No fue posible conectar con la tienda. Intentá nuevamente.",
+
+            data: null,
+
+            codigo: null
+
+        };
+
+    }
+
+}
+
+// =======================================================
+// PEDIDOS VERIFICADOS — POST /email-verificaciones/pedidos
+// =======================================================
+//
+// Contrato real auditado del backend:
+//
+//   POST ${TIENDA_API.URL}/email-verificaciones/pedidos
+//   headers: Accept + Content-Type application/json
+//   body: { token }
+//
+//   200 { resultado: "ok", pedidos: [ {
+//           id, estado,
+//           items: [ { producto_id, cantidad,
+//                      precio_unitario } ] } ] }
+//        Endpoint de SÓLO LECTURA: devuelve los Pedidos
+//        asociados al token de verificación de email, con
+//        sus PedidoItem incluidos.
+//   400 { error }  ("token_invalido" | "token_expirado" |
+//                    "verificacion_pendiente" | errores de
+//                    validación del body/token)
+//   404 / 405 / 500 { error }
+//
+// Envelope { ok, message, data, codigo }:
+//
+//   ok: true  => 200 y data.resultado === "ok" con
+//                data.pedidos un array. No implica que
+//                haya un Pedido para pagar: eso lo decide
+//                el llamador (estado "PEND_PAGO").
+//   ok: false => el backend respondió con error, la
+//                respuesta no corresponde al contrato o
+//                falló la conexión. message es apto para
+//                mostrarsele al usuario.
+//   codigo     => código crudo del backend cuando existe
+//                (p. ej. "token_invalido",
+//                "verificacion_pendiente"); null si no hay
+//                código identificable.
+//   data       => cuerpo JSON crudo de la respuesta, o null
+//                si no hubo cuerpo.
+//
+// No crea ni modifica Pedidos. Los items[] de cada Pedido
+// son la fuente de verdad para continuar la compra: no se
+// reconstruyen desde el carrito de sessionStorage.
+
+async function obtenerPedidosVerificados(token) {
+
+    try {
+
+        // Sin configuración (por ejemplo, si ENVIRONMENT
+        // apunta a un PROD que todavía no existe).
+        if (!TIENDA_API.URL) {
+
+            return {
+
+                ok: false,
+
+                message: "La API de la tienda no está configurada en este entorno.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        // Sin token no se arma la ruta: se evita un request
+        // inválido al backend.
+        if (
+            token === null ||
+            token === undefined ||
+            token === ""
+        ) {
+
+            return {
+
+                ok: false,
+
+                message: "No pudimos identificar la verificación de tu email.",
+
+                data: null,
+
+                codigo: null
+
+            };
+
+        }
+
+        const response = await fetch(
+            `${TIENDA_API.URL}/email-verificaciones/pedidos`,
+            {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ token }),
+                signal: AbortSignal.timeout(TIENDA_API.TIMEOUT)
+            }
+        );
+
+        const cuerpo = await response.json().catch(() => null);
+
+        // --------------------------------------------------
+        // 200 - token válido: pedidos con sus items
+        // --------------------------------------------------
+
+        if (
+            response.ok &&
+            cuerpo &&
+            typeof cuerpo === "object" &&
+            cuerpo.resultado === "ok" &&
+            Array.isArray(cuerpo.pedidos)
+        ) {
+
+            return {
+
+                ok: true,
+
+                message: "",
+
+                data: cuerpo,
+
+                codigo: null
+
+            };
 
         }
 
