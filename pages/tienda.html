@@ -157,6 +157,30 @@
 
             </aside>
         </div>
+        <!-- ====================================================== 
+                        MENSAJE BLOQUEANTE: PEDIDO CREADO 
+        ======================================================= -->
+        <!-- Tras crear el pedido, tapa toda la tienda: el único control
+             funcional es [OK]. Escape, el fondo y otros controles no lo
+             cierran. Se muestra/oculta desde scripts/tienda.js. -->
+        <div id="pedido-creado-overlay" class="pedido-creado-overlay" hidden>
+            <div class="pedido-creado-dialogo" role="dialog" aria-modal="true"
+                aria-labelledby="pedido-creado-titulo" aria-describedby="pedido-creado-texto">
+                <h2 id="pedido-creado-titulo">Pedido creado</h2>
+                <p id="pedido-creado-texto">
+                    Te enviamos un correo electrónico a
+                    <span id="pedido-creado-email"></span>
+                    para verificar tu compra.
+                    <br><br>
+                    Abrí el enlace recibido para verificar tu dirección
+                    de correo y continuar con el pago en una nueva
+                    pestaña.
+                </p>
+                <button id="pedido-creado-ok" class="btn pedido-creado-ok" type="button">
+                    OK
+                </button>
+            </div>
+        </div>
         <!-- SCRIPTS -->
         <script src="../scripts/components.js"></script>
         <script src="../scripts/main.js"></script>

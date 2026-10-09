@@ -114,6 +114,18 @@ const checkoutEstado =
 const carritoEstado =
     document.querySelector("#carrito-estado");
 
+// Mensaje bloqueante mostrado tras crear el pedido (sólo [OK] cierra)
+const pedidoCreadoOverlay =
+    document.querySelector("#pedido-creado-overlay");
+
+const pedidoCreadoOk =
+    document.querySelector("#pedido-creado-ok");
+
+// Dirección de email del comprador mostrada dentro del mensaje
+// (insertada con textContent, nunca con innerHTML)
+const pedidoCreadoEmail =
+    document.querySelector("#pedido-creado-email");
+
 // Catálogo cargado en memoria (para resolver el clic por índice)
 let catalogoActual = [];
 
@@ -918,6 +930,22 @@ async function manejarEnvioPedido(evento) {
 
     if (enviandoPedido) return;
 
+    // Esta pestaña ya creó un Pedido para la compra en curso: no se crea
+    // otro desde acá hasta que el usuario confirme el mensaje con [OK]
+    // (que vacía el carrito y habilita una compra nueva).
+    if (pedidoCreado) {
+
+        mostrarEstadoCheckout(
+            "Tu pedido ya fue creado. Revisá tu correo para continuar la compra.",
+            ""
+        );
+
+        checkoutEstado?.focus();
+
+        return;
+
+    }
+
     const datos = leerDatosCheckout();
 
     if (!datos) return;
@@ -973,20 +1001,12 @@ async function manejarEnvioPedido(evento) {
 
         };
 
-        mostrarEstadoCheckout(
-            `Pedido creado. Te enviamos la verificación a ${datos.email}. Revisá tu correo para continuar.`,
-            "exito"
-        );
+        // Marca persistida: si el usuario cierra o restaura la pestaña
+        // sin confirmar el mensaje, el carrito de ESTA compra no debe
+        // reaparecer en la siguiente carga de la tienda.
+        marcarPedidoCreado(pedido.id);
 
-        [checkoutNombre, checkoutApellido, checkoutEmail].forEach(campo => {
-
-            if (campo) campo.disabled = true;
-
-        });
-
-        if (checkoutEnviar) checkoutEnviar.hidden = true;
-
-        checkoutEstado?.focus();
+        mostrarMensajePedidoCreado(datos.email);
 
         return;
 
@@ -1031,6 +1051,224 @@ async function manejarEnvioPedido(evento) {
     );
 
     checkoutEstado?.focus();
+
+}
+
+// ---------------------------------------------------------------------------
+// PEDIDO CREADO — MENSAJE BLOQUEANTE Y LIMPIEZA (cierre en A)
+// ---------------------------------------------------------------------------
+//
+// Tras el alta confirmada por el backend, ESTA pestaña muestra un mensaje
+// modal bloqueante: el carrito se conserva intacto, no se refresca el
+// catálogo y no hay interacciones con el resto de la página. El único
+// control funcional es [OK].
+//
+// [OK] vacía el carrito con la función existente vaciarCarrito(), limpia
+// el contexto local del pedido y del checkout, y recarga el catálogo
+// desde la API (disponibilidad habitual, sin fórmulas nuevas). No se
+// cancela nada en el backend.
+//
+// La marca en sessionStorage (propia de ESTA pestaña) garantiza que,
+// si el usuario recarga o restaura la pestaña sin presionar [OK], al
+// volver a cargar la tienda no reaparezca el carrito del pedido ya
+// creado. Al ser por pestaña, ninguna otra pestaña del sitio ve esta
+// marca ni ve afectado su carrito. No se guardan tokens ni datos de la
+// compra: sólo la marca de que el pedido fue creado.
+
+const CLAVE_PEDIDO_CREADO = "incancelables_pedido_creado";
+
+let mensajePedidoCreadoVisible = false;
+
+function marcarPedidoCreado(pedidoId) {
+
+    try {
+
+        sessionStorage.setItem(CLAVE_PEDIDO_CREADO, String(pedidoId ?? ""));
+
+    } catch (error) {
+
+        // Almacenamiento no disponible: la marca no persiste entre cargas.
+        void error;
+
+    }
+
+}
+
+function hayPedidoCreadoMarcado() {
+
+    try {
+
+        return sessionStorage.getItem(CLAVE_PEDIDO_CREADO) !== null;
+
+    } catch (error) {
+
+        void error;
+
+        return false;
+
+    }
+
+}
+
+function desmarcarPedidoCreado() {
+
+    try {
+
+        sessionStorage.removeItem(CLAVE_PEDIDO_CREADO);
+
+    } catch (error) {
+
+        void error;
+
+    }
+
+}
+
+function mostrarMensajePedidoCreado(email) {
+
+    if (!pedidoCreadoOverlay || mensajePedidoCreadoVisible) return;
+
+    // El drawer no debe quedar abierto debajo del mensaje.
+    cerrarCarrito();
+
+    // La dirección se inserta como texto plano (textContent): el valor
+    // proviene del checkout y no se interpreta como HTML.
+    if (pedidoCreadoEmail) {
+
+        pedidoCreadoEmail.textContent = email ?? "";
+
+    }
+
+    pedidoCreadoOverlay.hidden = false;
+
+    mensajePedidoCreadoVisible = true;
+
+    document.body.classList.add("pedido-creado-abierto");
+
+    document.addEventListener("keydown", bloquearTecladoDelMensaje, true);
+
+    document.addEventListener("click", bloquearClicDelMensaje, true);
+
+    document.addEventListener("focusin", retenerFocoEnElMensaje);
+
+    pedidoCreadoOk?.focus();
+
+}
+
+function ocultarMensajePedidoCreado() {
+
+    if (!pedidoCreadoOverlay || !mensajePedidoCreadoVisible) return;
+
+    pedidoCreadoOverlay.hidden = true;
+
+    mensajePedidoCreadoVisible = false;
+
+    // La dirección no permanece en el DOM tras cerrar el mensaje.
+    if (pedidoCreadoEmail) {
+
+        pedidoCreadoEmail.textContent = "";
+
+    }
+
+    document.body.classList.remove("pedido-creado-abierto");
+
+    document.removeEventListener("keydown", bloquearTecladoDelMensaje, true);
+
+    document.removeEventListener("click", bloquearClicDelMensaje, true);
+
+    document.removeEventListener("focusin", retenerFocoEnElMensaje);
+
+}
+
+// Escape no descarta el mensaje y Tab no sale del atrapado del foco:
+// el único control enfocable es [OK].
+function bloquearTecladoDelMensaje(evento) {
+
+    if (evento.key !== "Escape" && evento.key !== "Tab") return;
+
+    evento.preventDefault?.();
+
+    evento.stopPropagation?.();
+
+    if (evento.key === "Tab") pedidoCreadoOk?.focus();
+
+}
+
+// Ningún clic fuera del diálogo produce efecto en la página de fondo.
+function bloquearClicDelMensaje(evento) {
+
+    if (!pedidoCreadoOverlay) return;
+
+    if (pedidoCreadoOverlay.contains(evento.target)) return;
+
+    evento.preventDefault?.();
+
+    evento.stopPropagation?.();
+
+    evento.stopImmediatePropagation?.();
+
+}
+
+// El foco no escapa del diálogo (mouse o teclado).
+function retenerFocoEnElMensaje(evento) {
+
+    if (!pedidoCreadoOverlay) return;
+
+    if (pedidoCreadoOverlay.contains(evento.target)) return;
+
+    pedidoCreadoOk?.focus();
+
+}
+
+// Secuencia de [OK]: vaciar carrito, limpiar el contexto local del pedido
+// y del checkout, y recargar el catálogo desde la API. Si la recarga
+// falla, cargarCatalogo() deja el estado de error con reintentos y NO
+// muestra el catálogo viejo como si estuviera actualizado.
+async function confirmarPedidoCreado() {
+
+    if (!mensajePedidoCreadoVisible) return;
+
+    ocultarMensajePedidoCreado();
+
+    vaciarCarrito();
+
+    pedidoCreado = null;
+
+    desmarcarPedidoCreado();
+
+    restablecerCheckout();
+
+    mostrarEstadoCarrito("");
+
+    actualizarBadgeCarrito();
+
+    await cargarCatalogo();
+
+    volverAlCarrito();
+
+    botonCarrito?.focus();
+
+}
+
+// Restauración de pestaña (recarga, sesión de Chrome o vuelta con
+// bfcache) con un pedido ya creado: el carrito de esa compra no debe
+// reaparecer. Si el mensaje sigue visible en memoria (bfcache), el
+// estado interno es el autoritativo y no se toca nada.
+function limpiarPedidoCreadoPendiente() {
+
+    if (mensajePedidoCreadoVisible) return;
+
+    if (!hayPedidoCreadoMarcado()) return;
+
+    desmarcarPedidoCreado();
+
+    vaciarCarrito();
+
+    pedidoCreado = null;
+
+    actualizarBadgeCarrito();
+
+    refrescarCatalogo();
 
 }
 
@@ -2240,6 +2478,9 @@ function initCarrito() {
 
     checkoutVolver?.addEventListener("click", volverAlCarrito);
 
+    // Mensaje bloqueante de pedido creado: sólo [OK] avanza.
+    pedidoCreadoOk?.addEventListener("click", confirmarPedidoCreado);
+
     // El envío es un submit del formulario: el pedido se crea en
     // manejarEnvioPedido().
     checkoutDatos?.addEventListener("submit", manejarEnvioPedido);
@@ -2272,6 +2513,12 @@ function initCarrito() {
 // /////////////////////////////////////////////////////////////////////////////
 
 initCarrito();
+
+// Restauración de pestaña (recarga, sesión o bfcache) con un pedido ya
+// creado sin confirmar: el carrito de esa compra no debe reaparecer.
+window.addEventListener("pageshow", limpiarPedidoCreadoPendiente);
+
+limpiarPedidoCreadoPendiente();
 
 cargarCatalogo();
 

@@ -1057,3 +1057,74 @@ body.carrito-abierto {
     }
 
 }
+
+/* ==========================
+   MENSAJE BLOQUEANTE: PEDIDO CREADO
+   ========================== */
+
+/* Fondo bloqueado mientras el mensaje está visible */
+body.pedido-creado-abierto {
+
+    overflow: hidden;
+
+}
+
+/* Contenedor fijo a pantalla completa, por encima del drawer del
+   carrito (z-index 1200) y del aviso de tienda (1300). Sin controles
+   de cierre: Escape, el fondo y otros elementos no lo descartan. */
+.pedido-creado-overlay {
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 1400;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 1.5rem;
+
+    background: var(--overlay);
+
+}
+
+.pedido-creado-overlay[hidden] {
+
+    display: none;
+
+}
+
+.pedido-creado-dialogo {
+
+    width: min(100%, 28rem);
+
+    padding: 1.75rem;
+
+    background: var(--bg-alt);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    box-shadow: var(--shadow);
+
+    text-align: center;
+
+}
+
+.pedido-creado-dialogo h2 {
+
+    margin: 0 0 1rem;
+
+    font-size: 1.35rem;
+
+}
+
+.pedido-creado-dialogo p {
+
+    margin: 0 0 1.5rem;
+
+    line-height: 1.6;
+
+}
